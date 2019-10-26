@@ -271,130 +271,75 @@ morserinoMode morseState = morseKeyer;
 //////// variables and constants for the modus menu
 
 
-const uint8_t menuN = 47;     // no of menu items +1
+enum navi {naviLevel, naviLeft, naviRight, naviUp, naviDown };
 
-const String menuText [menuN] = {
-  "",
-  "CW Keyer", // 1
-  
-  "CW Generator", // 2
-    "Random",
-    "CW Abbrevs",
-    "English Words",
-    "Call Signs",
-    "Mixed",
-    "File Player",
-
-  "Head Copying", // 9
-    "Random",
-    "CW Abbrevs",
-    "English Words",
-    "Call Signs",
-    "Mixed",
-    "File Player",
-
-  "Echo Trainer", // 9 + 7
-    "Random",
-    "CW Abbrevs",
-    "English Words",
-    "Call Signs",
-    "Mixed",
-    "File Player",
-  
-  "Koch Trainer", // 16
-    "Select Lesson",
-    "Learn New Chr",
-    "CW Generator",   // 19
-      "Random",   // 20
-      "CW Abbrevs",
-      "English Words",
-      "Mixed",
-    "Echo Trainer",   // 24
-      "Random",
-      "CW Abbrevs",
-      "English Words",
-      "Mixed",
-  
-  "Transceiver",    // 29
-    "LoRa Trx",
-    "iCW/Ext Trx",
-  
-  "CW Decoder",     // 32
-
-  "WiFi Functions", // 33
-    "Disp MAC Addr",
-    "Config WiFi",
-    "Check WiFi",
-    "Upload File",
-    "Update Firmw", //38
-  
-  
-  "Go To Sleep" } ; // 39
-
-enum navi {naviLevel, item, naviLeft, naviRight, naviUp, naviDown };
 enum menuNo { _dummy, _keyer, 
               _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
-              _head, _headRand, _headAbb, _headWords, _headCalls, _headMixed, _headPlayer,
               _echo, _echoRand, _echoAbb, _echoWords, _echoCalls, _echoMixed, _echoPlayer,
               _koch, _kochSel, _kochLearn, _kochGen, _kochGenRand, _kochGenAbb, _kochGenWords,
               _kochGenMixed, _kochEcho, _kochEchoRand, _kochEchoAbb, _kochEchoWords, _kochEchoMixed,
               _trx, _trxLora, _trxIcw, _decode, _wifi, _wifi_mac, _wifi_config, _wifi_check, _wifi_upload, _wifi_update, _goToSleep };
-              
 
-const uint8_t menuNav [menuN] [6] = {                   // { level, item, left, right, up, down}
-  { 0,_dummy, 0,0,0,0},                                         // 0 = dummy                
-  {0,_keyer,_goToSleep,_gen,_dummy,0},                         // 1 keyer
-  {0,_gen,_keyer,_echo,_dummy,_genRand},                     // 2 generator
-  {1,_genRand,_genPlayer,_genAbb,_gen,0},                        // 3 gen random
-  {1,_genAbb,_genRand,_genWords,_gen,0},                        // 4 gen Abb
-  {1,_genWords,_genAbb,_genCalls,_gen,0},                         // 5 gen words
-  {1,_genCalls,_genWords,_genMixed,_gen,0},                       // 6 gen calls
-  {1,_genMixed,_genCalls,_genPlayer,_gen,0},                      // 7 gen mixed
-  {1,_genPlayer,_genMixed,_genRand,_gen,0},                        // 8 gen player
+
+typedef struct MenuItem {
+  String text;
+  menuNo no;
+  uint8_t nav[5];
+} menuItem_t;
+
+
+const menuItem_t menuItems [] = {
+  {"",_dummy, { 0,0,0,0,0}},               
+  {"CW Keyer",_keyer, {0,_goToSleep,_gen,_dummy,0}},
   
-  {0,_head,_genPlayer,_echo,_dummy,_genRand},                     // 2 head
-  {1,_headRand,_genPlayer,_genAbb,_gen,0},                        // 3 head random
-  {1,_headAbb,_genRand,_genWords,_gen,0},                        // 4 head Abb
-  {1,_headWords,_genAbb,_genCalls,_gen,0},                         // 5 head words
-  {1,_headCalls,_genWords,_genMixed,_gen,0},                       // 6 head calls
-  {1,_headMixed,_genCalls,_genPlayer,_gen,0},                      // 7 head mixed
-  {1,_headPlayer,_genMixed,_genRand,_gen,0},                        // 8 head player
+  {"CW Generator",_gen, {0,_keyer,_echo,_dummy,_genRand}},
+  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}},
+  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}},
+  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}},
+  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}},
+  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}},
+  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}},
 
-  {0,_echo,_gen,_koch,_dummy,_echoRand},                      // 9 echo tr
-  {1,_echoRand,_echoPlayer,_echoAbb,_echo,0},                     // 10 echo random
-  {1,_echoAbb,_echoRand,_echoWords,_echo,0},                     // 11 echo abb
-  {1,_echoWords,_echoAbb,_echoCalls,_echo,0},                      // 12 echo words
-  {1,_echoCalls,_echoWords,_echoMixed,_echo,0},                    // 13 echo calls
-  {1,_echoMixed,_echoCalls,_echoPlayer,_echo,0},                   // 14 echo mixed
-  {1,_echoPlayer,_echoMixed,_echoRand,_echo,0},                     // 15 echo player
+  {"Echo Trainer",_echo, {0,_keyer,_koch,_dummy,_echoRand}},
+  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}},
+  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}},
+  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}},
+  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}},
+  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}},
+  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}},
 
-  {0,_koch,_echo,_trx,_dummy,_kochSel},                          // 16 koch
-  {1,_kochSel,_kochEcho,_kochLearn,_koch,0},                     // 17 koch select
-  {1,_kochLearn,_kochSel,_kochGen,_koch,0},                        // 18 koch learn new
-  {1,_kochGen,_kochLearn,_kochEcho,_koch,_kochGenRand},          // 19 koch gen
-  {2,_kochGenRand,_kochGenMixed,_kochGenAbb,_kochGen,0},             // 20 koch gen random
-  {2,_kochGenAbb,_kochGenRand,_kochGenWords,_kochGen,0},            // 21 koch gen abb
-  {2,_kochGenWords,_kochGenAbb,_kochGenMixed,_kochGen,0},             // 22 koch gen words
-  {2,_kochGenMixed,_kochGenWords,_kochGenRand,_kochGen,0},            // 23 koch gen mixed
+  {"Koch Trainer",_koch,  {0,_echo,_trx,_dummy,_kochSel}},
+  {"Select Lesson",_kochSel, {1,_kochEcho,_kochLearn,_koch,0}},
+  {"Learn New Chr",_kochLearn, {1,_kochSel,_kochGen,_koch,0}},
+  {"CW Generator",_kochGen, {1,_kochLearn,_kochEcho,_koch,_kochGenRand}},
+  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}},
+  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}},
+  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}},
+  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}},
 
-  {1,_kochEcho,_kochGen,_kochSel,_koch,_kochEchoRand},            // 24 koch echo
-  {2,_kochEchoRand,_kochEchoMixed,_kochEchoAbb,_kochEcho,0},          // 25 koch echo random
-  {2,_kochEchoAbb,_kochEchoRand,_kochEchoWords,_kochEcho,0},         // 26 koch echo abb
-  {2,_kochEchoWords,_kochEchoAbb,_kochEchoMixed,_kochEcho,0},          // 27 koch echo words
-  {2,_kochEchoMixed,_kochEchoWords,_kochEchoRand,_kochEcho,0},         // 28 koch echo mixed
+  {"Echo Trainer",_kochEcho, {1,_kochGen,_kochSel,_koch,_kochEchoRand}},
+  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}},
+  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}},
+  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}},
+  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}},
 
-  {0,_trx,_koch,_decode,_dummy,_trxLora},                    // 29 transceiver
-  {1,_trxLora,_trxIcw,_trxIcw,_trx,0},                           // 30 lora
-  {1,_trxIcw,_trxLora,_trxLora,_trx,0},                         // 31 icw
-  {0,_decode,_trx,_wifi,_dummy,0},                              // 32 decoder
-  {0,_wifi,_decode,_goToSleep,_dummy,_wifi_mac},              // 33 WiFi
-  {1,_wifi_mac,_wifi_update,_wifi_config,_wifi,0},                // 34 Disp Mac
-  {1,_wifi_config,_wifi_mac,_wifi_check,_wifi,0},                    // 35 Config Wifi
-  {1,_wifi_check,_wifi_config,_wifi_upload,_wifi,0},                // 36 Check WiFi
-  {1,_wifi_upload,_wifi_check,_wifi_update,_wifi,0},                 // 37 Upload File
-  {1,_wifi_update,_wifi_upload,_wifi_mac,_wifi,0},                   // 38 Update Firmware 
-  {0,_goToSleep,_wifi,_keyer,_dummy,0}                             // 39 goto sleep
+  {"Transceiver",_trx, {0,_koch,_decode,_dummy,_trxLora}},
+  {"LoRa Trx",_trxLora, {1,_trxIcw,_trxIcw,_trx,0}},
+  {"iCW/Ext Trx",_trxIcw, {1,_trxLora,_trxLora,_trx,0}},
+
+  {"CW Decoder",_decode, {0,_trx,_wifi,_dummy,0}},
+
+  {"WiFi Functions",_wifi, {0,_decode,_goToSleep,_dummy,_wifi_mac}},
+  {"Disp MAC Addr",_wifi_mac, {1,_wifi_update,_wifi_config,_wifi,0}},
+  {"Config WiFi",_wifi_config, {1,_wifi_mac,_wifi_check,_wifi,0}},
+  {"Check WiFi",_wifi_check, {1,_wifi_config,_wifi_upload,_wifi,0}},
+  {"Upload File",_wifi_upload, {1,_wifi_check,_wifi_update,_wifi,0}},
+  {"Update Firmw",_wifi_update, {1,_wifi_upload,_wifi_mac,_wifi,0}},
+
+  {"Go To Sleep",_goToSleep, {0,_wifi,_keyer,_dummy,0}}
+
 };
+
 
 boolean quickStart;                                     // should we execute menu item immediately?
 
@@ -1626,7 +1571,7 @@ void menu_() {
                   break;
           case 1: // check if we have a submenu or if we execute the selection
                   //Serial.println("newMP: " + String(newMenuPtr) + " navi: " + String(menuNav[newMenuPtr][naviDown]));
-                  if (menuNav[newMenuPtr][naviDown] == 0) {
+                  if (menuItems[newMenuPtr].nav[naviDown] == 0) {
                       p_menuPtr = newMenuPtr;
                       disp = 0;
                       if (p_menuPtr < _wifi) {                        // remember last executed, unless it is a wifi function or shutdown
@@ -1637,18 +1582,18 @@ void menu_() {
                       if (menuExec())
                         return;
                   } else {
-                      newMenuPtr = menuNav[newMenuPtr][naviDown];
+                      newMenuPtr = menuItems[newMenuPtr].nav[naviDown];
                   }
                   break;
           case -1:  // we need to go one level up, if possible
-                  if (menuNav[newMenuPtr][naviUp] != 0) 
-                      newMenuPtr = menuNav[newMenuPtr][naviUp];
+                  if (menuItems[newMenuPtr].nav[naviUp] != 0) 
+                      newMenuPtr = menuItems[newMenuPtr].nav[naviUp];
           default: break;
         }
 
        if ((t=checkEncoder())) {
           //pwmClick(p_sidetoneVolume);         /// click 
-          newMenuPtr =  menuNav [newMenuPtr][(t == -1) ? naviLeft : naviRight];
+          newMenuPtr =  menuItems[newMenuPtr].nav[(t == -1) ? naviLeft : naviRight];
        }
 
        volButton.Update();
@@ -1668,10 +1613,10 @@ void menu_() {
 
 
 void menuDisplay(uint8_t ptr) {
-  //Serial.println("Level: " + (String) menuNav [ptr][naviLevel] + " " + menuText[ptr]);
-  uint8_t oneUp = menuNav[ptr][naviUp];
-  uint8_t twoUp = menuNav[oneUp][naviUp];
-  uint8_t oneDown = menuNav[ptr][naviDown];
+  //Serial.println("Level: " + (String) menuItems[ptr].nav[naviLevel] + " " + menuItems[ptr].text);
+  uint8_t oneUp = menuItems[ptr].nav[naviUp];
+  uint8_t twoUp = menuItems[oneUp].nav[naviUp];
+  uint8_t oneDown = menuItems[ptr].nav[naviDown];
     
   printOnStatusLine(true, 0,  "Select Modus:     ");
 
@@ -1680,20 +1625,20 @@ void menuDisplay(uint8_t ptr) {
   /// level 0: top line, possibly ".." on line 1
   /// level 1: higher level on 0, item on 1, possibly ".." on 2
   /// level 2: higher level on 1, highest level on 0, item on 2
-  switch (menuNav [ptr][naviLevel]) {
-    case 2: printOnScroll(2, BOLD, 0, menuText[ptr]);
-            printOnScroll(1, REGULAR, 0, menuText[oneUp]);
-            printOnScroll(0, REGULAR, 0, menuText[twoUp]);
+  switch (menuItems[ptr].nav[naviLevel]) {
+    case 2: printOnScroll(2, BOLD, 0, menuItems[ptr].text);
+            printOnScroll(1, REGULAR, 0, menuItems[oneUp].text);
+            printOnScroll(0, REGULAR, 0, menuItems[twoUp].text);
             break;
     case 1: if (oneDown)
                 printOnScroll(2, REGULAR, 0, String(".."));
-            printOnScroll(1, BOLD, 0, menuText[ptr]);
-            printOnScroll(0, REGULAR, 0, menuText[oneUp]);
+            printOnScroll(1, BOLD, 0, menuItems[ptr].text);
+            printOnScroll(0, REGULAR, 0, menuItems[oneUp].text);
             break;
     case 0: 
             if (oneDown)
                 printOnScroll(1, REGULAR, 0, String(".."));
-            printOnScroll(0, BOLD, 0, menuText[ptr]);
+            printOnScroll(0, BOLD, 0, menuItems[ptr].text);
             break;
   }
 }
