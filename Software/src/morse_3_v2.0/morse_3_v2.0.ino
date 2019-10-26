@@ -130,7 +130,7 @@ const int PinDT=39;                    // Used for reading DT signal  - needs ex
 const int batteryPin = 13;
 
 // pin to switch ON Vext
-const int Vext = 21;
+//const int Vext = 21;
 
 
 #else
@@ -271,7 +271,7 @@ morserinoMode morseState = morseKeyer;
 //////// variables and constants for the modus menu
 
 
-const uint8_t menuN = 40;     // no of menu items +1
+const uint8_t menuN = 47;     // no of menu items +1
 
 const String menuText [menuN] = {
   "",
@@ -285,7 +285,15 @@ const String menuText [menuN] = {
     "Mixed",
     "File Player",
 
-  "Echo Trainer", // 9
+  "Head Copying", // 9
+    "Random",
+    "CW Abbrevs",
+    "English Words",
+    "Call Signs",
+    "Mixed",
+    "File Player",
+
+  "Echo Trainer", // 9 + 7
     "Random",
     "CW Abbrevs",
     "English Words",
@@ -323,55 +331,69 @@ const String menuText [menuN] = {
   
   "Go To Sleep" } ; // 39
 
-enum navi {naviLevel, naviLeft, naviRight, naviUp, naviDown };
-enum menuNo { _dummy, _keyer, _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
+enum navi {naviLevel, item, naviLeft, naviRight, naviUp, naviDown };
+enum menuNo { _dummy, _keyer, 
+              _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
+              _head, _headRand, _headAbb, _headWords, _headCalls, _headMixed, _headPlayer,
               _echo, _echoRand, _echoAbb, _echoWords, _echoCalls, _echoMixed, _echoPlayer,
               _koch, _kochSel, _kochLearn, _kochGen, _kochGenRand, _kochGenAbb, _kochGenWords,
               _kochGenMixed, _kochEcho, _kochEchoRand, _kochEchoAbb, _kochEchoWords, _kochEchoMixed,
               _trx, _trxLora, _trxIcw, _decode, _wifi, _wifi_mac, _wifi_config, _wifi_check, _wifi_upload, _wifi_update, _goToSleep };
               
 
-const uint8_t menuNav [menuN] [5] = {                   // { level, left, right, up, down}
-  { 0,0,0,0,0},                                         // 0 = dummy                
-  {0,_goToSleep,_gen,_dummy,0},                         // 1 keyer
-  {0,_keyer,_echo,_dummy,_genRand},                     // 2 generator
-  {1,_genPlayer,_genAbb,_gen,0},                        // 3 gen random
-  {1,_genRand,_genWords,_gen,0},                        // 4 gen Abb
-  {1,_genAbb,_genCalls,_gen,0},                         // 5 gen words
-  {1,_genWords,_genMixed,_gen,0},                       // 6 gen calls
-  {1,_genCalls,_genPlayer,_gen,0},                      // 7 gen mixed
-  {1,_genMixed,_genRand,_gen,0},                        // 8 gen player
-  {0,_gen,_koch,_dummy,_echoRand},                      // 9 echo tr
-  {1,_echoPlayer,_echoAbb,_echo,0},                     // 10 echo random
-  {1,_echoRand,_echoWords,_echo,0},                     // 11 echo abb
-  {1,_echoAbb,_echoCalls,_echo,0},                      // 12 echo words
-  {1,_echoWords,_echoMixed,_echo,0},                    // 13 echo calls
-  {1,_echoCalls,_echoPlayer,_echo,0},                   // 14 echo mixed
-  {1,_echoMixed,_echoRand,_echo,0},                     // 15 echo player
-  {0,_echo,_trx,_dummy,_kochSel},                          // 16 koch
-  {1,_kochEcho,_kochLearn,_koch,0},                     // 17 koch select
-  {1,_kochSel,_kochGen,_koch,0},                        // 18 koch learn new
-  {1,_kochLearn,_kochEcho,_koch,_kochGenRand},          // 19 koch gen
-  {2,_kochGenMixed,_kochGenAbb,_kochGen,0},             // 20 koch gen random
-  {2,_kochGenRand,_kochGenWords,_kochGen,0},            // 21 koch gen abb
-  {2,_kochGenAbb,_kochGenMixed,_kochGen,0},             // 22 koch gen words
-  {2,_kochGenWords,_kochGenRand,_kochGen,0},            // 23 koch gen mixed
-  {1,_kochGen,_kochSel,_koch,_kochEchoRand},            // 24 koch echo
-  {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0},          // 25 koch echo random
-  {2,_kochEchoRand,_kochEchoWords,_kochEcho,0},         // 26 koch echo abb
-  {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0},          // 27 koch echo words
-  {2,_kochEchoWords,_kochEchoRand,_kochEcho,0},         // 28 koch echo mixed
-  {0,_koch,_decode,_dummy,_trxLora},                    // 29 transceiver
-  {1,_trxIcw,_trxIcw,_trx,0},                           // 30 lora
-  {1,_trxLora,_trxLora,_trx,0},                         // 31 icw
-  {0,_trx,_wifi,_dummy,0},                              // 32 decoder
-  {0,_decode,_goToSleep,_dummy,_wifi_mac},              // 33 WiFi
-  {1,_wifi_update,_wifi_config,_wifi,0},                // 34 Disp Mac
-  {1,_wifi_mac,_wifi_check,_wifi,0},                    // 35 Config Wifi
-  {1,_wifi_config,_wifi_upload,_wifi,0},                // 36 Check WiFi
-  {1,_wifi_check,_wifi_update,_wifi,0},                 // 37 Upload File
-  {1,_wifi_upload,_wifi_mac,_wifi,0},                   // 38 Update Firmware 
-  {0,_wifi,_keyer,_dummy,0}                             // 39 goto sleep
+const uint8_t menuNav [menuN] [6] = {                   // { level, item, left, right, up, down}
+  { 0,_dummy, 0,0,0,0},                                         // 0 = dummy                
+  {0,_keyer,_goToSleep,_gen,_dummy,0},                         // 1 keyer
+  {0,_gen,_keyer,_echo,_dummy,_genRand},                     // 2 generator
+  {1,_genRand,_genPlayer,_genAbb,_gen,0},                        // 3 gen random
+  {1,_genAbb,_genRand,_genWords,_gen,0},                        // 4 gen Abb
+  {1,_genWords,_genAbb,_genCalls,_gen,0},                         // 5 gen words
+  {1,_genCalls,_genWords,_genMixed,_gen,0},                       // 6 gen calls
+  {1,_genMixed,_genCalls,_genPlayer,_gen,0},                      // 7 gen mixed
+  {1,_genPlayer,_genMixed,_genRand,_gen,0},                        // 8 gen player
+  
+  {0,_head,_genPlayer,_echo,_dummy,_genRand},                     // 2 head
+  {1,_headRand,_genPlayer,_genAbb,_gen,0},                        // 3 head random
+  {1,_headAbb,_genRand,_genWords,_gen,0},                        // 4 head Abb
+  {1,_headWords,_genAbb,_genCalls,_gen,0},                         // 5 head words
+  {1,_headCalls,_genWords,_genMixed,_gen,0},                       // 6 head calls
+  {1,_headMixed,_genCalls,_genPlayer,_gen,0},                      // 7 head mixed
+  {1,_headPlayer,_genMixed,_genRand,_gen,0},                        // 8 head player
+
+  {0,_echo,_gen,_koch,_dummy,_echoRand},                      // 9 echo tr
+  {1,_echoRand,_echoPlayer,_echoAbb,_echo,0},                     // 10 echo random
+  {1,_echoAbb,_echoRand,_echoWords,_echo,0},                     // 11 echo abb
+  {1,_echoWords,_echoAbb,_echoCalls,_echo,0},                      // 12 echo words
+  {1,_echoCalls,_echoWords,_echoMixed,_echo,0},                    // 13 echo calls
+  {1,_echoMixed,_echoCalls,_echoPlayer,_echo,0},                   // 14 echo mixed
+  {1,_echoPlayer,_echoMixed,_echoRand,_echo,0},                     // 15 echo player
+
+  {0,_koch,_echo,_trx,_dummy,_kochSel},                          // 16 koch
+  {1,_kochSel,_kochEcho,_kochLearn,_koch,0},                     // 17 koch select
+  {1,_kochLearn,_kochSel,_kochGen,_koch,0},                        // 18 koch learn new
+  {1,_kochGen,_kochLearn,_kochEcho,_koch,_kochGenRand},          // 19 koch gen
+  {2,_kochGenRand,_kochGenMixed,_kochGenAbb,_kochGen,0},             // 20 koch gen random
+  {2,_kochGenAbb,_kochGenRand,_kochGenWords,_kochGen,0},            // 21 koch gen abb
+  {2,_kochGenWords,_kochGenAbb,_kochGenMixed,_kochGen,0},             // 22 koch gen words
+  {2,_kochGenMixed,_kochGenWords,_kochGenRand,_kochGen,0},            // 23 koch gen mixed
+
+  {1,_kochEcho,_kochGen,_kochSel,_koch,_kochEchoRand},            // 24 koch echo
+  {2,_kochEchoRand,_kochEchoMixed,_kochEchoAbb,_kochEcho,0},          // 25 koch echo random
+  {2,_kochEchoAbb,_kochEchoRand,_kochEchoWords,_kochEcho,0},         // 26 koch echo abb
+  {2,_kochEchoWords,_kochEchoAbb,_kochEchoMixed,_kochEcho,0},          // 27 koch echo words
+  {2,_kochEchoMixed,_kochEchoWords,_kochEchoRand,_kochEcho,0},         // 28 koch echo mixed
+
+  {0,_trx,_koch,_decode,_dummy,_trxLora},                    // 29 transceiver
+  {1,_trxLora,_trxIcw,_trxIcw,_trx,0},                           // 30 lora
+  {1,_trxIcw,_trxLora,_trxLora,_trx,0},                         // 31 icw
+  {0,_decode,_trx,_wifi,_dummy,0},                              // 32 decoder
+  {0,_wifi,_decode,_goToSleep,_dummy,_wifi_mac},              // 33 WiFi
+  {1,_wifi_mac,_wifi_update,_wifi_config,_wifi,0},                // 34 Disp Mac
+  {1,_wifi_config,_wifi_mac,_wifi_check,_wifi,0},                    // 35 Config Wifi
+  {1,_wifi_check,_wifi_config,_wifi_upload,_wifi,0},                // 36 Check WiFi
+  {1,_wifi_upload,_wifi_check,_wifi_update,_wifi,0},                 // 37 Upload File
+  {1,_wifi_update,_wifi_upload,_wifi_mac,_wifi,0},                   // 38 Update Firmware 
+  {0,_goToSleep,_wifi,_keyer,_dummy,0}                             // 39 goto sleep
 };
 
 boolean quickStart;                                     // should we execute menu item immediately?
