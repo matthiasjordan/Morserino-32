@@ -270,6 +270,7 @@ morserinoMode morseState = morseKeyer;
 
 //////// variables and constants for the modus menu
 
+enum GEN_TYPE { RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, KOCH_LEARN };              // the things we can generate in generator mode
 
 enum navi {naviLevel, naviLeft, naviRight, naviUp, naviDown };
 
@@ -278,6 +279,7 @@ enum menuNo { _dummy, _keyer,
               _echo, _echoRand, _echoAbb, _echoWords, _echoCalls, _echoMixed, _echoPlayer,
               _koch, _kochSel, _kochLearn, _kochGen, _kochGenRand, _kochGenAbb, _kochGenWords,
               _kochGenMixed, _kochEcho, _kochEchoRand, _kochEchoAbb, _kochEchoWords, _kochEchoMixed,
+              _head, _headRand, _headAbb, _headWords, _headCalls, _headMixed, _headPlayer,
               _trx, _trxLora, _trxIcw, _decode, _wifi, _wifi_mac, _wifi_config, _wifi_check, _wifi_upload, _wifi_update, _goToSleep };
 
 
@@ -285,6 +287,7 @@ typedef struct MenuItem {
   String text;
   menuNo no;
   uint8_t nav[5];
+  GEN_TYPE generatorMode;
 } menuItem_t;
 
 
@@ -293,37 +296,45 @@ const menuItem_t menuItems [] = {
   {"CW Keyer",_keyer, {0,_goToSleep,_gen,_dummy,0}},
   
   {"CW Generator",_gen, {0,_keyer,_echo,_dummy,_genRand}},
-  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}},
-  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}},
-  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}},
-  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}},
-  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}},
-  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}},
+  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}, RANDOMS},
+  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}, ABBREVS},
+  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}, WORDS},
+  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}, CALLS},
+  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}, MIXED},
+  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}, PLAYER},
 
-  {"Echo Trainer",_echo, {0,_keyer,_koch,_dummy,_echoRand}},
-  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}},
-  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}},
-  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}},
-  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}},
-  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}},
-  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}},
+  {"Echo Trainer",_echo, {0,_gen,_koch,_dummy,_echoRand}},
+  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}, RANDOMS},
+  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}, ABBREVS},
+  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}, WORDS},
+  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}, CALLS},
+  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}, MIXED},
+  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}, PLAYER},
 
-  {"Koch Trainer",_koch,  {0,_echo,_trx,_dummy,_kochSel}},
+  {"Koch Trainer",_koch,  {0,_echo,_head,_dummy,_kochSel}},
   {"Select Lesson",_kochSel, {1,_kochEcho,_kochLearn,_koch,0}},
   {"Learn New Chr",_kochLearn, {1,_kochSel,_kochGen,_koch,0}},
   {"CW Generator",_kochGen, {1,_kochLearn,_kochEcho,_koch,_kochGenRand}},
-  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}},
-  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}},
-  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}},
-  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}},
+  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}, RANDOMS},
+  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}, ABBREVS},
+  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}, WORDS},
+  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}, MIXED},
 
   {"Echo Trainer",_kochEcho, {1,_kochGen,_kochSel,_koch,_kochEchoRand}},
-  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}},
-  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}},
-  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}},
-  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}},
+  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}, RANDOMS},
+  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}, ABBREVS},
+  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}, WORDS},
+  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}, MIXED},
 
-  {"Transceiver",_trx, {0,_koch,_decode,_dummy,_trxLora}},
+  {"Head Copying",_head, {0,_koch,_trx,_dummy,_headRand}},
+  {"Random",_headRand, {1,_headPlayer,_headAbb,_head,0}, RANDOMS},
+  {"CW Abbrevs",_headAbb, {1,_headRand,_headWords,_head,0}, ABBREVS},
+  {"English Words",_headWords, {1,_headAbb,_headCalls,_head,0}, WORDS},
+  {"Call Signs",_headCalls, {1,_headWords,_headMixed,_head,0}, CALLS},
+  {"Mixed",_headMixed, {1,_headCalls,_headPlayer,_head,0}, MIXED},
+  {"File Player",_headPlayer, {1,_headMixed,_headRand,_head,0}, PLAYER},
+
+  {"Transceiver",_trx, {0,_head,_decode,_dummy,_trxLora}},
   {"LoRa Trx",_trxLora, {1,_trxIcw,_trxIcw,_trx,0}},
   {"iCW/Ext Trx",_trxIcw, {1,_trxLora,_trxLora,_trx,0}},
 
@@ -430,7 +441,6 @@ volatile uint64_t TOTcounter;                       // holds millis for Time-Out
 char numBuffer[16];                // for number to string conversion with sprintf()
 
 
-enum GEN_TYPE { RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, KOCH_LEARN };              // the things we can generate in generator mode
 enum DISPLAY_TYPE { NO_DISPLAY, DISPLAY_BY_CHAR, DISPLAY_BY_WORD };   // how we display in trainer mode
 enum random_OPTIONS {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO, OPT_KOCH };
 enum PROMPT_TYPE { NO_PROMPT, CODE_ONLY , DISP_ONLY ,CODE_AND_DISP };
@@ -1650,6 +1660,8 @@ boolean menuExec() {                                          // return true if 
   //Serial.println("Executing menu item " + String(p_menuPtr));
 
   uint32_t wcount = 0;
+
+  p_autoStop = false;
   
   kochActive = false;
   switch (p_menuPtr) {
@@ -1667,17 +1679,26 @@ boolean menuExec() {                                          // return true if 
                 keyTx = true;
                 return true;
                 break;
+
+     case _headRand:
+     case _headAbb:
+     case _headWords:
+     case _headCalls:
+     case _headMixed:      /// head copying
+                p_autoStop = true;
      case _genRand:
      case _genAbb:
      case _genWords:
      case _genCalls:
      case _genMixed:      /// generator
-                generatorMode = (GEN_TYPE) (p_menuPtr - 3);                   /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = generatorOptions;                            // list of available options in generator mode
                 currentOptionSize = SizeOfArray(generatorOptions);
                 goto startTrainer;
+     case _headPlayer:
+                p_autoStop = true;
      case _genPlayer:  
-                generatorMode = (GEN_TYPE) (p_menuPtr - 3);                   /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = playerOptions;                               // list of available options in player mode
                 currentOptionSize = SizeOfArray(playerOptions);
                 file = SPIFFS.open("/player.txt");                            // open file
@@ -1708,10 +1729,10 @@ boolean menuExec() {                                          // return true if 
       case  _echoMixed:
                 currentOptions = echoTrainerOptions;                        // list of available options in echo trainer mode
                 currentOptionSize = SizeOfArray(echoTrainerOptions);
-                generatorMode = (GEN_TYPE) (p_menuPtr - 10);                /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 goto startEcho;
       case  _echoPlayer:    /// echo trainer
-                generatorMode = (GEN_TYPE) (p_menuPtr - 10);                /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = echoPlayerOptions;                         // list of available options in echo player mode
                 currentOptionSize = SizeOfArray(echoPlayerOptions);
                 file = SPIFFS.open("/player.txt");                            // open file
