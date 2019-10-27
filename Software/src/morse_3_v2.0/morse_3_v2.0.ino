@@ -378,8 +378,10 @@ enum prefPos  { posClicks, posPitch, posExtPaddles, posPolarity,
                 posRandomLength, posCallLength, posAbbrevLength, posWordLength, 
                 posTrainerDisplay, posWordDoubler, posEchoDisplay, posEchoRepeats,  posEchoConf, 
                 posKeyTrainerMode, posLoraTrainerMode, posGoertzelBandwidth, posSpeedAdapt,
-                posKochSeq, posKochFilter, posLatency, posRandomFile, posTimeOut, posQuickStart, posLoraSyncW,
-                posLoraBand, posLoraQRG, posSnapRecall, posSnapStore, posMaxSequence};
+                posKochSeq, posKochFilter, posLatency, posRandomFile, 
+                posTimeOut, posQuickStart, posLoraSyncW,
+                posLoraBand, posLoraQRG, posSnapRecall, posSnapStore, 
+                posMaxSequence};
 
 const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", 
                               "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce", 
@@ -388,13 +390,16 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
                               "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", 
                               "Key ext TX   ", "Send via LoRa", "Bandwidth    ", "Adaptv. Speed",  
                               "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-                              "Time Out     ", "Quick Start  ", "Auto Stop    ", "LoRa Channel  ",
+                              "Time Out     ", "Quick Start  ", "LoRa Channel  ",
                               "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
                               "Max # of Words"};                   
  prefPos keyerOptions[] =      {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS, posKeyTrainerMode, posTimeOut, posQuickStart };
  prefPos generatorOptions[] =  {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, 
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
                                     posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
+ prefPos headOptions[] =  {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, 
+                                    posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
+                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos playerOptions[] =     {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, 
                                      posRandomFile, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos echoPlayerOptions[] = {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
@@ -1658,6 +1663,8 @@ void menuDisplay(uint8_t ptr) {
 ///////////// GEN_TYPE { RANDOMS, ABBREVS, WORDS, CALLS, MIXED, KOCH_MIXED, KOCH_LEARN };           // the things we can generate in generator mode
 
 
+
+
 boolean menuExec() {                                          // return true if we should  leave menu after execution, true if we should stay in menu
   //Serial.println("Executing menu item " + String(p_menuPtr));
 
@@ -1689,21 +1696,26 @@ boolean menuExec() {                                          // return true if 
      case _headCalls:
      case _headMixed:      /// head copying
                 setupHeadCopying();
+                currentOptions = headOptions;
+                currentOptionSize = SizeOfArray(headOptions);
+                goto startTrainer;
      case _genRand:
      case _genAbb:
      case _genWords:
      case _genCalls:
      case _genMixed:      /// generator
-                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = generatorOptions;                            // list of available options in generator mode
                 currentOptionSize = SizeOfArray(generatorOptions);
                 goto startTrainer;
      case _headPlayer:
                 setupHeadCopying();
+                currentOptions = headOptions;
+                currentOptionSize = SizeOfArray(headOptions);
+                goto startPlayer;
      case _genPlayer:  
-                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = playerOptions;                               // list of available options in player mode
                 currentOptionSize = SizeOfArray(playerOptions);
+     startPlayer:
                 file = SPIFFS.open("/player.txt");                            // open file
                 //skip p_fileWordPointer words, as they have been played before
                 wcount = p_fileWordPointer;
@@ -1711,6 +1723,7 @@ boolean menuExec() {                                          // return true if 
                 skipWords(wcount);
                 
      startTrainer:
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 startFirst = true;
                 firstTime = true;
                 morseState = morseGenerator;
