@@ -378,7 +378,7 @@ enum prefPos  { posClicks, posPitch, posExtPaddles, posPolarity,
                 posRandomLength, posCallLength, posAbbrevLength, posWordLength, 
                 posTrainerDisplay, posWordDoubler, posEchoDisplay, posEchoRepeats,  posEchoConf, 
                 posKeyTrainerMode, posLoraTrainerMode, posGoertzelBandwidth, posSpeedAdapt,
-                posKochSeq, posKochFilter, posLatency, posRandomFile, posTimeOut, posQuickStart, posAutoStop, posLoraSyncW,
+                posKochSeq, posKochFilter, posLatency, posRandomFile, posTimeOut, posQuickStart, posLoraSyncW,
                 posLoraBand, posLoraQRG, posSnapRecall, posSnapStore, posMaxSequence};
 
 const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", 
@@ -394,9 +394,9 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
  prefPos keyerOptions[] =      {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS, posKeyTrainerMode, posTimeOut, posQuickStart };
  prefPos generatorOptions[] =  {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, 
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
-                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, posAutoStop };
+                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos playerOptions[] =     {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, 
-                                     posRandomFile, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, posAutoStop };
+                                     posRandomFile, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos echoPlayerOptions[] = {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats,  posEchoDisplay, posEchoConf, posTimeOut, posQuickStart};
  prefPos echoTrainerOptions[]= {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
@@ -404,7 +404,7 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence, posEchoRepeats,  posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart };
  prefPos kochGenOptions[] =    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, 
                                     posRandomLength,  posAbbrevLength, posWordLength, posMaxSequence,
-                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut, posQuickStart, posAutoStop };
+                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut, posQuickStart };
  prefPos kochEchoOptions[] =   {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, 
                                     posRandomLength, posAbbrevLength, posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart };
@@ -419,7 +419,7 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, 
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
                                     posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf, 
-                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, posAutoStop};
+                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart};
 
 prefPos *currentOptions = allOptions;
 
@@ -491,7 +491,6 @@ Preferences pref;               // use the Preferences library for storing and r
   boolean p_lcwoKochSeq = false;              // if true, replace native sequence with LCWO sequence    
   uint8_t p_timeOut = 1;                      // time-out value: 4 = no timeout, 1 = 5 min, 2 = 10 min, 3 = 15 min
   boolean p_quickStart = false;               // should we start the last executed command immediately?
-  boolean p_autoStop = false;                 // If to stop after each word in generator modes
   uint8_t p_loraSyncW = 0x27;                 // allows to set different LoRa sync words, and so creating virtual "channels"
 
 ///// stored in preferences, but not adjustable through preferences menu:
@@ -1282,6 +1281,8 @@ void loraSystemSetup() {
 
 
 enum AutoStopModes {off, stop1, stop2}  autoStop = off;
+boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
+
 
 ///////////////////////// THE MAIN LOOP - do this OFTEN! /////////////////////////////////
 
@@ -1315,7 +1316,7 @@ void loop() {
                           while (checkPaddles() )
                               ;                                                           // wait until paddles are released
 
-                          if (p_autoStop) {
+                          if (effectiveAutoStop) {
                             active = (autoStop == off);
                             switch (autoStop) {
                               case off : {
@@ -1662,7 +1663,7 @@ boolean menuExec() {                                          // return true if 
 
   uint32_t wcount = 0;
 
-  p_autoStop = false;
+  effectiveAutoStop = false;
   
   kochActive = false;
   switch (p_menuPtr) {
@@ -1686,7 +1687,7 @@ boolean menuExec() {                                          // return true if 
      case _headWords:
      case _headCalls:
      case _headMixed:      /// head copying
-                p_autoStop = true;
+                effectiveAutoStop = true;
      case _genRand:
      case _genAbb:
      case _genWords:
@@ -1697,7 +1698,7 @@ boolean menuExec() {                                          // return true if 
                 currentOptionSize = SizeOfArray(generatorOptions);
                 goto startTrainer;
      case _headPlayer:
-                p_autoStop = true;
+                effectiveAutoStop = true;
      case _genPlayer:  
                 generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = playerOptions;                               // list of available options in player mode
@@ -2659,7 +2660,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             if (! CWword.length())   {                                 // we just ended the the word, ...  //// intercept here in Echo Trainer mode
  //             // display last character - consider echo mode!
                 if (morseState == morseGenerator) 
-                    autoStop = p_autoStop ? stop1 : off;
+                    autoStop = effectiveAutoStop ? stop1 : off;
                 dispGeneratedChar();
                 if (morseState == echoTrainer) {
                     switch (echoTrainerState) {
@@ -2785,7 +2786,7 @@ void fetchNewWord() {
     else {
 
     //if (morseState != echoTrainer)
-    if ((morseState == morseGenerator) && !p_autoStop) {
+    if ((morseState == morseGenerator) && !effectiveAutoStop) {
         printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
     }
     
@@ -3070,8 +3071,6 @@ void displayKeyerPreferencesMenu(int pos) {
     case posTimeOut:      displayTimeOut();
                           break;
     case posQuickStart:   displayQuickStart();
-                          break;
-    case posAutoStop:     displayAutoStop();
                           break;
      case  posLoraBand:  displayLoraBand();
                           break;
@@ -3370,11 +3369,6 @@ void displayQuickStart() {
                                                   "OFF        " ); 
 }
 
-void displayAutoStop() {
-      printOnScroll(2, REGULAR, 1, p_autoStop ? "ON         " :
-                                                  "OFF        " ); 
-}
-
 void displayLoraBand() {
   String bandName;
   switch (p_loraBand) {
@@ -3613,9 +3607,6 @@ boolean adjustKeyerPreference(prefPos pos) {        /// rotating the encoder cha
                 case posQuickStart: p_quickStart = !p_quickStart;
                                 displayQuickStart();
                                 break;
-                case posAutoStop: p_autoStop = !p_autoStop;
-                                displayAutoStop();
-                                break;
                 case posLoraBand: p_loraBand += (t+1);                              // set the LoRa band
                                   p_loraBand = constrain(p_loraBand-1, 0, 2);
                                   displayLoraBand();                                // display LoRa band
@@ -3838,7 +3829,7 @@ String SL = "/";
   printToScroll_lastStyle = style;
 
   boolean linebreak = text.endsWith("\n");
-  boolean printToScroll_autoflush = !p_autoStop;
+  boolean printToScroll_autoflush = !effectiveAutoStop;
   //Serial.println("AUTO: " + String(printToScroll_autoflush));
   //((Serial.println("morseState: " + String(morseState));
   if (morseState != morseGenerator)
@@ -5316,8 +5307,6 @@ void readPreferences(String repository) {
     p_lcwoKochSeq = pref.getBool("lcwoKochSeq");
     p_quickStart = pref.getBool("quickStart");
 
-    p_autoStop  = pref.getBool("autoStop");
-
 
     if (atStart) {
       if (temp = pref.getUChar("loraBand"))
@@ -5445,8 +5434,6 @@ void writePreferences(String repository) {
         pref.putUChar("timeOut", p_timeOut);
     if (p_quickStart != pref.getBool("quickStart"))
         pref.putBool("quickStart", p_quickStart);
-    if (p_autoStop != pref.getBool("autoStop"))
-        pref.putBool("autoStop", p_autoStop);
 
     if (p_snapShots != pref.getUChar("snapShots"))
         pref.putUChar("snapShots", p_snapShots);
