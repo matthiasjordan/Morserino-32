@@ -1283,7 +1283,7 @@ void loraSystemSetup() {
 enum AutoStopModes {off, stop1, stop2}  autoStop = off;
 boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
 
-
+uint8_t effectiveTrainerDisplay = p_trainerDisplay;
 ///////////////////////// THE MAIN LOOP - do this OFTEN! /////////////////////////////////
 
 void loop() {
@@ -1664,6 +1664,7 @@ boolean menuExec() {                                          // return true if 
   uint32_t wcount = 0;
 
   effectiveAutoStop = false;
+  effectiveTrainerDisplay = p_trainerDisplay;
   
   kochActive = false;
   switch (p_menuPtr) {
@@ -1687,7 +1688,7 @@ boolean menuExec() {                                          // return true if 
      case _headWords:
      case _headCalls:
      case _headMixed:      /// head copying
-                effectiveAutoStop = true;
+                setupHeadCopying();
      case _genRand:
      case _genAbb:
      case _genWords:
@@ -1698,7 +1699,7 @@ boolean menuExec() {                                          // return true if 
                 currentOptionSize = SizeOfArray(generatorOptions);
                 goto startTrainer;
      case _headPlayer:
-                effectiveAutoStop = true;
+                setupHeadCopying();
      case _genPlayer:  
                 generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = playerOptions;                               // list of available options in player mode
@@ -1923,6 +1924,13 @@ boolean menuExec() {                                          // return true if 
   return false;
 }   /// end menuExec()
 
+
+
+
+void setupHeadCopying() {
+  effectiveAutoStop = true;
+  effectiveTrainerDisplay = DISPLAY_BY_CHAR;
+}
 
 
 ///////////////////
@@ -2596,7 +2604,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             if (l==0)  {                                               // fetch a new word if we have an empty word
                 if (clearText.length() > 0) {                          // this should not be reached at all.... except when display word by word
                   //Serial.println("Text left: " + clearText);
-                  if (morseState == loraTrx || (morseState == morseGenerator && p_trainerDisplay == DISPLAY_BY_WORD) ||
+                  if (morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_WORD) ||
                         ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY)) {
                       printToScroll(BOLD,cleanUpProSigns(clearText));
                       clearText = "";
@@ -2720,7 +2728,7 @@ void dispGeneratedChar() {
   static String charString;
   charString.reserve(10);
   
-  if (generatorMode == KOCH_LEARN || morseState == loraTrx || (morseState == morseGenerator && p_trainerDisplay == DISPLAY_BY_CHAR) ||
+  if (generatorMode == KOCH_LEARN || morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_CHAR) ||
                     ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY ))
                     //&& echoTrainerState != SEND_WORD
                     //&& echoTrainerState != REPEAT_WORD)) 
