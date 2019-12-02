@@ -1,3 +1,6 @@
+#ifndef ABBREV_H
+#define ABBREV_H
+
 /// ABBREVIATIONS in various lengths for CW Trainer
 ///////////////////////////////////////////////////
 
@@ -248,3 +251,5 @@ const String abbreviations[ABBREV_NUMBER_OF_ELEMENTS]  = {
   { "w" },
   { "z" }
 };
+
+#endif

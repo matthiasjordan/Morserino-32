@@ -60,6 +60,7 @@
 #include "FS.h"
 #include "SPIFFS.h"
 
+#include "morsedefs.h"
 #include "wklfonts.h"      // monospaced fonts in size 12 (regular and bold) for smaller text and 15 for larger text (regular and bold), called :
                            // DialogInput_plain_12, DialogInput_bold_12 & DialogInput_plain_15, DialogInput_bold_15
                            // these fonts were created with this tool: http://oleddisplay.squix.ch/#/home
@@ -130,7 +131,7 @@ const int PinDT=39;                    // Used for reading DT signal  - needs ex
 const int batteryPin = 13;
 
 // pin to switch ON Vext
-const int Vext = 21;
+//const int Vext = 21;
 
 
 #else
@@ -214,7 +215,6 @@ ClickButton volButton(volButtonPin);    // external pullup for this one
 char textBuffer[NoOfLines][2*NoOfCharsPerLine+1];   /// we need extra room for style markers (FONT_ATTRIB stored as characters to toggle on/off the style within a line) 
                                                     /// and 0 terminator
 
-enum FONT_ATTRIB {REGULAR, BOLD, INVERSE_REGULAR, INVERSE_BOLD};
 
 uint8_t linePointer = 0;    /// defines the current bottom line
 uint8_t bottomLine = 0;
@@ -393,14 +393,6 @@ encoderMode encoderState = speedSettingMode;    // we start with adjusting the s
 //// for adjusting preferences
 
 
-enum prefPos  { posClicks, posPitch, posExtPaddles, posPolarity, 
-                posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS, 
-                posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, 
-                posRandomLength, posCallLength, posAbbrevLength, posWordLength, 
-                posTrainerDisplay, posWordDoubler, posEchoDisplay, posEchoRepeats,  posEchoConf, 
-                posKeyTrainerMode, posLoraTrainerMode, posGoertzelBandwidth, posSpeedAdapt,
-                posKochSeq, posKochFilter, posLatency, posRandomFile, posTimeOut, posQuickStart, posAutoStop, posLoraSyncW,
-                posLoraBand, posLoraQRG, posSnapRecall, posSnapStore, posMaxSequence};
 
 const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", 
                               "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce", 
@@ -1246,7 +1238,7 @@ void setup()
 
 // display startup screen and check battery status
 void displayStartUp() {
-  String stat = "Morserino-32 ";
+  String stat = "Morserino-32m ";
   display.clear();
   display.display();
   stat += String(p_loraQRG / 10000);
@@ -5331,18 +5323,18 @@ void readPreferences(String repository) {
 
 
     if (atStart) {
-      if (temp = pref.getUChar("loraBand"))
+      if ((temp = pref.getUChar("loraBand")))
         p_loraBand = temp;
       else
        p_loraBand = 0;
   
-      if (tempInt = pref.getUInt("loraQRG")) {
+      if ((tempInt = pref.getUInt("loraQRG"))) {
         p_loraQRG = tempInt;
       }
       else
         p_loraQRG = QRG433;
   
-     if (temp = pref.getUChar("snapShots")) {
+     if ((temp = pref.getUChar("snapShots"))) {
         p_snapShots = temp;
         updateMemory(temp);
      }  // end: we have snapshots

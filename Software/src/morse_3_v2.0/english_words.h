@@ -1,3 +1,6 @@
+#ifndef ENGLISH_WORDS_H
+#define ENGLISH_WORDS_H
+
 /// The most common English Words in various lengths for CW Trainer
 ///////////////////////////////////////////////////////////////////
 
@@ -211,3 +214,5 @@ const String words[WORDS_NUMBER_OF_ELEMENTS]  = {
 { "i" },   /// 
 { "m" }     // new
 };
+
+#endif
