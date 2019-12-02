@@ -270,109 +270,88 @@ morserinoMode morseState = morseKeyer;
 
 //////// variables and constants for the modus menu
 
-
-const uint8_t menuN = 40;     // no of menu items +1
-
-const String menuText [menuN] = {
-  "",
-  "CW Keyer", // 1
-  
-  "CW Generator", // 2
-    "Random",
-    "CW Abbrevs",
-    "English Words",
-    "Call Signs",
-    "Mixed",
-    "File Player",
-
-  "Echo Trainer", // 9
-    "Random",
-    "CW Abbrevs",
-    "English Words",
-    "Call Signs",
-    "Mixed",
-    "File Player",
-  
-  "Koch Trainer", // 16
-    "Select Lesson",
-    "Learn New Chr",
-    "CW Generator",   // 19
-      "Random",   // 20
-      "CW Abbrevs",
-      "English Words",
-      "Mixed",
-    "Echo Trainer",   // 24
-      "Random",
-      "CW Abbrevs",
-      "English Words",
-      "Mixed",
-  
-  "Transceiver",    // 29
-    "LoRa Trx",
-    "iCW/Ext Trx",
-  
-  "CW Decoder",     // 32
-
-  "WiFi Functions", // 33
-    "Disp MAC Addr",
-    "Config WiFi",
-    "Check WiFi",
-    "Upload File",
-    "Update Firmw", //38
-  
-  
-  "Go To Sleep" } ; // 39
+enum GEN_TYPE { NA, RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, KOCH_LEARN };              // the things we can generate in generator mode
 
 enum navi {naviLevel, naviLeft, naviRight, naviUp, naviDown };
-enum menuNo { _dummy, _keyer, _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
+
+enum menuNo { _dummy, _keyer, 
+              _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
               _echo, _echoRand, _echoAbb, _echoWords, _echoCalls, _echoMixed, _echoPlayer,
               _koch, _kochSel, _kochLearn, _kochGen, _kochGenRand, _kochGenAbb, _kochGenWords,
               _kochGenMixed, _kochEcho, _kochEchoRand, _kochEchoAbb, _kochEchoWords, _kochEchoMixed,
+              _head, _headRand, _headAbb, _headWords, _headCalls, _headMixed, _headPlayer,
               _trx, _trxLora, _trxIcw, _decode, _wifi, _wifi_mac, _wifi_config, _wifi_check, _wifi_upload, _wifi_update, _goToSleep };
-              
 
-const uint8_t menuNav [menuN] [5] = {                   // { level, left, right, up, down}
-  { 0,0,0,0,0},                                         // 0 = dummy                
-  {0,_goToSleep,_gen,_dummy,0},                         // 1 keyer
-  {0,_keyer,_echo,_dummy,_genRand},                     // 2 generator
-  {1,_genPlayer,_genAbb,_gen,0},                        // 3 gen random
-  {1,_genRand,_genWords,_gen,0},                        // 4 gen Abb
-  {1,_genAbb,_genCalls,_gen,0},                         // 5 gen words
-  {1,_genWords,_genMixed,_gen,0},                       // 6 gen calls
-  {1,_genCalls,_genPlayer,_gen,0},                      // 7 gen mixed
-  {1,_genMixed,_genRand,_gen,0},                        // 8 gen player
-  {0,_gen,_koch,_dummy,_echoRand},                      // 9 echo tr
-  {1,_echoPlayer,_echoAbb,_echo,0},                     // 10 echo random
-  {1,_echoRand,_echoWords,_echo,0},                     // 11 echo abb
-  {1,_echoAbb,_echoCalls,_echo,0},                      // 12 echo words
-  {1,_echoWords,_echoMixed,_echo,0},                    // 13 echo calls
-  {1,_echoCalls,_echoPlayer,_echo,0},                   // 14 echo mixed
-  {1,_echoMixed,_echoRand,_echo,0},                     // 15 echo player
-  {0,_echo,_trx,_dummy,_kochSel},                          // 16 koch
-  {1,_kochEcho,_kochLearn,_koch,0},                     // 17 koch select
-  {1,_kochSel,_kochGen,_koch,0},                        // 18 koch learn new
-  {1,_kochLearn,_kochEcho,_koch,_kochGenRand},          // 19 koch gen
-  {2,_kochGenMixed,_kochGenAbb,_kochGen,0},             // 20 koch gen random
-  {2,_kochGenRand,_kochGenWords,_kochGen,0},            // 21 koch gen abb
-  {2,_kochGenAbb,_kochGenMixed,_kochGen,0},             // 22 koch gen words
-  {2,_kochGenWords,_kochGenRand,_kochGen,0},            // 23 koch gen mixed
-  {1,_kochGen,_kochSel,_koch,_kochEchoRand},            // 24 koch echo
-  {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0},          // 25 koch echo random
-  {2,_kochEchoRand,_kochEchoWords,_kochEcho,0},         // 26 koch echo abb
-  {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0},          // 27 koch echo words
-  {2,_kochEchoWords,_kochEchoRand,_kochEcho,0},         // 28 koch echo mixed
-  {0,_koch,_decode,_dummy,_trxLora},                    // 29 transceiver
-  {1,_trxIcw,_trxIcw,_trx,0},                           // 30 lora
-  {1,_trxLora,_trxLora,_trx,0},                         // 31 icw
-  {0,_trx,_wifi,_dummy,0},                              // 32 decoder
-  {0,_decode,_goToSleep,_dummy,_wifi_mac},              // 33 WiFi
-  {1,_wifi_update,_wifi_config,_wifi,0},                // 34 Disp Mac
-  {1,_wifi_mac,_wifi_check,_wifi,0},                    // 35 Config Wifi
-  {1,_wifi_config,_wifi_upload,_wifi,0},                // 36 Check WiFi
-  {1,_wifi_check,_wifi_update,_wifi,0},                 // 37 Upload File
-  {1,_wifi_upload,_wifi_mac,_wifi,0},                   // 38 Update Firmware 
-  {0,_wifi,_keyer,_dummy,0}                             // 39 goto sleep
+
+typedef struct MenuItem {
+  String text;
+  menuNo no;
+  uint8_t nav[5];
+  GEN_TYPE generatorMode;
+  boolean remember;
+} menuItem_t;
+
+
+const menuItem_t menuItems [] = {
+  {"",_dummy, { 0,0,0,0,0}, NA, true},
+  {"CW Keyer",_keyer, {0,_goToSleep,_gen,_dummy,0}, NA, true},
+  
+  {"CW Generator",_gen, {0,_keyer,_echo,_dummy,_genRand}, NA, true},
+  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}, RANDOMS, true},
+  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}, ABBREVS, true},
+  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}, WORDS, true},
+  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}, CALLS, true},
+  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}, MIXED, true},
+  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}, PLAYER, true},
+
+  {"Echo Trainer",_echo, {0,_gen,_koch,_dummy,_echoRand}, NA, true},
+  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}, RANDOMS, true},
+  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}, ABBREVS, true},
+  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}, WORDS, true},
+  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}, CALLS, true},
+  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}, MIXED, true},
+  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}, PLAYER, true},
+
+  {"Koch Trainer",_koch,  {0,_echo,_head,_dummy,_kochSel}, NA, true},
+  {"Select Lesson",_kochSel, {1,_kochEcho,_kochLearn,_koch,0}, NA, true},
+  {"Learn New Chr",_kochLearn, {1,_kochSel,_kochGen,_koch,0}, NA, true},
+  {"CW Generator",_kochGen, {1,_kochLearn,_kochEcho,_koch,_kochGenRand}, NA, true},
+  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}, RANDOMS, true},
+  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}, ABBREVS, true},
+  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}, WORDS, true},
+  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}, MIXED, true},
+
+  {"Echo Trainer",_kochEcho, {1,_kochGen,_kochSel,_koch,_kochEchoRand}, NA, true},
+  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}, RANDOMS, true},
+  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}, ABBREVS, true},
+  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}, WORDS, true},
+  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}, MIXED, true},
+
+  {"Head Copying",_head, {0,_koch,_trx,_dummy,_headRand}, NA, true},
+  {"Random",_headRand, {1,_headPlayer,_headAbb,_head,0}, RANDOMS, true},
+  {"CW Abbrevs",_headAbb, {1,_headRand,_headWords,_head,0}, ABBREVS, true},
+  {"English Words",_headWords, {1,_headAbb,_headCalls,_head,0}, WORDS, true},
+  {"Call Signs",_headCalls, {1,_headWords,_headMixed,_head,0}, CALLS, true},
+  {"Mixed",_headMixed, {1,_headCalls,_headPlayer,_head,0}, MIXED, true},
+  {"File Player",_headPlayer, {1,_headMixed,_headRand,_head,0}, PLAYER, true},
+
+  {"Transceiver",_trx, {0,_head,_decode,_dummy,_trxLora}, NA, true},
+  {"LoRa Trx",_trxLora, {1,_trxIcw,_trxIcw,_trx,0}, NA, true},
+  {"iCW/Ext Trx",_trxIcw, {1,_trxLora,_trxLora,_trx,0}, NA, true},
+
+  {"CW Decoder",_decode, {0,_trx,_wifi,_dummy,0}, NA, true},
+
+  {"WiFi Functions",_wifi, {0,_decode,_goToSleep,_dummy,_wifi_mac}, NA, false},
+  {"Disp MAC Addr",_wifi_mac, {1,_wifi_update,_wifi_config,_wifi,0}, NA, false},
+  {"Config WiFi",_wifi_config, {1,_wifi_mac,_wifi_check,_wifi,0}, NA, false},
+  {"Check WiFi",_wifi_check, {1,_wifi_config,_wifi_upload,_wifi,0}, NA, false},
+  {"Upload File",_wifi_upload, {1,_wifi_check,_wifi_update,_wifi,0}, NA, false},
+  {"Update Firmw",_wifi_update, {1,_wifi_upload,_wifi_mac,_wifi,0}, NA, false},
+
+  {"Go To Sleep",_goToSleep, {0,_wifi,_keyer,_dummy,0}, NA, false}
+
 };
+
 
 boolean quickStart;                                     // should we execute menu item immediately?
 
@@ -394,22 +373,15 @@ encoderMode encoderState = speedSettingMode;    // we start with adjusting the s
 
 
 
-const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", 
-                              "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce", 
-                              "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", 
-                              "Length Rnd Gr", "Length Calls ", "Length Abbrev", "Length Words ", 
-                              "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", 
-                              "Key ext TX   ", "Send via LoRa", "Bandwidth    ", "Adaptv. Speed",  
-                              "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-                              "Time Out     ", "Quick Start  ", "Auto Stop    ", "LoRa Channel  ",
-                              "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-                              "Max # of Words"};                   
  prefPos keyerOptions[] =      {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS, posKeyTrainerMode, posTimeOut, posQuickStart };
  prefPos generatorOptions[] =  {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, 
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
-                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, posAutoStop };
+                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
+ prefPos headOptions[] =  {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, 
+                                    posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
+                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos playerOptions[] =     {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, 
-                                     posRandomFile, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, posAutoStop };
+                                     posRandomFile, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart };
  prefPos echoPlayerOptions[] = {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats,  posEchoDisplay, posEchoConf, posTimeOut, posQuickStart};
  prefPos echoTrainerOptions[]= {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
@@ -417,7 +389,7 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence, posEchoRepeats,  posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart };
  prefPos kochGenOptions[] =    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, 
                                     posRandomLength,  posAbbrevLength, posWordLength, posMaxSequence,
-                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut, posQuickStart, posAutoStop };
+                                    posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut, posQuickStart };
  prefPos kochEchoOptions[] =   {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, 
                                     posRandomLength, posAbbrevLength, posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart };
@@ -432,7 +404,7 @@ const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.",
                                     posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, 
                                     posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence,
                                     posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf, 
-                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, posAutoStop};
+                                    posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart};
 
 prefPos *currentOptions = allOptions;
 
@@ -455,7 +427,6 @@ volatile uint64_t TOTcounter;                       // holds millis for Time-Out
 char numBuffer[16];                // for number to string conversion with sprintf()
 
 
-enum GEN_TYPE { RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, KOCH_LEARN };              // the things we can generate in generator mode
 enum DISPLAY_TYPE { NO_DISPLAY, DISPLAY_BY_CHAR, DISPLAY_BY_WORD };   // how we display in trainer mode
 enum random_OPTIONS {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO, OPT_KOCH };
 enum PROMPT_TYPE { NO_PROMPT, CODE_ONLY , DISP_ONLY ,CODE_AND_DISP };
@@ -505,7 +476,6 @@ Preferences pref;               // use the Preferences library for storing and r
   boolean p_lcwoKochSeq = false;              // if true, replace native sequence with LCWO sequence    
   uint8_t p_timeOut = 1;                      // time-out value: 4 = no timeout, 1 = 5 min, 2 = 10 min, 3 = 15 min
   boolean p_quickStart = false;               // should we start the last executed command immediately?
-  boolean p_autoStop = false;                 // If to stop after each word in generator modes
   uint8_t p_loraSyncW = 0x27;                 // allows to set different LoRa sync words, and so creating virtual "channels"
 
 ///// stored in preferences, but not adjustable through preferences menu:
@@ -1295,7 +1265,18 @@ void loraSystemSetup() {
 
 
 
+
+
 enum AutoStopModes {off, stop1, stop2}  autoStop = off;
+boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
+
+uint8_t effectiveTrainerDisplay = p_trainerDisplay;
+
+void setupHeadCopying() {
+  effectiveAutoStop = true;
+  effectiveTrainerDisplay = DISPLAY_BY_CHAR;
+}
+
 
 ///////////////////////// THE MAIN LOOP - do this OFTEN! /////////////////////////////////
 
@@ -1329,7 +1310,7 @@ void loop() {
                           while (checkPaddles() )
                               ;                                                           // wait until paddles are released
 
-                          if (p_autoStop) {
+                          if (effectiveAutoStop) {
                             active = (autoStop == off);
                             switch (autoStop) {
                               case off : {
@@ -1596,10 +1577,10 @@ void menu_() {
                   break;
           case 1: // check if we have a submenu or if we execute the selection
                   //Serial.println("newMP: " + String(newMenuPtr) + " navi: " + String(menuNav[newMenuPtr][naviDown]));
-                  if (menuNav[newMenuPtr][naviDown] == 0) {
+                  if (menuItems[newMenuPtr].nav[naviDown] == 0) {
                       p_menuPtr = newMenuPtr;
                       disp = 0;
-                      if (p_menuPtr < _wifi) {                        // remember last executed, unless it is a wifi function or shutdown
+                      if (menuItems[p_menuPtr].remember) {            // remember last executed, unless it is a wifi function or shutdown
                           pref.begin("morserino", false);             // open the namespace as read/write
                           pref.putUChar("lastExecuted", p_menuPtr);   // store last executed command
                           pref.end();                                 // close namespace
@@ -1607,18 +1588,18 @@ void menu_() {
                       if (menuExec())
                         return;
                   } else {
-                      newMenuPtr = menuNav[newMenuPtr][naviDown];
+                      newMenuPtr = menuItems[newMenuPtr].nav[naviDown];
                   }
                   break;
           case -1:  // we need to go one level up, if possible
-                  if (menuNav[newMenuPtr][naviUp] != 0) 
-                      newMenuPtr = menuNav[newMenuPtr][naviUp];
+                  if (menuItems[newMenuPtr].nav[naviUp] != 0) 
+                      newMenuPtr = menuItems[newMenuPtr].nav[naviUp];
           default: break;
         }
 
        if ((t=checkEncoder())) {
           //pwmClick(p_sidetoneVolume);         /// click 
-          newMenuPtr =  menuNav [newMenuPtr][(t == -1) ? naviLeft : naviRight];
+          newMenuPtr =  menuItems[newMenuPtr].nav[(t == -1) ? naviLeft : naviRight];
        }
 
        volButton.Update();
@@ -1638,10 +1619,10 @@ void menu_() {
 
 
 void menuDisplay(uint8_t ptr) {
-  //Serial.println("Level: " + (String) menuNav [ptr][naviLevel] + " " + menuText[ptr]);
-  uint8_t oneUp = menuNav[ptr][naviUp];
-  uint8_t twoUp = menuNav[oneUp][naviUp];
-  uint8_t oneDown = menuNav[ptr][naviDown];
+  //Serial.println("Level: " + (String) menuItems[ptr].nav[naviLevel] + " " + menuItems[ptr].text);
+  uint8_t oneUp = menuItems[ptr].nav[naviUp];
+  uint8_t twoUp = menuItems[oneUp].nav[naviUp];
+  uint8_t oneDown = menuItems[ptr].nav[naviDown];
     
   printOnStatusLine(true, 0,  "Select Modus:     ");
 
@@ -1650,20 +1631,20 @@ void menuDisplay(uint8_t ptr) {
   /// level 0: top line, possibly ".." on line 1
   /// level 1: higher level on 0, item on 1, possibly ".." on 2
   /// level 2: higher level on 1, highest level on 0, item on 2
-  switch (menuNav [ptr][naviLevel]) {
-    case 2: printOnScroll(2, BOLD, 0, menuText[ptr]);
-            printOnScroll(1, REGULAR, 0, menuText[oneUp]);
-            printOnScroll(0, REGULAR, 0, menuText[twoUp]);
+  switch (menuItems[ptr].nav[naviLevel]) {
+    case 2: printOnScroll(2, BOLD, 0, menuItems[ptr].text);
+            printOnScroll(1, REGULAR, 0, menuItems[oneUp].text);
+            printOnScroll(0, REGULAR, 0, menuItems[twoUp].text);
             break;
     case 1: if (oneDown)
                 printOnScroll(2, REGULAR, 0, String(".."));
-            printOnScroll(1, BOLD, 0, menuText[ptr]);
-            printOnScroll(0, REGULAR, 0, menuText[oneUp]);
+            printOnScroll(1, BOLD, 0, menuItems[ptr].text);
+            printOnScroll(0, REGULAR, 0, menuItems[oneUp].text);
             break;
     case 0: 
             if (oneDown)
                 printOnScroll(1, REGULAR, 0, String(".."));
-            printOnScroll(0, BOLD, 0, menuText[ptr]);
+            printOnScroll(0, BOLD, 0, menuItems[ptr].text);
             break;
   }
 }
@@ -1671,10 +1652,15 @@ void menuDisplay(uint8_t ptr) {
 ///////////// GEN_TYPE { RANDOMS, ABBREVS, WORDS, CALLS, MIXED, KOCH_MIXED, KOCH_LEARN };           // the things we can generate in generator mode
 
 
+
+
 boolean menuExec() {                                          // return true if we should  leave menu after execution, true if we should stay in menu
   //Serial.println("Executing menu item " + String(p_menuPtr));
 
   uint32_t wcount = 0;
+
+  effectiveAutoStop = false;
+  effectiveTrainerDisplay = p_trainerDisplay;
   
   kochActive = false;
   switch (p_menuPtr) {
@@ -1692,19 +1678,33 @@ boolean menuExec() {                                          // return true if 
                 keyTx = true;
                 return true;
                 break;
+
+     case _headRand:
+     case _headAbb:
+     case _headWords:
+     case _headCalls:
+     case _headMixed:      /// head copying
+                setupHeadCopying();
+                currentOptions = headOptions;
+                currentOptionSize = SizeOfArray(headOptions);
+                goto startTrainer;
      case _genRand:
      case _genAbb:
      case _genWords:
      case _genCalls:
      case _genMixed:      /// generator
-                generatorMode = (GEN_TYPE) (p_menuPtr - 3);                   /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
                 currentOptions = generatorOptions;                            // list of available options in generator mode
                 currentOptionSize = SizeOfArray(generatorOptions);
                 goto startTrainer;
+     case _headPlayer:
+                setupHeadCopying();
+                currentOptions = headOptions;
+                currentOptionSize = SizeOfArray(headOptions);
+                goto startPlayer;
      case _genPlayer:  
-                generatorMode = (GEN_TYPE) (p_menuPtr - 3);                   /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
                 currentOptions = playerOptions;                               // list of available options in player mode
                 currentOptionSize = SizeOfArray(playerOptions);
+     startPlayer:
                 file = SPIFFS.open("/player.txt");                            // open file
                 //skip p_fileWordPointer words, as they have been played before
                 wcount = p_fileWordPointer;
@@ -1712,6 +1712,7 @@ boolean menuExec() {                                          // return true if 
                 skipWords(wcount);
                 
      startTrainer:
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 startFirst = true;
                 firstTime = true;
                 morseState = morseGenerator;
@@ -1733,10 +1734,10 @@ boolean menuExec() {                                          // return true if 
       case  _echoMixed:
                 currentOptions = echoTrainerOptions;                        // list of available options in echo trainer mode
                 currentOptionSize = SizeOfArray(echoTrainerOptions);
-                generatorMode = (GEN_TYPE) (p_menuPtr - 10);                /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 goto startEcho;
       case  _echoPlayer:    /// echo trainer
-                generatorMode = (GEN_TYPE) (p_menuPtr - 10);                /// 0 = RANDOMS ... 4 = MIXED, 5 = PLAYER
+                generatorMode = menuItems[p_menuPtr].generatorMode;
                 currentOptions = echoPlayerOptions;                         // list of available options in echo player mode
                 currentOptionSize = SizeOfArray(echoPlayerOptions);
                 file = SPIFFS.open("/player.txt");                            // open file
@@ -1924,6 +1925,8 @@ boolean menuExec() {                                          // return true if 
   }
   return false;
 }   /// end menuExec()
+
+
 
 
 
@@ -2598,7 +2601,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             if (l==0)  {                                               // fetch a new word if we have an empty word
                 if (clearText.length() > 0) {                          // this should not be reached at all.... except when display word by word
                   //Serial.println("Text left: " + clearText);
-                  if (morseState == loraTrx || (morseState == morseGenerator && p_trainerDisplay == DISPLAY_BY_WORD) ||
+                  if (morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_WORD) ||
                         ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY)) {
                       printToScroll(BOLD,cleanUpProSigns(clearText));
                       clearText = "";
@@ -2662,7 +2665,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             if (! CWword.length())   {                                 // we just ended the the word, ...  //// intercept here in Echo Trainer mode
  //             // display last character - consider echo mode!
                 if (morseState == morseGenerator) 
-                    autoStop = p_autoStop ? stop1 : off;
+                    autoStop = effectiveAutoStop ? stop1 : off;
                 dispGeneratedChar();
                 if (morseState == echoTrainer) {
                     switch (echoTrainerState) {
@@ -2722,7 +2725,7 @@ void dispGeneratedChar() {
   static String charString;
   charString.reserve(10);
   
-  if (generatorMode == KOCH_LEARN || morseState == loraTrx || (morseState == morseGenerator && p_trainerDisplay == DISPLAY_BY_CHAR) ||
+  if (generatorMode == KOCH_LEARN || morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_CHAR) ||
                     ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY ))
                     //&& echoTrainerState != SEND_WORD
                     //&& echoTrainerState != REPEAT_WORD)) 
@@ -2788,7 +2791,7 @@ void fetchNewWord() {
     else {
 
     //if (morseState != echoTrainer)
-    if ((morseState == morseGenerator) && !p_autoStop) {
+    if ((morseState == morseGenerator) && !effectiveAutoStop) {
         printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
     }
     
@@ -2884,6 +2887,7 @@ void fetchNewWord() {
                                                       */
                                                       clearText = cleanUpText(clearText);
                                                       break;  
+                                      case NA: break;
                                     }   // end switch (generatorMode)
                             }
                             firstTime = false;
@@ -3073,8 +3077,6 @@ void displayKeyerPreferencesMenu(int pos) {
     case posTimeOut:      displayTimeOut();
                           break;
     case posQuickStart:   displayQuickStart();
-                          break;
-    case posAutoStop:     displayAutoStop();
                           break;
      case  posLoraBand:  displayLoraBand();
                           break;
@@ -3373,11 +3375,6 @@ void displayQuickStart() {
                                                   "OFF        " ); 
 }
 
-void displayAutoStop() {
-      printOnScroll(2, REGULAR, 1, p_autoStop ? "ON         " :
-                                                  "OFF        " ); 
-}
-
 void displayLoraBand() {
   String bandName;
   switch (p_loraBand) {
@@ -3616,9 +3613,6 @@ boolean adjustKeyerPreference(prefPos pos) {        /// rotating the encoder cha
                 case posQuickStart: p_quickStart = !p_quickStart;
                                 displayQuickStart();
                                 break;
-                case posAutoStop: p_autoStop = !p_autoStop;
-                                displayAutoStop();
-                                break;
                 case posLoraBand: p_loraBand += (t+1);                              // set the LoRa band
                                   p_loraBand = constrain(p_loraBand-1, 0, 2);
                                   displayLoraBand();                                // display LoRa band
@@ -3841,7 +3835,7 @@ String SL = "/";
   printToScroll_lastStyle = style;
 
   boolean linebreak = text.endsWith("\n");
-  boolean printToScroll_autoflush = !p_autoStop;
+  boolean printToScroll_autoflush = !effectiveAutoStop;
   //Serial.println("AUTO: " + String(printToScroll_autoflush));
   //((Serial.println("morseState: " + String(morseState));
   if (morseState != morseGenerator)
@@ -5319,8 +5313,6 @@ void readPreferences(String repository) {
     p_lcwoKochSeq = pref.getBool("lcwoKochSeq");
     p_quickStart = pref.getBool("quickStart");
 
-    p_autoStop  = pref.getBool("autoStop");
-
 
     if (atStart) {
       if ((temp = pref.getUChar("loraBand")))
@@ -5448,8 +5440,6 @@ void writePreferences(String repository) {
         pref.putUChar("timeOut", p_timeOut);
     if (p_quickStart != pref.getBool("quickStart"))
         pref.putBool("quickStart", p_quickStart);
-    if (p_autoStop != pref.getBool("autoStop"))
-        pref.putBool("autoStop", p_autoStop);
 
     if (p_snapShots != pref.getUChar("snapShots"))
         pref.putUChar("snapShots", p_snapShots);
