@@ -2,27 +2,15 @@
 #define MORSEDEFS_H
 
 
-enum prefPos  { posClicks, posPitch, posExtPaddles, posPolarity,
-                posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-                posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption,
-                posRandomLength, posCallLength, posAbbrevLength, posWordLength,
-                posTrainerDisplay, posWordDoubler, posEchoDisplay, posEchoRepeats,  posEchoConf,
-                posKeyTrainerMode, posLoraTrainerMode, posGoertzelBandwidth, posSpeedAdapt,
-                posKochSeq, posKochFilter, posLatency, posRandomFile,
-                posTimeOut, posQuickStart, posLoraSyncW,
-                posLoraBand, posLoraQRG, posSnapRecall, posSnapStore,
-                posMaxSequence};
+#define VERSION_MAJOR 2
+#define VERSION_MINOR 0
 
-const String prefOption[] = { "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.",
-                              "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
-                              "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups",
-                              "Length Rnd Gr", "Length Calls ", "Length Abbrev", "Length Words ",
-                              "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ",
-                              "Key ext TX   ", "Send via LoRa", "Bandwidth    ", "Adaptv. Speed",
-                              "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-                              "Time Out     ", "Quick Start  ", "LoRa Channel  ",
-                              "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-                              "Max # of Words"};
+
+
+
+enum DISPLAY_TYPE { NO_DISPLAY, DISPLAY_BY_CHAR, DISPLAY_BY_WORD };   // how we display in trainer mode
+enum random_OPTIONS {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO, OPT_KOCH };
+enum PROMPT_TYPE { NO_PROMPT, CODE_ONLY , DISP_ONLY ,CODE_AND_DISP };
 
 
 
