@@ -174,7 +174,7 @@ class MorsePrefs
 
 
 
-
+    MorsePrefs prefs;
 
     MorsePrefs readPreferences(String repository);
     void writePreferences(String repository, MorsePrefs p);

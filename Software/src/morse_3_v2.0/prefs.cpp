@@ -1,5 +1,6 @@
 /////////////// READING and WRITING parameters from / into Non Volatile Storage, using ESP32 preferences
 #include "prefs.h"
+#include "koch.h"
 #include "abbrev.h"
 #include "english_words.h"
 
@@ -8,6 +9,8 @@ Preferences pref;               // use the Preferences library for storing and r
 
 using namespace MorsePreferences;
 
+
+//MorsePrefs prefs;
 
 /**
  * Clients have to call     updateTimings();
@@ -219,6 +222,8 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     }  // endif atStart
     pref.end();
 
+
+    prefs = p;
     return p;
 }
 
@@ -309,7 +314,7 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
         if (morserino)
         {
             Koch::updateKochChars(p.lcwoKochSeq);
-            EnglishWord::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
+            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
             Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter);
         }
     }
