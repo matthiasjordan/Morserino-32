@@ -58,7 +58,7 @@
 #include "SPIFFS.h"
 
 #include "morsedefs.h"
-#include "preferences.h"
+#include "prefs.h"
 #include "wklfonts.h"      // monospaced fonts in size 12 (regular and bold) for smaller text and 15 for larger text (regular and bold), called :
                            // DialogInput_plain_12, DialogInput_bold_12 & DialogInput_plain_15, DialogInput_bold_15
                            // these fonts were created with this tool: http://oleddisplay.squix.ch/#/home
@@ -646,14 +646,8 @@ String echoTrainerPrompt, echoTrainerWord;
 
 /////////////////// Variables for Koch modes
 
-String  kochWords[WORDS_NUMBER_OF_ELEMENTS];
-int numberOfWords;
-String kochAbbr[ABBREV_NUMBER_OF_ELEMENTS];
-int numberOfAbbr;
 
 String kochChars;
-const String morserinoKochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=K+SNAV@:";
-const String lcwoKochChars =      "kmuresnaptlwi.jz=foy,vg5/q92h38b?47c1d60x-K+ASNV@:";
 
 ////// variables for CW decoder
 
@@ -3536,6 +3530,7 @@ boolean adjustKeyerPreference(prefPos pos) {        /// rotating the encoder cha
                                   displayLoraQRG();
                                   break;
                 case posSnapRecall: 
+                case posSnapRecall:
                                   if (memCounter) {
                                       memPtr = (memPtr +t + memCounter + 1) % (memCounter+1);
                                       //memPtr += (t+1);
@@ -3621,30 +3616,6 @@ void keyTransmitter() {
    digitalWrite(keyerPin, HIGH);           // turn the LED on, key transmitter, or whatever
 }
 
-void createKochWords(uint8_t maxl, uint8_t koch) {                  // this function creates an array of words that are compliant to Koch filter and max word length
-  numberOfWords = 0;
-  for (int i = WORDS_POINTER[maxl]; i< WORDS_NUMBER_OF_ELEMENTS; ++i) {     // do this for all words with max length maxl
-      if (wordIsKoch(words[i]) <= koch)
-          kochWords[numberOfWords++] = words[i];
-  }
-}
-
-uint8_t wordIsKoch(String thisWord) {
-  uint8_t thisKoch = 0;
-  uint8_t l = thisWord.length();
-  for ( int i = 0; i< l; ++i)
-    thisKoch = _max(thisKoch, kochChars.indexOf(thisWord.charAt(i))+1);
-  return thisKoch;
-}
-
-
-void createKochAbbr(uint8_t maxl, uint8_t koch) {                  // this function creates an array of words that are compliant to Koch filter and max word length
-  numberOfAbbr = 0;
-  for (int i = ABBREV_POINTER[maxl]; i< ABBREV_NUMBER_OF_ELEMENTS; ++i) {     // do this for all words with max length maxl
-      if (wordIsKoch(abbreviations[i]) <= koch)
-          kochAbbr[numberOfAbbr++] = abbreviations[i];
-  }
-}
 
 
 

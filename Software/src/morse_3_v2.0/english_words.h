@@ -4,6 +4,10 @@
 /// The most common English Words in various lengths for CW Trainer
 ///////////////////////////////////////////////////////////////////
 
+
+
+namespace EnglishWords {
+
 const int WORDS_NUMBER_OF_ELEMENTS = 204;                                    // how many items all together?
 const int WORDS_MAX_SIZE = 14;                                                // longest item  +1
 const int WORDS_POINTER[] = {0, 201, 181, 146, 90, 46, 26};// array where items start with length = index
@@ -214,5 +218,11 @@ const String words[WORDS_NUMBER_OF_ELEMENTS]  = {
 { "i" },   /// 
 { "m" }     // new
 };
+
+
+void createKochWords(uint8_t maxl, uint8_t koch);
+
+
+}
 
 #endif

@@ -1,6 +1,7 @@
 /////////////// READING and WRITING parameters from / into Non Volatile Storage, using ESP32 preferences
-#include "preferences.h"
-#include "morsedefs.h"
+#include "prefs.h"
+#include "abbrev.h"
+#include "english_words.h"
 
 Preferences pref;               // use the Preferences library for storing and retrieving objects
 
@@ -221,6 +222,12 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     return p;
 }
 
+
+
+
+
+
+
 void MorsePreferences::writePreferences(String repository, MorsePrefs p)
 {
     unsigned int l = 15;
@@ -263,13 +270,13 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
     {
         pref.putUChar("abbrevLength", p.abbrevLength);
         if (morserino)
-            createKochAbbr(p.abbrevLength, p.kochFilter); // update the abbrev array!
+            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter); // update the abbrev array!
     }
     if (p.wordLength != pref.getUChar("wordLength"))
     {
         pref.putUChar("wordLength", p.wordLength);
         if (morserino)
-            createKochWords(p.wordLength, p.kochFilter);  // update the word array!
+            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the word array!
     }
     if (p.trainerDisplay != pref.getUChar("trainerDisplay"))
         pref.putUChar("trainerDisplay", p.trainerDisplay);
@@ -292,8 +299,8 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
         if (p.kochFilter != pref.getUChar("kochFilter"))
         {
             pref.putUChar("kochFilter", p.kochFilter);
-            createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
-            createKochAbbr(p.abbrevLength, p.kochFilter);
+            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
+            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter);
         }
     }
     if (p.lcwoKochSeq != pref.getBool("lcwoKochSeq"))
@@ -301,9 +308,9 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
         pref.putBool("lcwoKochSeq", p.lcwoKochSeq);
         if (morserino)
         {
-            kochChars = p.lcwoKochSeq ? lcwoKochChars : morserinoKochChars;
-            createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
-            createKochAbbr(p.abbrevLength, p.kochFilter);
+            Koch::updateKochChars(p.lcwoKochSeq);
+            EnglishWord::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
+            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter);
         }
     }
     if (p.wordDoubler != pref.getBool("wordDoubler"))

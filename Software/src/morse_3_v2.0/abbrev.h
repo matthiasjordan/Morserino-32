@@ -4,6 +4,10 @@
 /// ABBREVIATIONS in various lengths for CW Trainer
 ///////////////////////////////////////////////////
 
+#include <Arduino.h>
+
+namespace Abbrev {
+
 const int ABBREV_NUMBER_OF_ELEMENTS = 241;                                    // how many items all together?
 const int ABBREV_MAX_SIZE = 9;                                                // longest item +1
 const int ABBREV_POINTER[] = {0, 232, 148, 41, 11, 2, 1, 0};// array whe items start with length = index
@@ -251,5 +255,10 @@ const String abbreviations[ABBREV_NUMBER_OF_ELEMENTS]  = {
   { "w" },
   { "z" }
 };
+
+
+void createKochAbbr(uint8_t maxl, uint8_t koch);
+
+}
 
 #endif

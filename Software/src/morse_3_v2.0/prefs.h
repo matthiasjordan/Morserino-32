@@ -1,10 +1,14 @@
-#ifndef PREFERENCES_H
-#define PREFERENCES_H
+#ifndef PREFS_H
+#define PREFS_H
 
 #include <Arduino.h>
 #include <Preferences.h>   // ESP 32 library for storing things in non-volatile storage
 
 #include "morsedefs.h"
+
+
+namespace MorsePreferences
+{
 
 enum prefPos
 {
@@ -171,8 +175,6 @@ class MorsePrefs
 
 
 
-namespace MorsePreferences
-{
 
     MorsePrefs readPreferences(String repository);
     void writePreferences(String repository, MorsePrefs p);
@@ -180,6 +182,12 @@ namespace MorsePreferences
     boolean storeSnapshot(uint8_t menu);
     void updateMemory(uint8_t temp);
     void clearMemory(uint8_t ptr);
+
+
+    // Private
+    uint8_t wordIsKoch(String thisWord);
+    void createKochAbbr(uint8_t maxl, uint8_t koch);
+
 }
 
 #endif
