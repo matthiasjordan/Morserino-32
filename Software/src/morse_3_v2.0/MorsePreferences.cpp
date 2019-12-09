@@ -1,14 +1,20 @@
 /////////////// READING and WRITING parameters from / into Non Volatile Storage, using ESP32 preferences
-#include "prefs.h"
+#include <LoRa.h>          // library for LoRa transceiver
+
 #include "koch.h"
 #include "abbrev.h"
 #include "english_words.h"
+#include "decoder.h"
+#include "MorsePreferences.h"
 
 Preferences pref;               // use the Preferences library for storing and retrieving objects
 
-
 using namespace MorsePreferences;
 
+/// variables for managing snapshots
+uint8_t memories[8];
+uint8_t memCounter;
+uint8_t memPtr = 0;
 
 //MorsePrefs prefs;
 
@@ -222,16 +228,9 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     }  // endif atStart
     pref.end();
 
-
     prefs = p;
     return p;
 }
-
-
-
-
-
-
 
 void MorsePreferences::writePreferences(String repository, MorsePrefs p)
 {
@@ -328,7 +327,7 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
     {
         pref.putUChar("goertzelBW", p.goertzelBandwidth);
         if (morserino)
-            setupGoertzel();
+            Decoder::setupGoertzel();
     }
     if (p.loraSyncW != pref.getUChar("loraSyncW"))
     {
@@ -415,7 +414,7 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
         p.snapShots = p.snapShots | mask;
         //Serial.println("store p.snapShots: " + String(p.snapShots));
         printOnScroll(2, BOLD, 0, text);
-        updateMemory (p.snapShots);
+        updateMemory(p.snapShots);
         delay(1000);
         return true;
     }
@@ -442,6 +441,6 @@ void MorsePreferences::clearMemory(uint8_t ptr)
 
     p.snapShots &= ~(1 << memories[ptr]);     // clear the bit
     printOnScroll(2, BOLD, 0, text);
-    updateMemory (p.snapShots);
+    updateMemory(p.snapShots);
     delay(1000);
 }

@@ -11,6 +11,10 @@
 #include "morsedefs.h"
 #include <Arduino.h>
 
+namespace Decoder
+{
+    void setupGoertzel();
 
+}
 
 #endif /* DECODER_H_ */

@@ -13,16 +13,16 @@
 
 using namespace EnglishWords;
 
-
-String  kochWords[EnglishWords::WORDS_NUMBER_OF_ELEMENTS];
+String kochWords[EnglishWords::WORDS_NUMBER_OF_ELEMENTS];
 int numberOfWords;
 
-
-void EnglishWords::createKochWords(uint8_t maxl, uint8_t koch) {                  // this function creates an array of words that are compliant to Koch filter and max word length
-  numberOfWords = 0;
-  for (int i = WORDS_POINTER[maxl]; i< WORDS_NUMBER_OF_ELEMENTS; ++i) {     // do this for all words with max length maxl
-      if (Koch::wordIsKoch(words[i]) <= koch)
-          kochWords[numberOfWords++] = words[i];
-  }
+void EnglishWords::createKochWords(uint8_t maxl, uint8_t koch)
+{                  // this function creates an array of words that are compliant to Koch filter and max word length
+    numberOfWords = 0;
+    for (int i = WORDS_POINTER[maxl]; i < WORDS_NUMBER_OF_ELEMENTS; ++i)
+    {     // do this for all words with max length maxl
+        if (Koch::wordIsKoch(words[i]) <= koch)
+            kochWords[numberOfWords++] = words[i];
+    }
 }
 

@@ -6,7 +6,10 @@
  */
 
 #include "decoder.h"
-#include "prefs.h"
+
+#include "MorsePreferences.h"
+
+using namespace Decoder;
 
 ////// variables for Morse Decoder - the more global ones. rest is further down...
 ////////////////////////////
@@ -86,3 +89,4 @@ void setupGoertzel()
     cosine = cos(omega);                                            // 0,999999739
     coeff = 2.0 * cosine;                                           // 1,999999479
 }
+
