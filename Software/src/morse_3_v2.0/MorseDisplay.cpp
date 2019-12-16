@@ -7,6 +7,7 @@
 #include "wklfonts.h"
 #include "MorsePreferences.h"
 #include "MorseSystem.h"
+#include "MorseMachine.h"
 
 using namespace MorseDisplay;
 
@@ -180,7 +181,7 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     boolean printToScroll_autoflush = !effectiveAutoStop;
     //Serial.println("AUTO: " + String(printToScroll_autoflush));
     //((Serial.println("morseState: " + String(morseState));
-    if (morseState != morseGenerator)
+    if (MorseMachine::isMode(morseGenerator))
         printToScroll_autoflush = true;
     if (printToScroll_autoflush || linebreak)
     {
@@ -305,7 +306,7 @@ void MorseDisplay::newLine()
         refreshScrollArea((bottomLine + 1) % NoOfLines);
     else if (relPos == maxPos)
         refreshScrollArea((NoOfLines + bottomLine - 2) % NoOfLines);
-    if (encoderState == scrollMode)
+    if (MorseMachine::isEncoderMode(scrollMode))
         displayScrollBar(true);
 
 }
@@ -464,7 +465,7 @@ void MorseDisplay::displayScrollBar(boolean visible)
 /// display volume as a progress bar: vol = 1-100
 void MorseDisplay::displayVolume()
 {
-    MorseDisplay::drawVolumeCtrl(encoderState == speedSettingMode ? false : true, 93, 0, 28, 15, MorsePreferences::prefs.sidetoneVolume);
+    MorseDisplay::drawVolumeCtrl(MorseMachine::isEncoderMode(speedSettingMode) ? false : true, 93, 0, 28, 15, MorsePreferences::prefs.sidetoneVolume);
     display.display();
 }
 
