@@ -108,7 +108,7 @@ enum GEN_TYPE { NA, RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, K
 
 enum navi {naviLevel, naviLeft, naviRight, naviUp, naviDown };
 
-enum menuNo { _dummy, _keyer, 
+enum menuNo { _dummy, _keyer,
               _gen, _genRand, _genAbb, _genWords, _genCalls, _genMixed, _genPlayer,
               _echo, _echoRand, _echoAbb, _echoWords, _echoCalls, _echoMixed, _echoPlayer,
               _koch, _kochSel, _kochLearn, _kochGen, _kochGenRand, _kochGenAbb, _kochGenWords,
@@ -1207,7 +1207,7 @@ void menu_() {
                   }
                   break;
           case -1:  // we need to go one level up, if possible
-                  if (menuItems[newMenuPtr].nav[naviUp] != 0) 
+                  if (menuItems[newMenuPtr].nav[naviUp] != 0)
                       newMenuPtr = menuItems[newMenuPtr].nav[naviUp];
           default: break;
         }

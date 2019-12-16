@@ -1,7 +1,8 @@
 #ifndef MORSEDISPLAY_H_
 #define MORSEDISPLAY_H_
 
-#include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
+#include <Arduino.h>
+//#include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
 #include "morsedefs.h"
 
 namespace MorseDisplay
