@@ -59,34 +59,7 @@
 
 
 
-/////////////////////// parameters for LF tone generation and  HF (= vol ctrl) PWM
-int toneFreq = 500 ;
-int toneChannel = 2;      // this PWM channel is used for LF generation, duty cycle is 0 (silent) or 50% (tone)
-int lineOutChannel = 3;   // this PWM channel is used for line-out LF generation, duty cycle is 0 (silent) or 50% (tone)
-int volChannel = 8;       // this PWM channel is used for HF generation, duty cycle between 1% (almost silent) and 100% (loud)
-int pwmResolution = 10;
-unsigned int volFreq = 32000; // this is the HF frequency we are using
 
-const int  dutyCycleFiftyPercent =  512;                                                                             ;
-const int  dutyCycleTwentyPercent = 25;
-const int  dutyCycleZero = 0;
-
-const int notes[] = {0, 233, 262, 294, 311, 349, 392, 440, 466, 523, 587, 622, 698, 784, 880, 932};
-
-
-
-// things for reading the encoder
-portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-
-
-volatile int8_t _oldState;
-
-#define LATCHSTATE 3
-
-volatile int8_t encoderPos = 0;
-volatile uint64_t IRTime = 0;   // interrupt time
-const int encoderWaitTime = 100 ;         // how long to wait for next reading from encoder in microseconds
-volatile uint8_t stateRegister = 0;
 
 // positions: [3] 1 0 2 [3] 1 0 2 [3]
 // [3] is the positions where my rotary switch detends
@@ -208,8 +181,6 @@ int currentOptionSize;
 //// Other Global VARIABLES ////////////
 /////////////////////////////////
 
-unsigned int interCharacterSpace, interWordSpace;   // need to be properly initialised!
-unsigned int effWpm;                                // calculated effective speed in WpM
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;
 
@@ -226,26 +197,6 @@ volatile uint64_t TOTcounter;                       // holds millis for Time-Out
 
 
 boolean kochActive = false;                 // set to true when in Koch trainer mode
-
-//  keyerControl bit definitions
-
-#define     DIT_L      0x01     // Dit latch
-#define     DAH_L      0x02     // Dah latch
-#define     DIT_LAST   0x04     // Dit was last processed element
-
-//  Global Keyer Variables
-//
-unsigned char keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
-
-
-boolean DIT_FIRST = false; // first latched was dit?
-unsigned int ditLength ;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
-unsigned int dahLength ;        // dahs are 3 dits long
-unsigned char keyerState;
-unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
-uint8_t sensor;                 // what we read from checking the touch sensors
-boolean leftKey, rightKey;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -1852,55 +1803,6 @@ void displayMorse() {
 
 
 
-//// functions for generating a tone....
-
-void pwmTone(unsigned int frequency, unsigned int volume, boolean lineOut) { // frequency in Hertz, volume in range 0 - 100; we use 10 bit resolution
-  const uint16_t vol[] = {0, 1,  2, 3, 16, 150, 380, 580, 700, 880, 1023};
-  int i = constrain(volume/10, 0, 10);
-  //Serial.println(vol[i]);
-  //Serial.println(frequency);
-  if (lineOut) {
-      ledcWriteTone(lineOutChannel, (double) frequency);
-      ledcWrite(lineOutChannel, dutyCycleFiftyPercent);
-  }
-
-  ledcWrite(volChannel, volFreq);
-  ledcWrite(volChannel, vol[i]);
-  ledcWriteTone(toneChannel, frequency);
- 
-
-  if (i == 0 ) 
-      ledcWrite(toneChannel, dutyCycleZero);
-  else if (i > 3)
-      ledcWrite(toneChannel, dutyCycleFiftyPercent);
-  else
-      ledcWrite(toneChannel, i*i*i + 4 + 2*i);          /// an ugly hack to allow for lower volumes on headphones
-    
-   
-  
-}
-
-
-void pwmNoTone() {      // stop playing a tone by changing duty cycle of the tone to 0
-  ledcWrite(toneChannel, dutyCycleTwentyPercent);
-  ledcWrite(lineOutChannel, dutyCycleTwentyPercent);
-  delayMicroseconds(125);
-  ledcWrite(toneChannel, dutyCycleZero);
-  ledcWrite(lineOutChannel, dutyCycleZero);
-  
-}
-
-
-void pwmClick(unsigned int volume) {                        /// generate a click on the speaker
-    if (!p_encoderClicks)
-      return;
-    pwmTone(250,volume, false);
-    delay(6);
-    pwmTone(280,volume, false);
-    delay(5);
-    pwmNoTone();
-}
-
 
 //////// Display the status line in CW Keyer Mode
 //////// Layout of top line:
@@ -2642,15 +2544,6 @@ void echoTrainerEval() {
 }   // end of function
 
 
-void updateTimings() {
-  ditLength = 1200 / p_wpm;                    // set new value for length of dits and dahs and other timings
-  dahLength = 3 * ditLength;
-  interCharacterSpace =  p_interCharSpace *  ditLength;
-  //interWordSpace = _max(p_interWordSpace * ditLength, (p_interCharSpace+6)*ditLength);
-  interWordSpace = _max(p_interWordSpace, p_interCharSpace+4) * ditLength;
-
-  effWpm = 60000 / (31 * ditLength + 4 * interCharacterSpace + interWordSpace );  ///  effective wpm with lengthened spaces = Farnsworth speed
-} 
 
 void changeSpeed( int t) {
   p_wpm += t;

@@ -14,10 +14,6 @@ Preferences pref;               // use the Preferences library for storing and r
 
 using namespace MorsePreferences;
 
-/// variables for managing snapshots
-uint8_t memories[8];
-uint8_t memCounter;
-uint8_t memPtr = 0;
 
 //MorsePrefs prefs;
 

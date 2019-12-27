@@ -96,6 +96,16 @@ void MorseDisplay::displayStartUp()
     delay(3000);
 }
 
+
+void MorseDisplay::clearAll() {
+    display.clear();
+}
+
+void MorseDisplay::display() {
+    display.display();
+}
+
+
 ///// functions to use the graphics display more or less like a character display
 ///// basically we use two different fixed-width fonts, Dialoginput 12 (for the status line) and Dialoginput 15 for almost everything else
 ///// MAYBE we might use an even bigger font (18?) for setting parameters?
@@ -367,6 +377,15 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
 //Serial.println("temp: " + temp);
     if (temp.length())
         printOnScroll(displayLine, style, pos, temp);
+}
+
+
+uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String format, ...) {
+    va_list arglist;
+    va_start( arglist, format );
+    vsprintf(numBuffer, "%3i", arglist);
+    va_end( arglist );
+    MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
 }
 
 uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring)

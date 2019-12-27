@@ -1,10 +1,3 @@
-/*
- * koch.cpp
- *
- *  Created on: 07.12.2019
- *      Author: mj
- */
-
 #include "koch.h"
 
 using namespace Koch;
@@ -12,7 +5,6 @@ using namespace Koch;
 const String morserinoKochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=K+SNAV@:";
 const String lcwoKochChars = "kmuresnaptlwi.jz=foy,vg5/q92h38b?47c1d60x-K+ASNV@:";
 
-String kochChars;
 
 void Koch::updateKochChars(boolean lcwoKochSeq)
 {

@@ -154,6 +154,8 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 ClickButton modeButton(modeButtonPin);  // initialize mode button
 ClickButton volButton(volButtonPin);    // external pullup for this one
 
+const int notes[] = {0, 233, 262, 294, 311, 349, 392, 440, 466, 523, 587, 622, 698, 784, 880, 932};
+
 #endif
 
 
