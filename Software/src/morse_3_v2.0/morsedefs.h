@@ -1,6 +1,8 @@
 #ifndef MORSEDEFS_H
 #define MORSEDEFS_H
 
+#include "ClickButton.h"   // button control library
+
 //////// Program Version
 #define BETA false
 
@@ -147,4 +149,11 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 
 ///////////////////////////////////////// END OF HARDWARE DEFS ////////////////////////////////////////////////////////////////////
 
+
+// define the buttons for the clickbutton library
+ClickButton modeButton(modeButtonPin);  // initialize mode button
+ClickButton volButton(volButtonPin);    // external pullup for this one
+
 #endif
+
+

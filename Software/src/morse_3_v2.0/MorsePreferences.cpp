@@ -4,8 +4,11 @@
 #include "koch.h"
 #include "abbrev.h"
 #include "english_words.h"
+#include "morsedefs.h"
 #include "decoder.h"
 #include "MorsePreferences.h"
+#include "MorseDisplay.h"
+#include "menu.h"
 
 Preferences pref;               // use the Preferences library for storing and retrieving objects
 
@@ -365,8 +368,8 @@ boolean MorsePreferences::recallSnapshot()
     String text;
 
     memPtr = 0;
-    displayKeyerPreferencesMenu(posSnapRecall);
-    if (!adjustKeyerPreference(posSnapRecall))
+    Menu::displayKeyerPreferencesMenu(posSnapRecall);
+    if (!Menu::adjustKeyerPreference(posSnapRecall))
     {
         //Serial.println("recall memPtr: " + String(memPtr));
         text = "Snap " + String(memories[memPtr] + 1) + " RECALLD";
@@ -377,7 +380,7 @@ boolean MorsePreferences::recallSnapshot()
                 snapname = "snap" + String(memories[memPtr]);
                 //Serial.println("recall snapname: " + snapname);
                 readPreferences(snapname);
-                printOnScroll(2, BOLD, 0, text);
+                MorseDisplay::printOnScroll(2, BOLD, 0, text);
                 //Serial.println("after recall - p.menuPtr: " + String(p.menuPtr));
                 delay(1000);
                 return true;
@@ -396,25 +399,25 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
     String text;
 
     memPtr = 0;
-    displayKeyerPreferencesMenu(posSnapStore);
-    adjustKeyerPreference(posSnapStore);
+    Menu::displayKeyerPreferencesMenu(posSnapStore);
+    Menu::adjustKeyerPreference(posSnapStore);
     volButton.Update();
     //Serial.println("store memPtr: " + String(memPtr));
     if (memPtr != 8)
     {
-        p.menuPtr = menu;     // also store last menu selection
+        MorsePreferences::prefs.menuPtr = menu;     // also store last menu selection
         //Serial.println("menu: " + String(p.menuPtr));
         text = "Snap " + String(memPtr + 1) + " STORED ";
         snapname = "snap" + String(memPtr);
         //Serial.println("store snapname: " + snapname);
         //Serial.println("store: p.menuPtr = " + String(p.menuPtr));
-        writePreferences(snapname);
+        writePreferences(snapname, prefs);
         /// insert the correct bit into p.snapShots & update memory variables
         mask = mask << memPtr;
-        p.snapShots = p.snapShots | mask;
+        prefs.snapShots = MorsePreferences::prefs.snapShots | mask;
         //Serial.println("store p.snapShots: " + String(p.snapShots));
-        printOnScroll(2, BOLD, 0, text);
-        updateMemory(p.snapShots);
+        MorseDisplay::printOnScroll(2, BOLD, 0, text);
+        updateMemory(MorsePreferences::prefs.snapShots);
         delay(1000);
         return true;
     }
@@ -439,8 +442,8 @@ void MorsePreferences::clearMemory(uint8_t ptr)
 {
     String text = "Snap " + String(memories[ptr] + 1) + " CLEARED";
 
-    p.snapShots &= ~(1 << memories[ptr]);     // clear the bit
-    printOnScroll(2, BOLD, 0, text);
-    updateMemory(p.snapShots);
+    prefs.snapShots &= ~(1 << memories[ptr]);     // clear the bit
+    MorseDisplay::printOnScroll(2, BOLD, 0, text);
+    updateMemory(prefs.snapShots);
     delay(1000);
 }

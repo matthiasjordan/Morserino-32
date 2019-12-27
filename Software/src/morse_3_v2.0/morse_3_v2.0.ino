@@ -57,9 +57,6 @@
 #define _max(a,b) ((a)>(b)?(a):(b))
 
 
-// define the buttons for the clickbutton library
-ClickButton modeButton(modeButtonPin);  // initialize mode button
-ClickButton volButton(volButtonPin);    // external pullup for this one
 
 
 /////////////////////// parameters for LF tone generation and  HF (= vol ctrl) PWM
@@ -98,9 +95,6 @@ volatile uint8_t stateRegister = 0;
 
 
 
-/// the states the morserino can be in - selected intop level menu
-enum morserinoMode {morseKeyer, loraTrx, morseTrx, morseGenerator, echoTrainer, morseDecoder, shutDown, measureNF, invalid };
-morserinoMode morseState = morseKeyer;
 
 //////// variables and constants for the modus menu
 
@@ -197,11 +191,6 @@ boolean quickStart;                                     // should we execute men
 #define    ULTIMATIC    3          // Ultimatic mode
 #define    NONSQUEEZE   4          // Non-squeeze mode of dual-lever paddles - simulate a single-lever paddle
 
-// define modes for state machine of the various modi the encoder can be in
- 
-enum encoderMode {speedSettingMode, volumeSettingMode, scrollMode }; 
-
-encoderMode encoderState = speedSettingMode;    // we start with adjusting the speed
 
 //// for adjusting preferences
 

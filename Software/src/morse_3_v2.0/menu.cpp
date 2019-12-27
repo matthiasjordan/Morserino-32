@@ -523,7 +523,7 @@ void displaySnapStore()
 
 //// function to addjust the selected preference
 
-boolean adjustKeyerPreference(prefPos pos)
+boolean Menu::adjustKeyerPreference(MorsePreferences::prefPos pos)
 {        /// rotating the encoder changes the value, click returns to preferences menu
     //printOnScroll(1, REGULAR, 0, " ");       /// returns true when a long button press ended it, and false when there was a short click
     printOnScroll(2, INVERSE_BOLD, 0, ">");
