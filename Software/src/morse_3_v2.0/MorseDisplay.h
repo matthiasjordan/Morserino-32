@@ -11,6 +11,7 @@ namespace MorseDisplay
     void init();
     void displayStartUp();
     void display();
+    void sleep();
     void clearAll();
     void clearStatusLine();
     String cleanUpProSigns(String &input);

@@ -1,4 +1,8 @@
 #include "MorseSystem.h"
+#include "MorseDisplay.h"
+#include "MorsePreferences.h"
+#include <WiFi.h>          // basic WiFi functionality
+#include <LoRa.h>          // library for LoRa transceiver
 
 using namespace MorseSystem;
 
@@ -37,6 +41,9 @@ int16_t batteryVoltage()
     return c;
 }
 
+volatile uint64_t TOTcounter;                       // holds millis for Time-Out Timer
+
+
 void resetTOT()
 {       //// reset the Time Out Timer - we do this whenever there is a screen update
     TOTcounter = millis();
@@ -46,22 +53,22 @@ void checkShutDown(boolean enforce)
 {       /// if enforce == true, we shut donw even if there was no time-out
     // unsigend long timeOut = ((morseState == loraTrx) || (morseState == morseTrx)) ? 450000 : 300000;  /// 7,5 or 5 minutes
     unsigned long timeOut;
-    switch (p_timeOut)
+    switch (MorsePreferences::prefs.timeOut)
     {
         case 4:
             timeOut = ULONG_MAX;
             break;
         default:
-            timeOut = 300000UL * p_timeOut;
+            timeOut = 300000UL * MorsePreferences::prefs.timeOut;
             break;
     }
 
     if ((millis() - TOTcounter) > timeOut || enforce == true)
     {
-        display.clear();
-        printOnScroll(1, INVERSE_BOLD, 0, "Power OFF...");
-        printOnScroll(2, REGULAR, 0, "RED to turn ON");
-        display.display();
+        MorseDisplay::clearAll();
+        MorseDisplay::printOnScroll(1, INVERSE_BOLD, 0, "Power OFF...");
+        MorseDisplay::printOnScroll(2, REGULAR, 0, "RED to turn ON");
+        MorseDisplay::display();
         delay(1500);
         shutMeDown();
     }
@@ -69,7 +76,7 @@ void checkShutDown(boolean enforce)
 
 void shutMeDown()
 {
-    display.sleep();                //OLED sleep
+    MorseDisplay::sleep();                //OLED sleep
     LoRa.sleep();                   //LORA sleep
     delay(50);
 #if BOARDVERSION == 3

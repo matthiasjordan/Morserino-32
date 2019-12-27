@@ -1,6 +1,17 @@
 #include "MorseDisplay.h"
 
 #include <Arduino.h>
+#include <Wire.h>          // Only needed for Arduino 1.6.5 and earlier
+#include "ClickButton.h"   // button control library
+#include <SPI.h>           // library for SPI interface
+#include <LoRa.h>          // library for LoRa transceiver
+#include <WiFi.h>          // basic WiFi functionality
+#include <ESPmDNS.h>       // DNS functionality
+#include <WiFiClient.h>    //WiFi clinet library
+#include <Update.h>        // update "over the air" (OTA) functionality
+#include "FS.h"
+#include "SPIFFS.h"
+
 #include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
 
 #include "morsedefs.h"
@@ -103,6 +114,10 @@ void MorseDisplay::clearAll() {
 
 void MorseDisplay::display() {
     display.display();
+}
+
+void MorseDisplay::sleep() {
+    display.sleep();
 }
 
 

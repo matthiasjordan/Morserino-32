@@ -1,6 +1,7 @@
 #ifndef MORSEDEFS_H
 #define MORSEDEFS_H
 
+#include <Arduino.h>
 #include "ClickButton.h"   // button control library
 
 //////// Program Version
@@ -118,8 +119,9 @@ const int batteryPin = 13;
 #define RST     14   // GPIO14 -- SX127x's RESET
 #define DI0     26   // GPIO26 -- SX127x's IRQ(Interrupt Request)
 
-// #define BAND    433E6  //you can set band here directly,e.g. 868E6,915E6
-#define PABOOST true
+// hash define BAND    433E6  //you can set band here directly,e.g. 868E6,915E6
+#define PABOOSTx true
+// This used to be PABOOST but it didn't work
 
 //// with the following we define which pins are used as output for the two pwm channels
 //// HF output (with varying duticycle and fixed frequency) and LF output (with varying frequency and fixed dutycycle of 50%)

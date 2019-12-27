@@ -184,7 +184,6 @@ int currentOptionSize;
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;
 
-volatile uint64_t TOTcounter;                       // holds millis for Time-Out Timer
 
 
 
