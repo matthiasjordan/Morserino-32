@@ -4,6 +4,6 @@
 
 using namespace MorseUI;
 
-void MorseUI::encoderClick() {
+void MorseUI::click() {
     MorseSound::pwmClick(MorsePreferences::prefs.sidetoneVolume);         /// click
 }

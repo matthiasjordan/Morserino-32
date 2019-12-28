@@ -54,6 +54,7 @@
 #include "koch.h"
 #include "MorseLoRa.h"
 #include "MorseSystem.h"
+#include "MorseUI.h"
 
 
 /// we need this for some strange reason: the min definition breaks with WiFi
@@ -660,7 +661,7 @@ void loop() {
                         
               }
               break;
-       case 2:  setupPreferences(p_menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
+       case 2:  setupPreferences(MorsePreferences::prefs.menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
                 MorseDisplay::clear();                                  // restore display
                 displayTopLine();
                 if (morseState == morseGenerator || morseState == echoTrainer) 
@@ -675,15 +676,15 @@ void loop() {
 /// and we have time to check the encoder
      if ((t = checkEncoder())) {
         //Serial.println("t: " + String(t));
-        pwmClick(MorsePreferences::prefs.sidetoneVolume);         /// click
+        MorseUI::click();
         switch (encoderState) {
           case speedSettingMode:  
                                   changeSpeed(t);
                                   break;
           case volumeSettingMode: 
-                                  p_sidetoneVolume += (t*10)+11;
-                                  p_sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) -11;
-                                  //Serial.println(p_sidetoneVolume);
+                                  MorsePreferences::prefs.sidetoneVolume += (t*10)+11;
+                                  MorsePreferences::prefs.sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) -11;
+                                  //Serial.println(MorsePreferences::prefs.sidetoneVolume);
                                   displayVolume();
                                   break;
           case scrollMode:
@@ -724,7 +725,7 @@ void cleanStartSettings() {
 
 
 void menu_() {
-   uint8_t newMenuPtr = p_menuPtr;
+   uint8_t newMenuPtr = MorsePreferences::prefs.menuPtr;
    uint8_t disp = 0;
    int t, command;
    
@@ -745,8 +746,8 @@ void menu_() {
     interWordTimer = 4294967000;                 // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
     genTimer = millis()-1;                       // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc... 
     */
-    clearScroll();                  // clear the buffer
-    clearScrollBuffer();
+    MorseDisplay::clearScroll();                  // clear the buffer
+    MorseDisplay::clearScrollBuffer();
 
     keyOut(false, true, 0, 0);
     keyOut(false, false, 0, 0);
@@ -754,11 +755,11 @@ void menu_() {
     currentOptions = allOptions;                 // this is the array of options when we double click the BLACK button: while in menu, you can change all of them
     currentOptionSize = SizeOfArray(allOptions);
     pref.begin("morserino", false);              // open the namespace as read/write
-    if ((p_fileWordPointer != pref.getUInt("fileWordPtr")))   // update word pointer if necessary (if we ran player before)
-       pref.putUInt("fileWordPtr", p_fileWordPointer);
+    if ((MorsePreferences::prefs.fileWordPointer != pref.getUInt("fileWordPtr")))   // update word pointer if necessary (if we ran player before)
+       pref.putUInt("fileWordPtr", MorsePreferences::prefs.fileWordPointer);
     pref.end(); 
     file.close();                               // just in case it is still open....
-    display.clear();
+    MorseDisplay::clear();
     
     while (true) {                          // we wait for a click (= selection)
         if (disp != newMenuPtr) {
@@ -769,10 +770,7 @@ void menu_() {
             quickStart = false;
             command = 1;
             delay(500);
-            printOnScroll(2, REGULAR, 1, "QUICK START");
-            display.display();
-            delay(500);
-            display.clear();
+            MorseDisplay::printOnScrollFlash(2, REGULAR, 1, "QUICK START");
         }
         else {
             modeButton.Update();
@@ -781,17 +779,17 @@ void menu_() {
 
         switch (command) {                                          // actions based on enocder button
           case 2: if (setupPreferences(newMenuPtr))                       // all available options when called from top menu
-                    newMenuPtr = p_menuPtr;
+                    newMenuPtr = MorsePreferences::prefs.menuPtr;
                   menuDisplay(newMenuPtr);
                   break;
           case 1: // check if we have a submenu or if we execute the selection
                   //Serial.println("newMP: " + String(newMenuPtr) + " navi: " + String(menuNav[newMenuPtr][naviDown]));
                   if (menuItems[newMenuPtr].nav[naviDown] == 0) {
-                      p_menuPtr = newMenuPtr;
+                      MorsePreferences::prefs.menuPtr = newMenuPtr;
                       disp = 0;
-                      if (menuItems[p_menuPtr].remember) {            // remember last executed, unless it is a wifi function or shutdown
+                      if (menuItems[MorsePreferences::prefs.menuPtr].remember) {            // remember last executed, unless it is a wifi function or shutdown
                           pref.begin("morserino", false);             // open the namespace as read/write
-                          pref.putUChar("lastExecuted", p_menuPtr);   // store last executed command
+                          pref.putUChar("lastExecuted", MorsePreferences::prefs.menuPtr);   // store last executed command
                           pref.end();                                 // close namespace
                       }
                       if (menuExec())
@@ -807,7 +805,7 @@ void menu_() {
         }
 
        if ((t=checkEncoder())) {
-          //pwmClick(p_sidetoneVolume);         /// click 
+          //pwmClick(MorsePreferences::prefs.sidetoneVolume);         /// click
           newMenuPtr =  menuItems[newMenuPtr].nav[(t == -1) ? naviLeft : naviRight];
        }
 
@@ -815,14 +813,14 @@ void menu_() {
     
        switch (volButton.clicks) {
           case -1:  audioLevelAdjust();                         /// for adjusting line-in audio level (at the same time keying tx and sending oudio on line-out
-                    display.clear();
+                    MorseDisplay::clear();
                     menuDisplay(disp);
                     break;
           /* case  3:  wifiFunction();                                  /// configure wifi, upload file or firmware update
                     break;
           */
        }
-       checkShutDown(false);                  // check for time out   
+       MorseSystem::checkShutDown(false);                  // check for time out
   } // end while - we leave as soon as the button has been pressed
 } // end menu_() 
 
@@ -833,27 +831,33 @@ void menuDisplay(uint8_t ptr) {
   uint8_t twoUp = menuItems[oneUp].nav[naviUp];
   uint8_t oneDown = menuItems[ptr].nav[naviDown];
     
-  printOnStatusLine(true, 0,  "Select Modus:     ");
+  MorseDisplay::printOnStatusLine(true, 0,  "Select Modus:     ");
 
-  clearLine(0); clearLine(1); clearLine(2);                       // delete previous content
+  //MorseDisplay::clearLine(0); MorseDisplay::clearLine(1); MorseDisplay::clearLine(2);                       // delete previous content
+  MorseDisplay::clearScroll();
   
   /// level 0: top line, possibly ".." on line 1
   /// level 1: higher level on 0, item on 1, possibly ".." on 2
   /// level 2: higher level on 1, highest level on 0, item on 2
   switch (menuItems[ptr].nav[naviLevel]) {
-    case 2: printOnScroll(2, BOLD, 0, menuItems[ptr].text);
-            printOnScroll(1, REGULAR, 0, menuItems[oneUp].text);
-            printOnScroll(0, REGULAR, 0, menuItems[twoUp].text);
+    case 2: {MorseDisplay::printOnScroll(2, BOLD, 0, menuItems[ptr].text);
+    MorseDisplay::printOnScroll(1, REGULAR, 0, menuItems[oneUp].text);
+    MorseDisplay::printOnScroll(0, REGULAR, 0, menuItems[twoUp].text);
             break;
-    case 1: if (oneDown)
-                printOnScroll(2, REGULAR, 0, String(".."));
-            printOnScroll(1, BOLD, 0, menuItems[ptr].text);
-            printOnScroll(0, REGULAR, 0, menuItems[oneUp].text);
+    }
+    case 1: {if (oneDown) {
+        MorseDisplay::printOnScroll(2, REGULAR, 0, String(".."));
+    }
+    MorseDisplay::printOnScroll(1, BOLD, 0, menuItems[ptr].text);
+    MorseDisplay::printOnScroll(0, REGULAR, 0, menuItems[oneUp].text);
+    }
             break;
-    case 0: 
-            if (oneDown)
-                printOnScroll(1, REGULAR, 0, String(".."));
-            printOnScroll(0, BOLD, 0, menuItems[ptr].text);
+    case 0: {
+            if (oneDown) {
+                MorseDisplay::printOnScroll(1, REGULAR, 0, String(".."));
+            }
+            MorseDisplay::printOnScroll(0, BOLD, 0, menuItems[ptr].text);
+    }
             break;
   }
 }
@@ -864,25 +868,25 @@ void menuDisplay(uint8_t ptr) {
 
 
 boolean menuExec() {                                          // return true if we should  leave menu after execution, true if we should stay in menu
-  //Serial.println("Executing menu item " + String(p_menuPtr));
+  //Serial.println("Executing menu item " + String(MorsePreferences::prefs.menuPtr));
 
   uint32_t wcount = 0;
 
   effectiveAutoStop = false;
-  effectiveTrainerDisplay = p_trainerDisplay;
+  effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
   
   kochActive = false;
-  switch (p_menuPtr) {
+  switch (MorsePreferences::prefs.menuPtr) {
     case  _keyer:  /// keyer
                 currentOptions = keyerOptions;                // list of available options in keyer mode
                 currentOptionSize = SizeOfArray(keyerOptions);
                 morseState = morseKeyer;
-                display.clear();
-                printOnScroll(1, REGULAR, 0, "Start CW Keyer" );
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer" );
                 delay(500);
-                display.clear();
+                MorseDisplay::clear();
                 displayTopLine();
-                printToScroll(REGULAR,"");      // clear the buffer
+                MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 clearPaddleLatches();
                 keyTx = true;
                 return true;
@@ -915,24 +919,24 @@ boolean menuExec() {                                          // return true if 
                 currentOptionSize = SizeOfArray(playerOptions);
      startPlayer:
                 file = SPIFFS.open("/player.txt");                            // open file
-                //skip p_fileWordPointer words, as they have been played before
-                wcount = p_fileWordPointer;
-                p_fileWordPointer = 0;
+                //skip MorsePreferences::prefs.fileWordPointer words, as they have been played before
+                wcount = MorsePreferences::prefs.fileWordPointer;
+                MorsePreferences::prefs.fileWordPointer = 0;
                 skipWords(wcount);
                 
      startTrainer:
-                generatorMode = menuItems[p_menuPtr].generatorMode;
+                generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
                 startFirst = true;
                 firstTime = true;
                 morseState = morseGenerator;
-                display.clear();
-                printOnScroll(0, REGULAR, 0, "Generator     ");
-                printOnScroll(1, REGULAR, 0, "Start/Stop:   ");
-                printOnScroll(2, REGULAR, 0, "Paddle | BLACK");
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(0, REGULAR, 0, "Generator     ");
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start/Stop:   ");
+                MorseDisplay::printOnScroll(2, REGULAR, 0, "Paddle | BLACK");
                 delay(1250);
-                display.clear();
+                MorseDisplay::clear();
                 displayTopLine();
-                clearScroll();      // clear the buffer
+                MorseDisplay::clearScroll();      // clear the buffer
                 keyTx = true;
                 return true;
                 break;
@@ -943,29 +947,29 @@ boolean menuExec() {                                          // return true if 
       case  _echoMixed:
                 currentOptions = echoTrainerOptions;                        // list of available options in echo trainer mode
                 currentOptionSize = SizeOfArray(echoTrainerOptions);
-                generatorMode = menuItems[p_menuPtr].generatorMode;
+                generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
                 goto startEcho;
       case  _echoPlayer:    /// echo trainer
-                generatorMode = menuItems[p_menuPtr].generatorMode;
+                generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
                 currentOptions = echoPlayerOptions;                         // list of available options in echo player mode
                 currentOptionSize = SizeOfArray(echoPlayerOptions);
                 file = SPIFFS.open("/player.txt");                            // open file
-                //skip p_fileWordPointer words, as they have been played before
-                wcount = p_fileWordPointer;
-                p_fileWordPointer = 0;
+                //skip MorsePreferences::prefs.fileWordPointer words, as they have been played before
+                wcount = MorsePreferences::prefs.fileWordPointer;
+                MorsePreferences::prefs.fileWordPointer = 0;
                 skipWords(wcount);
        startEcho:
                 startFirst = true;
                 morseState = echoTrainer;
                 echoStop = false;
-                display.clear();
-                printOnScroll(0, REGULAR, 0, generatorMode == KOCH_LEARN ? "New Character:" : "Echo Trainer:");
-                printOnScroll(1, REGULAR, 0, "Start:       ");
-                printOnScroll(2, REGULAR, 0, "Press paddle ");
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(0, REGULAR, 0, generatorMode == KOCH_LEARN ? "New Character:" : "Echo Trainer:");
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
+                MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
                 delay(1250);
-                display.clear();
+                MorseDisplay::clear();
                 displayTopLine();
-                printToScroll(REGULAR,"");      // clear the buffer
+                MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 keyTx = false;
                 return true;
                 break;
@@ -973,8 +977,8 @@ boolean menuExec() {                                          // return true if 
                 displayKeyerPreferencesMenu(posKochFilter);
                 adjustKeyerPreference(posKochFilter);
                 writePreferences("morserino");
-                //createKochWords(p_wordLength, p_kochFilter) ;  // update the arrays!
-                //createKochAbbr(p_abbrevLength, p_kochFilter);
+                //createKochWords(MorsePreferences::prefs.wordLength, MorsePreferences::prefs.kochFilter) ;  // update the arrays!
+                //createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
                 return false;
                 break;
       case  _kochLearn:   // Koch Learn New .  /// just a new generatormode....
@@ -1034,12 +1038,12 @@ boolean menuExec() {                                          // return true if 
                 currentOptions = loraTrxOptions;                            // list of available options in lora trx mode
                 currentOptionSize = SizeOfArray(loraTrxOptions);
                 morseState = loraTrx;
-                display.clear();
-                printOnScroll(1, REGULAR, 0, "Start LoRa Trx" );
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx" );
                 delay(600);
-                display.clear();
+                MorseDisplay::clear();
                 displayTopLine();
-                printToScroll(REGULAR,"");      // clear the buffer
+                MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 clearPaddleLatches();
                 keyTx = false;
                 clearText = "";
@@ -1050,8 +1054,8 @@ boolean menuExec() {                                          // return true if 
                 currentOptions = extTrxOptions;                            // list of available options in ext trx mode
                 currentOptionSize = SizeOfArray(extTrxOptions);
                 morseState = morseTrx;
-                display.clear();
-                printOnScroll(1, REGULAR, 0, "Start CW Trx" );
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx" );
                 clearPaddleLatches();
                 keyTx = true;
                 goto setupDecoder;
@@ -1064,18 +1068,18 @@ boolean menuExec() {                                          // return true if 
                 //trainerMode = false;
                 encoderState = volumeSettingMode;
                 keyTx = false;
-                display.clear();
-                printOnScroll(1, REGULAR, 0, "Start Decoder" );
+                MorseDisplay::clear();
+                MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Decoder" );
       setupDecoder:
                 speedChanged = true;
                 delay(650);
-                display.clear();
+                MorseDisplay::clear();
                 displayTopLine();
                 drawInputStatus(false);
-                printToScroll(REGULAR,"");      // clear the buffer
+                MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 
                 displayCWspeed();
-                displayVolume();
+                MorseDisplay::displayVolume();
                   
                 /// set up variables for Goertzel Morse Decoder
                 setupGoertzel();
@@ -1087,14 +1091,13 @@ boolean menuExec() {                                          // return true if 
                 break;
       case  _wifi_mac:
                 WiFi.mode(WIFI_MODE_STA);               // init WiFi as client
-                display.clear();
-                display.display();
-                printOnStatusLine(true, 0,  WiFi.macAddress());
+                MorseDisplay::clearDisplay();
+                MorseDisplay::printOnStatusLine(true, 0,  WiFi.macAddress());
                 delay(2000);
-                printOnScroll(0, REGULAR, 0, "RED: restart" );
+                MorseDisplay::printOnScroll(0, REGULAR, 0, "RED: restart" );
                 delay(1000);  
                 while (true) {
-                  checkShutDown(false);  // possibly time-out: go to sleep
+                  MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
                   if (digitalRead(volButtonPin) == LOW)
                     ESP.restart();
                 }
@@ -1103,23 +1106,23 @@ boolean menuExec() {                                          // return true if 
                 startAP();          // run as AP to get WiFi credentials from user
                 break;
       case _wifi_check:
-                display.clear();
-                display.display();
-                printOnStatusLine(true, 0,  "Connecting... ");
+                MorseDisplay::clearDisplay();
+                MorseDisplay::printOnStatusLine(true, 0,  "Connecting... ");
                 if (! wifiConnect())
                     ; //return false;  
                 else {
-                    printOnStatusLine(true, 0,  "Connected!    ");
-                    printOnScroll(0, REGULAR, 0, p_wlanSSID);
-                    printOnScroll(1, REGULAR, 0, WiFi.localIP().toString());
+                    MorseDisplay::printOnStatusLine(true, 0,  "Connected!    ");
+                    MorseDisplay::printOnScroll(0, REGULAR, 0, MorsePreferences::prefs.wlanSSID);
+                    MorseDisplay::printOnScroll(1, REGULAR, 0, WiFi.localIP().toString());
                 }
                 WiFi.mode( WIFI_MODE_NULL ); // switch off WiFi                      
                 delay(1000);
-                printOnScroll(2, REGULAR, 0, "RED: return" );
+                MorseDisplay::printOnScroll(2, REGULAR, 0, "RED: return" );
                 while (true) {
-                      checkShutDown(false);  // possibly time-out: go to sleep
-                      if (digitalRead(volButtonPin) == LOW)
+                      MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
+                      if (digitalRead(volButtonPin) == LOW) {
                         return false;
+                      }
                 }
                 break;
       case _wifi_upload:
@@ -1129,7 +1132,7 @@ boolean menuExec() {                                          // return true if 
                 updateFirmware();   // run OTA update
                 break;
       case  _goToSleep: /// deep sleep
-                checkShutDown(true);
+                MorseSystem::checkShutDown(true);
       default:  break;
   }
   return false;
@@ -1150,7 +1153,7 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
   static long latencytimer;                // timer for "muting" paddles for some time in state INTER_ELEMENT
   unsigned int pitch;
 
-  if (!p_didah)   {              // swap left and right values if necessary!
+  if (!MorsePreferences::prefs.didah)   {              // swap left and right values if necessary!
       paddleSwap = dit; dit = dah; dah = paddleSwap; 
   }
       
@@ -1163,7 +1166,7 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
                  cwForLora(3);
                  sendWithLora();                        // finalise the string and send it to LoRA
              }
-             printToScroll(REGULAR, " ");                       // output a blank
+             MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
              interWordTimer = 4294967000;                       // almost the biggest possible unsigned long number :-) - do not output extra spaces!
              if (echoTrainerState == COMPLETE_ANSWER)   {       // change the state of the trainer at end of word
                 echoTrainerState = EVAL_ANSWER;
@@ -1197,14 +1200,14 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
 
     case DIT:
     /// first we check that we have waited as defined by ACS settings
-            if ( p_ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
+            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
               break;
             clearPaddleLatches();                           // always clear the paddle latches at beginning of new element
             keyerControl |= DIT_LAST;                        // remember that we process a DIT
 
             ktimer = ditLength;                              // prime timer for dit
-            switch ( p_keyermode ) {
-              case IAMBICB:  curtistimer = 2 + (ditLength * p_curtisBDotTiming / 100);   
+            switch ( MorsePreferences::prefs.keyermode ) {
+              case IAMBICB:  curtistimer = 2 + (ditLength * MorsePreferences::prefs.curtisBDotTiming / 100);
                              break;                         // enhanced Curtis mode B starts checking after some time
               case NONSQUEEZE:
                              curtistimer = 3;
@@ -1217,14 +1220,14 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
             break;
             
     case DAH:
-            if ( p_ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for 3 dits...
+            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for 3 dits...
               break;
             clearPaddleLatches();                          // clear the paddle latches
             keyerControl &= ~(DIT_LAST);                    // clear dit latch  - we are not processing a DIT
             
             ktimer = dahLength;
-            switch (p_keyermode) {
-              case IAMBICB:  curtistimer = 2 + (dahLength * p_curtisBTiming / 100);    // enhanced Curtis mode B starts checking after some time
+            switch (MorsePreferences::prefs.keyermode) {
+              case IAMBICB:  curtistimer = 2 + (dahLength * MorsePreferences::prefs.curtisBTiming / 100);    // enhanced Curtis mode B starts checking after some time
                              break;
               case NONSQUEEZE:
                              curtistimer = 3;
@@ -1240,13 +1243,13 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
       
     case KEY_START:
           // Assert key down, start timing, state shared for dit or dah
-          pitch = notes[p_sidetoneFreq];
-          if ((morseState == echoTrainer || morseState == loraTrx) && p_echoToneShift != 0) {
-             pitch = (p_echoToneShift == 1 ? pitch * 18 / 17 : pitch * 17 / 18);        /// one half tone higher or lower, as set in parameters in echo trainer mode
+          pitch = notes[MorsePreferences::prefs.sidetoneFreq];
+          if ((morseState == echoTrainer || morseState == loraTrx) && MorsePreferences::prefs.echoToneShift != 0) {
+             pitch = (MorsePreferences::prefs.echoToneShift == 1 ? pitch * 18 / 17 : pitch * 17 / 18);        /// one half tone higher or lower, as set in parameters in echo trainer mode
           }
-           //pwmTone(pitch, p_sidetoneVolume, true);
+           //pwmTone(pitch, MorsePreferences::prefs.sidetoneVolume, true);
            //keyTransmitter();
-           keyOut(true, true, pitch, p_sidetoneVolume);
+           keyOut(true, true, pitch, MorsePreferences::prefs.sidetoneVolume);
            ktimer += millis();                     // set ktimer to interval end time          
            curtistimer += millis();                // set curtistimer to curtis end time
            keyerState = KEYED;                     // next state
@@ -1259,7 +1262,7 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
                //pwmNoTone();                      // stop side tone
                keyOut(false, true, 0, 0);
                ktimer = millis() + ditLength;    // inter-element time
-               latencytimer = millis() + ((p_latency-1) * ditLength / 8);
+               latencytimer = millis() + ((MorsePreferences::prefs.latency-1) * ditLength / 8);
                keyerState = INTER_ELEMENT;       // next state
             }
             else if (millis() > curtistimer ) {     // in Curtis mode we check paddle as soon as Curtis time is off
@@ -1272,7 +1275,7 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
             break;
  
     case INTER_ELEMENT:
-            //if ((p_keyermode != NONSQUEEZE) && (millis() < latencytimer)) {     // or should it be p_keyermode > 2 ? Latency for Ultimatic mode?
+            //if ((MorsePreferences::prefs.keyermode != NONSQUEEZE) && (millis() < latencytimer)) {     // or should it be MorsePreferences::prefs.keyermode > 2 ? Latency for Ultimatic mode?
             if (millis() < latencytimer) {
               if (keyerControl & DIT_LAST)       // last element was a dit
                     updatePaddleLatch(false, dah);  // not sure here: we only check the opposite paddle - should be ok for Curtis B
@@ -1286,7 +1289,7 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
                     switch(keyerControl) {
                           case 3:                                         // both paddles are latched
                           case 7: 
-                                  switch (p_keyermode) {
+                                  switch (MorsePreferences::prefs.keyermode) {
                                       case NONSQUEEZE:  if (DIT_FIRST)                      // when first element was a DIT
                                                                setDITstate();            // next element is a DIT again
                                                         else                                // but when first element was a DAH
@@ -1325,13 +1328,13 @@ boolean doPaddleIambic (boolean dit, boolean dah) {
                                    // if we have seen 12 chars since changing speed, we write the config to preferences (speed and left & right thresholds)
                                    if (charCounter == 12) {
                                       pref.begin("morserino", false);             // open the namespace as read/write
-                                      pref.putUChar("wpm", p_wpm);
-                                      pref.putUChar("tLeft", p_tLeft);
-                                      pref.putUChar("tRight", p_tRight);
+                                      pref.putUChar("wpm", MorsePreferences::prefs.wpm);
+                                      pref.putUChar("tLeft", MorsePreferences::prefs.tLeft);
+                                      pref.putUChar("tRight", MorsePreferences::prefs.tRight);
                                       pref.end();
                                    }
-                                   if (p_ACSlength > 0)
-                                        acsTimer = millis() + p_ACSlength * ditLength; // prime the ACS timer
+                                   if (MorsePreferences::prefs.ACSlength > 0)
+                                        acsTimer = millis() + MorsePreferences::prefs.ACSlength * ditLength; // prime the ACS timer
                                    if (morseState == morseKeyer || morseState == loraTrx || morseState == morseTrx)
                                       interWordTimer = millis() + 5*ditLength;
                                    else
@@ -1364,15 +1367,15 @@ boolean checkPaddles() {
   static long lTimer = 0, rTimer = 0;
   const int debDelay = 750;       // debounce time = 0,75  ms
   
-  /* intral and external paddle are now working in parallel - the parameter p_extPaddle is used to indicate reverse polarity of external paddle
+  /* intral and external paddle are now working in parallel - the parameter MorsePreferences::prefs.extPaddle is used to indicate reverse polarity of external paddle
   */
-  left = p_useExtPaddle ? rightPin : leftPin;
-  right = p_useExtPaddle ? leftPin : rightPin;
+  left = MorsePreferences::prefs.useExtPaddle ? rightPin : leftPin;
+  right = MorsePreferences::prefs.useExtPaddle ? leftPin : rightPin;
   sensor = readSensors(LEFT, RIGHT);
   newL = (sensor >> 1) | (!digitalRead(left)) ;
   newR = (sensor & 0x01) | (!digitalRead(right)) ;
 
-  if ((p_keyermode == NONSQUEEZE) && newL && newR) 
+  if ((MorsePreferences::prefs.keyermode == NONSQUEEZE) && newL && newR)
     return (leftKey || rightKey);
 
   if (newL != oldL)
@@ -1429,7 +1432,7 @@ void setDAHstate() {
 
 // toggle polarity of paddles
 void togglePolarity () {
-      p_didah = !p_didah; 
+      MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;
      //displayPolarity();
 }
   
@@ -1442,7 +1445,7 @@ void displayMorse() {
     return;
   symbol = CWtree[treeptr].symb;
   //Serial.println("Symbol: " + symbol + " treeptr: " + String(treeptr));
-  printToScroll( REGULAR, symbol);
+  MorseDisplay::printToScroll( REGULAR, symbol);
   if (morseState == echoTrainer) {                /// store the character in the response string
       symbol.replace("<as>", "S");
       symbol.replace("<ka>", "A");
@@ -1464,34 +1467,28 @@ void displayMorse() {
 //////// 0    5    0
 
 void displayTopLine() {
-  clearStatusLine();
+    MorseDisplay::clearStatusLine();
 
-  // printOnStatusLine(true, 0, (p_useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
+  // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
   if (morseState == morseGenerator) 
-    printOnStatusLine(true, 1,  p_wordDoubler ? "x2" : "  ");
+      MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
   else {
-    switch (p_keyermode) {
-      case IAMBICA:   printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
-      case IAMBICB:   printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
-      case ULTIMATIC: printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
-      case NONSQUEEZE: printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
+    switch (MorsePreferences::prefs.keyermode) {
+      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
+      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
+      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
+      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
     }
   }
 
   displayCWspeed();                                     // update display of CW speed
-  if ((morseState == loraTrx ) || (morseState == morseGenerator  && p_loraTrainerMode == true))
+  if ((morseState == loraTrx ) || (morseState == morseGenerator  && MorsePreferences::prefs.loraTrainerMode == true))
       dispLoraLogo();
 
-  displayVolume();                                     // sidetone volume
-  display.display();
+  MorseDisplay::displayVolume();                                     // sidetone volume
+  MorseDisplay::display();
 }
 
-void dispLoraLogo() {     // display a small logo in the top right corner to indicate we operate with LoRa
-  display.setColor(BLACK);
-  display.drawXbm(121, 2, lora_width, lora_height, lora_bits);
-  display.setColor(WHITE);
-  display.display();
-}
 
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
@@ -1501,12 +1498,12 @@ void displayCWspeed () {
       sprintf(numBuffer, "(%2i)", effWpm);   
   else sprintf(numBuffer, "    ");
   
-  printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
+  MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
   
-  sprintf(numBuffer, "%2i", p_wpm);
-  printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
-  printOnStatusLine(false, 10,  "WpM");
-  display.display();
+  sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
+  MorseDisplay::printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
+  MorseDisplay::printOnStatusLine(false, 10,  "WpM");
+  MorseDisplay::display();
 }
 
 
@@ -1533,22 +1530,22 @@ uint8_t readSensors(int left, int right) {
     ;                                       // ignore readings with value 0
   rValue = (rValue+v) /2;
 
-  if (lValue < (p_tLeft+10))     {           //adaptive calibration
-      //if (first) Serial.println("p-tLeft " + String(p_tLeft));
+  if (lValue < (MorsePreferences::prefs.tLeft+10))     {           //adaptive calibration
+      //if (first) Serial.println("p-tLeft " + String(MorsePreferences::prefs.tLeft));
       //if (first) Serial.print("lValue: "); if (first) Serial.println(lValue);
-      //printOnScroll(0, INVERSE_BOLD, 0,  String(lValue) + " " + String(p_tLeft));
-      p_tLeft = ( 7*p_tLeft +  ((lValue+lUntouched) / SENS_FACTOR) ) / 8;
-      //Serial.print("p_tLeft: "); Serial.println(p_tLeft);
+      //printOnScroll(0, INVERSE_BOLD, 0,  String(lValue) + " " + String(MorsePreferences::prefs.tLeft));
+      MorsePreferences::prefs.tLeft = ( 7*MorsePreferences::prefs.tLeft +  ((lValue+lUntouched) / SENS_FACTOR) ) / 8;
+      //Serial.print("MorsePreferences::prefs.tLeft: "); Serial.println(MorsePreferences::prefs.tLeft);
   }
-  if (rValue < (p_tRight+10))     {           //adaptive calibration
-      //if (first) Serial.println("p-tRight " + String(p_tRight));
+  if (rValue < (MorsePreferences::prefs.tRight+10))     {           //adaptive calibration
+      //if (first) Serial.println("p-tRight " + String(MorsePreferences::prefs.tRight));
       //if (first) Serial.print("rValue: "); if (first) Serial.println(rValue);
-      //printOnScroll(1, INVERSE_BOLD, 0,  String(rValue) + " " + String(p_tRight));
-      p_tRight = ( 7*p_tRight +  ((rValue+rUntouched) / SENS_FACTOR) ) / 8;
-      //Serial.print("p_tRight: "); Serial.println(p_tRight);
+      //printOnScroll(1, INVERSE_BOLD, 0,  String(rValue) + " " + String(MorsePreferences::prefs.tRight));
+      MorsePreferences::prefs.tRight = ( 7*MorsePreferences::prefs.tRight +  ((rValue+rUntouched) / SENS_FACTOR) ) / 8;
+      //Serial.print("MorsePreferences::prefs.tRight: "); Serial.println(MorsePreferences::prefs.tRight);
   }
   //first = false;
-  return ( lValue < p_tLeft ? 2 : 0 ) + (rValue < p_tRight ? 1 : 0 );
+  return ( lValue < MorsePreferences::prefs.tLeft ? 2 : 0 ) + (rValue < MorsePreferences::prefs.tRight ? 1 : 0 );
 }
 
 
@@ -1567,8 +1564,8 @@ void initSensors() {
   }
   lUntouched /= 8;
   rUntouched /= 8;
-  p_tLeft = lUntouched - 9;
-  p_tRight = rUntouched - 9;
+  MorsePreferences::prefs.tLeft = lUntouched - 9;
+  MorsePreferences::prefs.tRight = rUntouched - 9;
 }
 
 
@@ -1614,7 +1611,7 @@ String getRandomChars( int maxLength, int option) {             /// random char 
       maxLength = random(2, maxLength - 3);                     // maxLength is max 10, so random upper limit is 7, means max 6 chars...
     }
     if (kochActive) {                                           // kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:"
-        int endk =  p_kochFilter;                               //              1   5    1    5    2    5    3    5    4    5    5  
+        int endk =  MorsePreferences::prefs.kochFilter;                               //              1   5    1    5    2    5    3    5    4    5    5
         for (i = 0; i < maxLength; ++i) {
         if (random(2))                                          // in Koch mode, we generate the last third of the chars learned  a bit more often
             result += kochChars.charAt(random(2*endk/3, endk));
@@ -1762,8 +1759,8 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
                 if (clearText.length() > 0) {                          // this should not be reached at all.... except when display word by word
                   //Serial.println("Text left: " + clearText);
                   if (morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_WORD) ||
-                        ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY)) {
-                      printToScroll(BOLD,cleanUpProSigns(clearText));
+                        ( morseState == echoTrainer && MorsePreferences::prefs.echoDisplay != CODE_ONLY)) {
+                      MorseDisplay::printToScroll(BOLD,MorseDisplay::cleanUpProSigns(clearText));
                       clearText = "";
                   }
                 }
@@ -1772,7 +1769,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
                 if (CWword.length() == 0)                             // we really should have something here - unless in trx mode; in this case return
                   return;
                 if ((morseState == echoTrainer)) {
-                  printToScroll(REGULAR, "\n");
+                    MorseDisplay::printToScroll(REGULAR, "\n");
                 }
             }
             c = CWword[0];                                            // retrieve next element from CWword; if 0, we were at end of character
@@ -1781,7 +1778,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
                    if (c == '0') {
                       c = CWword[0];                                  // retrieve next element from CWword;
                       CWword.remove(0,1); 
-                      if (morseState == morseGenerator && p_loraTrainerMode == 1)
+                      if (morseState == morseGenerator && MorsePreferences::prefs.loraTrainerMode == 1)
                           cwForLora(0);                             // send end of character to lora
                       }
             }   /// at end of character
@@ -1789,29 +1786,29 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             //// insert code here for outputting only on display, and not as morse characters - for echo trainer
             //// genTimer vy short (1ms?)
             //// no keyOut()
-            if (morseState == echoTrainer && p_echoDisplay == DISP_ONLY)
+            if (morseState == echoTrainer && MorsePreferences::prefs.echoDisplay == DISP_ONLY)
                 genTimer = millis() + 2;      // very short timing
             else if (morseState != loraTrx)
                 genTimer = millis() + (c == '1' ? ditLength : dahLength);           // start a dit or a dah, acording to the next element
             else 
                 genTimer = millis() + (c == '1' ? rxDitLength : rxDahLength);
-            if (morseState == morseGenerator && p_loraTrainerMode == 1)             // send the element to LoRa
+            if (morseState == morseGenerator && MorsePreferences::prefs.loraTrainerMode == 1)             // send the element to LoRa
                 c == '1' ? cwForLora(1) : cwForLora(2) ; 
             /// if Koch learn character we show dit or dah
             if (generatorMode == KOCH_LEARN)
-                printToScroll(REGULAR, c == '1' ? "."  : "-");
+                MorseDisplay::printToScroll(REGULAR, c == '1' ? "."  : "-");
 
-            silentEcho = (morseState == echoTrainer && p_echoDisplay == DISP_ONLY); // echo mode with no audible prompt
+            silentEcho = (morseState == echoTrainer && MorsePreferences::prefs.echoDisplay == DISP_ONLY); // echo mode with no audible prompt
 
             if (silentEcho || stopFlag)                                             // we finished maxSequence and so do start output (otherwise we get a short click)
               ;
             else  {
-                keyOut(true, (morseState != loraTrx), notes[p_sidetoneFreq], p_sidetoneVolume);
+                keyOut(true, (morseState != loraTrx), notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
             }
             /* // replaced by the lines above, to also take care of maxSequence
-            if ( ! (morseState == echoTrainer && p_echoDisplay == DISP_ONLY)) 
+            if ( ! (morseState == echoTrainer && MorsePreferences::prefs.echoDisplay == DISP_ONLY))
                    
-                        keyOut(true, (morseState != loraTrx), notes[p_sidetoneFreq], p_sidetoneVolume);
+                        keyOut(true, (morseState != loraTrx), notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
             */
             generatorState = KEY_DOWN;                              // next state = key down = dit or dah
 
@@ -1830,7 +1827,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
                 if (morseState == echoTrainer) {
                     switch (echoTrainerState) {
                         case START_ECHO:  echoTrainerState = SEND_WORD;
-                                          genTimer = millis() + interCharacterSpace + (p_promptPause * interWordSpace);
+                                          genTimer = millis() + interCharacterSpace + (MorsePreferences::prefs.promptPause * interWordSpace);
                                           break;
                         case REPEAT_WORD:
                                           // fall through 
@@ -1838,19 +1835,19 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
                                                 break;
                                           else {
                                                 echoTrainerState = GET_ANSWER;
-                                                if (p_echoDisplay != CODE_ONLY) {
-                                                    printToScroll(REGULAR, " ");
-                                                    printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
+                                                if (MorsePreferences::prefs.echoDisplay != CODE_ONLY) {
+                                                    MorseDisplay::printToScroll(REGULAR, " ");
+                                                    MorseDisplay::printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
                                                 }
                                                 ++repeats;
-                                                genTimer = millis() + p_responsePause * interWordSpace;
+                                                genTimer = millis() + MorsePreferences::prefs.responsePause * interWordSpace;
                                           }
                         default:          break;
                     }
                 }
                 else { 
                       genTimer = millis() + (morseState == loraTrx ? rxInterWordSpace : interWordSpace) ;              // we need a pause for interWordSpace
-                      if (morseState == morseGenerator && p_loraTrainerMode == 1) {                                   // in generator mode and we want to send with LoRa
+                      if (morseState == morseGenerator && MorsePreferences::prefs.loraTrainerMode == 1) {                                   // in generator mode and we want to send with LoRa
                           cwForLora(0);
                           cwForLora(3);                           // as we have just finished a word
                           //Serial.println("cwForLora(3);");
@@ -1863,7 +1860,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
 //              // display last character 
 //              // genTimer small if in echo mode and no code!
                 dispGeneratedChar(); 
-                if (morseState == echoTrainer && p_echoDisplay == DISP_ONLY)
+                if (morseState == echoTrainer && MorsePreferences::prefs.echoDisplay == DISP_ONLY)
                     genTimer = millis() +1;
                 else            
                     genTimer = millis() + (morseState == loraTrx ? rxInterCharacterSpace : interCharacterSpace);          // pause = intercharacter space
@@ -1879,25 +1876,26 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
 
 /// when generating CW, we display the character (under certain circumstances)
 /// add code to display in echo mode when parameter is so set
-/// p_echoDisplay 1 = CODE_ONLY 2 = DISP_ONLY 3 = CODE_AND_DISP
+/// MorsePreferences::prefs.echoDisplay 1 = CODE_ONLY 2 = DISP_ONLY 3 = CODE_AND_DISP
 
 void dispGeneratedChar() {
   static String charString;
   charString.reserve(10);
   
   if (generatorMode == KOCH_LEARN || morseState == loraTrx || (morseState == morseGenerator && effectiveTrainerDisplay == DISPLAY_BY_CHAR) ||
-                    ( morseState == echoTrainer && p_echoDisplay != CODE_ONLY ))
+                    ( morseState == echoTrainer && MorsePreferences::prefs.echoDisplay != CODE_ONLY ))
                     //&& echoTrainerState != SEND_WORD
                     //&& echoTrainerState != REPEAT_WORD)) 
     
       {       /// we need to output the character on the display now  
         charString = clearText.charAt(0);                   /// store first char of clearText in charString
         clearText.remove(0,1);                              /// and remove it from clearText
+        if (generatorMode == KOCH_LEARN) {
+            MorseDisplay::printToScroll(REGULAR,"");                      // clear the buffer first
+        }
+        MorseDisplay::printToScroll(morseState == loraTrx ? BOLD : REGULAR, MorseDisplay::cleanUpProSigns(charString));
         if (generatorMode == KOCH_LEARN)
-            printToScroll(REGULAR,"");                      // clear the buffer first
-        printToScroll(morseState == loraTrx ? BOLD : REGULAR, cleanUpProSigns(charString));
-        if (generatorMode == KOCH_LEARN)
-            printToScroll(REGULAR," ");                      // output a space
+            MorseDisplay::printToScroll(REGULAR," ");                      // output a space
       }   //// end display_by_char
       
       ++charCounter;                         // count this character
@@ -1905,7 +1903,7 @@ void dispGeneratedChar() {
      // if we have seen 12 chars since changing speed, we write the config to Preferences
      if (charCounter == 12) {
         pref.begin("morserino", false);             // open the namespace as read/write
-        pref.putUChar("wpm", p_wpm);
+        pref.putUChar("wpm", MorsePreferences::prefs.wpm);
         pref.end();
      }
 }
@@ -1921,7 +1919,7 @@ void fetchNewWord() {
        startFirst = false;
        ////// from here: retrieve next CWword from buffer!
         if (loRaBuReady()) {
-            printToScroll(BOLD, " ");
+            MorseDisplay::printToScroll(BOLD, " ");
             uint8_t header = decodePacket(&rssi, &rxWpm, &CWword);
             //Serial.println("Header: " + (String) header);
             //Serial.println("CWword: " + (String) CWword);
@@ -1940,9 +1938,8 @@ void fetchNewWord() {
             rxDahLength = 3* rxDitLength ;                      // calculate the other timing values
             rxInterCharacterSpace = 3 * rxDitLength;
             rxInterWordSpace = 7 * rxDitLength;
-            sprintf(numBuffer, "%2ir", rxWpm);
-            printOnStatusLine(true, 4,  numBuffer); 
-            printOnStatusLine(true, 9, "s");
+            MorseDisplay::vprintOnStatusLine(true, 4, "%2ir", rxWpm);
+            MorseDisplay::printOnStatusLine(true, 9, "s");
             updateSMeter(rssi);                                 // indicate signal strength of new packet
        }
        else return;                                             // we did not receive anything
@@ -1952,7 +1949,7 @@ void fetchNewWord() {
 
     //if (morseState != echoTrainer)
     if ((morseState == morseGenerator) && !effectiveAutoStop) {
-        printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+        MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
     }
     
     if (generatorMode == KOCH_LEARN) {
@@ -1962,20 +1959,20 @@ void fetchNewWord() {
     if (startFirst == true)  {                                 /// do the intial sequence in trainer mode, too
         clearText = "vvvA";
         startFirst = false;
-    } else if (morseState == morseGenerator && p_wordDoubler == true && firstTime == false) {
+    } else if (morseState == morseGenerator && MorsePreferences::prefs.wordDoubler == true && firstTime == false) {
         clearText = echoTrainerWord;
         firstTime = true;
     } else if (morseState == echoTrainer) {
         interWordTimer = 4294967000;                   /// interword timer should not trigger something now
         //Serial.println("echoTrainerState: " + String(echoTrainerState));
         switch (echoTrainerState) {
-            case  REPEAT_WORD:  if (p_echoRepeats == 7 || repeats <= p_echoRepeats) 
+            case  REPEAT_WORD:  if (MorsePreferences::prefs.echoRepeats == 7 || repeats <= MorsePreferences::prefs.echoRepeats)
                                     clearText = echoTrainerWord;
                                 else {
                                     clearText = echoTrainerWord;
                                     if (generatorMode != KOCH_LEARN) {
-                                        printToScroll(INVERSE_REGULAR, cleanUpProSigns(clearText));    //// clean up first!
-                                        printToScroll(REGULAR, " ");
+                                        MorseDisplay::printToScroll(INVERSE_REGULAR, MorseDisplay::cleanUpProSigns(clearText));    //// clean up first!
+                                        MorseDisplay::printToScroll(REGULAR, " ");
                                     }
                                     goto randomGenerate;
                                 }
@@ -1987,10 +1984,10 @@ void fetchNewWord() {
     } else {   
    
       randomGenerate:       repeats = 0;
-                            if (((morseState == morseGenerator) || (morseState == echoTrainer)) && (p_maxSequence != 0) &&
+                            if (((morseState == morseGenerator) || (morseState == echoTrainer)) && (MorsePreferences::prefs.maxSequence != 0) &&
                                     (generatorMode != KOCH_LEARN))  {                                           // a case for maxSequence
                                 ++ wordCounter;
-                                int limit = 1 + p_maxSequence;
+                                int limit = 1 + MorsePreferences::prefs.maxSequence;
                                 if (wordCounter == limit) {
                                   clearText = "+";
                                     echoStop = true;
@@ -2003,23 +2000,23 @@ void fetchNewWord() {
                             }
                             if (clearText != "+") {
                                 switch (generatorMode) {
-                                      case  RANDOMS:  clearText = getRandomChars(p_randomLength, p_randomOption);
+                                      case  RANDOMS:  clearText = getRandomChars(MorsePreferences::prefs.randomLength, MorsePreferences::prefs.randomOption);
                                                       break;
-                                      case  CALLS:    clearText = getRandomCall(p_callLength);
+                                      case  CALLS:    clearText = getRandomCall(MorsePreferences::prefs.callLength);
                                                       break;
-                                      case  ABBREVS:  clearText = getRandomAbbrev(p_abbrevLength);
+                                      case  ABBREVS:  clearText = getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
                                                       break;
-                                      case  WORDS:    clearText = getRandomWord(p_wordLength);
+                                      case  WORDS:    clearText = getRandomWord(MorsePreferences::prefs.wordLength);
                                                       break;
-                                      case  KOCH_LEARN:clearText = (String) kochChars.charAt(p_kochFilter - 1);
+                                      case  KOCH_LEARN:clearText = (String) kochChars.charAt(MorsePreferences::prefs.kochFilter - 1);
                                                       break;
                                       case  MIXED:    rv = random(4);
                                                       switch (rv) {
-                                                        case  0:  clearText = getRandomWord(p_wordLength);
+                                                        case  0:  clearText = getRandomWord(MorsePreferences::prefs.wordLength);
                                                                   break;
-                                                        case  1:  clearText = getRandomAbbrev(p_abbrevLength);
+                                                        case  1:  clearText = getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
                                                                     break;
-                                                        case  2:  clearText = getRandomCall(p_callLength);
+                                                        case  2:  clearText = getRandomCall(MorsePreferences::prefs.callLength);
                                                                   break;
                                                         case  3:  clearText = getRandomChars(1,OPT_PUNCTPRO);        // just a single pro-sign or interpunct
                                                                   break;
@@ -2027,23 +2024,23 @@ void fetchNewWord() {
                                                       break;
                                       case KOCH_MIXED:rv = random(3);
                                                       switch (rv) {
-                                                        case  0:  clearText = getRandomWord(p_wordLength);
+                                                        case  0:  clearText = getRandomWord(MorsePreferences::prefs.wordLength);
                                                                   break;
-                                                        case  1:  clearText = getRandomAbbrev(p_abbrevLength);
+                                                        case  1:  clearText = getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
                                                                     break;
-                                                        case  2:  clearText = getRandomChars(p_randomLength, OPT_KOCH);        // Koch option!
+                                                        case  2:  clearText = getRandomChars(MorsePreferences::prefs.randomLength, OPT_KOCH);        // Koch option!
                                                                   break;
                                                       }
                                                       break;
-                                      case PLAYER:    if (p_randomFile)
-                                                          skipWords(random(p_randomFile+1));
+                                      case PLAYER:    if (MorsePreferences::prefs.randomFile)
+                                                          skipWords(random(MorsePreferences::prefs.randomFile+1));
                                                       clearText = getWord();
                                                       /*
                                                       if (clearText == String()) {        /// at end of file: go to beginning again
-                                                        p_fileWordPointer = 0;
+                                                        MorsePreferences::prefs.fileWordPointer = 0;
                                                         file.close(); file = SPIFFS.open("/player.txt");
                                                       }
-                                                      ++p_fileWordPointer;
+                                                      ++MorsePreferences::prefs.fileWordPointer;
                                                       */
                                                       clearText = cleanUpText(clearText);
                                                       break;  
@@ -2070,14 +2067,14 @@ void updateSMeter(int rssi) {
       if (wasZero)
           return;
        else {
-          drawVolumeCtrl( false, 93, 0, 28, 15, 0);
+           MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, 0);
           wasZero = true;
        }
    else {
-      drawVolumeCtrl( false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
+       MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
       wasZero = false;
    }
-  display.display();
+  MorseDisplay::display();
 }
 
 ////// setup preferences ///////
@@ -2105,7 +2102,7 @@ boolean setupPreferences(uint8_t atMenu) {
   keyOut(false, true, 0, 0);                // turn the LED off, unkey transmitter, or whatever; just in case....
   keyOut(false,false, 0, 0);  
   displayKeyerPreferencesMenu(posPtr);
-  printOnScroll(2, REGULAR, 0,  " ");
+  MorseDisplay::printOnScroll(2, REGULAR, 0,  " ");
 
   while (true) {                            // we wait for single click = selection or long click = exit - or single or long click or RED button
         modeButton.Update();
@@ -2143,7 +2140,7 @@ boolean setupPreferences(uint8_t atMenu) {
           //// display the value of the preference in question
 
          if ((t=checkEncoder())) {
-            pwmClick(p_sidetoneVolume);         /// click 
+            MorseUI::click();
             ptrIndex = (ptrIndex +ptrMax + t) % ptrMax;
             //Serial.println("ptrIndex: " + String(ptrIndex));
             posPtr = currentOptions[ptrIndex];
@@ -2152,11 +2149,11 @@ boolean setupPreferences(uint8_t atMenu) {
             
             displayKeyerPreferencesMenu(posPtr);
             //printOnScroll(1, BOLD, 0, ">");
-            printOnScroll(2, REGULAR, 0, " ");
+            MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
 
-            display.display();                                                        // update the display   
+            MorseDisplay::display();                                                        // update the display
          }    // end if (encoderPos)
-         checkShutDown(false);         // check for time out
+         MorseSystem::checkShutDown(false);         // check for time out
   } // end while - we leave as soon as the button has been pressed long
 }   // end function setupKeyerPreferences()
 
@@ -2167,30 +2164,30 @@ void echoTrainerEval() {
     delay(interCharacterSpace / 2);
     if (echoResponse == echoTrainerWord) {
       echoTrainerState = SEND_WORD;
-      printToScroll(BOLD,  "OK");
-      if (p_echoConf) {
-          pwmTone(440,  p_sidetoneVolume, false);
+      MorseDisplay::printToScroll(BOLD,  "OK");
+      if (MorsePreferences::prefs.echoConf) {
+          pwmTone(440,  MorsePreferences::prefs.sidetoneVolume, false);
           delay(97);
           pwmNoTone();
-          pwmTone(587,  p_sidetoneVolume, false);
+          pwmTone(587,  MorsePreferences::prefs.sidetoneVolume, false);
           delay(193);
           pwmNoTone();
       }
       delay(interWordSpace);
-      if (p_speedAdapt)
+      if (MorsePreferences::prefs.speedAdapt)
           changeSpeed(1);
     } else {
       echoTrainerState = REPEAT_WORD;
       if (generatorMode != KOCH_LEARN || echoResponse != "") {
-          printToScroll(BOLD, "ERR");
-          if (p_echoConf) {
-              pwmTone(311,  p_sidetoneVolume, false);
+          MorseDisplay::printToScroll(BOLD, "ERR");
+          if (MorsePreferences::prefs.echoConf) {
+              pwmTone(311,  MorsePreferences::prefs.sidetoneVolume, false);
               delay(193);
               pwmNoTone();
           }
       }
       delay(interWordSpace);
-      if (p_speedAdapt)
+      if (MorsePreferences::prefs.speedAdapt)
           changeSpeed(-1);
     }
     echoResponse = "";
@@ -2200,8 +2197,8 @@ void echoTrainerEval() {
 
 
 void changeSpeed( int t) {
-  p_wpm += t;
-  p_wpm = constrain(p_wpm, 5, 60);
+  MorsePreferences::prefs.wpm += t;
+  MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
   updateTimings();
   displayCWspeed();                     // update display of CW speed
   charCounter = 0;                                    // reset character counter
@@ -2209,9 +2206,9 @@ void changeSpeed( int t) {
 
 
 void keyTransmitter() {
-  if (p_keyTrainerMode == 0 || morseState == echoTrainer || morseState == loraTrx )
+  if (MorsePreferences::prefs.keyTrainerMode == 0 || morseState == echoTrainer || morseState == loraTrx )
       return;                              // we never key Tx under these conditions
-  if (p_keyTrainerMode == 1 && morseState == morseGenerator)
+  if (MorsePreferences::prefs.keyTrainerMode == 1 && morseState == morseGenerator)
       return;                              // we key only in keyer mode; in all other case we key TX
   if (keyTx == false)
       return;                              // do not key when input is from tone decoder
@@ -2271,428 +2268,7 @@ String encodeProSigns( String &input ) {
 }
 
 
-//// new buffer code: unpack when needed, to save buffer space. We just use 256 bytes of buffer, instead of 32k! 
-//// in addition to the received packet, we need to store the RSSI as 8 bit positive number 
-//// (it is always between -20 and -150, so an 8bit integer is fine as long as we store it without sign as an unsigned number)
-//// the buffer is a 256 byte ring buffer with two pointers:
-////   nextBuRead where the next packet starts for reading it out; is incremented by l to get the next buffer read position
-////      you can read a packet as long as the buffer is not empty, so we need to check bytesBuFree before we read! if it is 256, the buffer is empty!
-////      with a read, the bytesBuFree has to be increased by the number of bytes read
-////   nextBuWrite where the next packet should be written; @write:
-////       increment nextBuWrite by l to get new pointer; and decrement bytesBuFree by l to get new free space
-//// we also need a variable that shows how many bytes are free (not in use): bytesBuFree
-//// if the next packet to be stored is larger than bytesBuFree, it is discarded
-//// structure of each packet:
-////    l:  1 uint8_t length of packet
-////    r:  1 uint8_t rssi as a positive number
-////    d:  (var. length) data packet as received by LoRa
-//// functions:
-////    int loRaBuWrite(int rssi, String packet): returns length of buffer if successful. otherwise 0
-////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
-////    boolean loRaBuReady():  true if there is something in the buffer, false otherwise
-////      example:
-////        (somewhere else as global var: ourBuffer[256]
-////        uint8_t myIndex;
-////        uint8_t mylength;
-////        foo() {
-////          myLength = loRaBuRead(&myIndex);
-////          if (myLength != 0) 
-////            doSomethingWith(ourBuffer[myIndex], myLength);
-////        }
 
-
-uint8_t loRaBuWrite(int rssi, String packet) {
-////   int loRaBuWrite(int rssi, String packet): returns length of buffer if successful. otherwise 0
-////   nextBuWrite where the next packet should be written; @write:
-////       increment nextBuWrite by l to get new pointer; and decrement bytesBuFree by l to get new free space
-  uint8_t l, posRssi;
-
-  posRssi = (uint8_t) abs(rssi);
-  l = 2 + packet.length();
-  if (byteBuFree < l)                               // buffer full - discard packet
-      return 0;
-  loRaRxBuffer[nextBuWrite++] = l;
-  loRaRxBuffer[nextBuWrite++] = posRssi;
-  for (int i = 0; i < packet.length(); ++i) {       // do this for all chars in the packet
-    loRaRxBuffer [nextBuWrite++] = packet[i];       // at end nextBuWrite is alread where it should be
-  }
-  byteBuFree -= l;
-  //Serial.println(byteBuFree);
-  //Serial.println((String)loRaRxBuffer[0]);
-  return l;
-}
-
-boolean loRaBuReady() {
-  if (byteBuFree == 256)
-    return (false);
-  else
-    return true;
-}
-
-
-uint8_t loRaBuRead(uint8_t* buIndex) {
-////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
-  uint8_t l;  
-  if (byteBuFree == 256)
-    return 0;
-  else {
-    l = loRaRxBuffer[nextBuRead++];
-    *buIndex = nextBuRead;
-    byteBuFree += l;
-    --l;
-    nextBuRead += l;
-    return l;
-  }
-}
-
-
-
-
-void storePacket(int rssi, String packet) {             // whenever we receive something, we just store it in our buffer
-  if (loRaBuWrite(rssi, packet) == 0)
-    Serial.println("LoRa Buffer full");
-}
-
-
-/// decodePacket analyzes packet as received and stored in buffer
-/// returns the header byte (protocol version*64 + 6bit packet serial number
-//// byte 0 (added by receiver): RSSI
-//// byte 1: header; first two bits are the protocol version (curently 01), plus 6 bit packet serial number (starting from random)
-//// byte 2: first 6 bits are wpm (must be between 5 and 60; values 00 - 04 and 61 to 63 are invalid), the remaining 2 bits are already data payload!
-
-
-uint8_t decodePacket(int* rssi, int* wpm, String* cwword) {
-  uint8_t l, c, header=0;
-  uint8_t index = 0;
-
-  l = loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
-
-  for (int i = 0; i < l; ++i) {     // decoding loop
-    c = loRaRxBuffer[index+i];
-
-    switch (i) {
-      case  0:  * rssi = (int) (-1 * c);    // the rssi byte
-                break;
-      case  1:  header = c;
-                break;
-      case  2:  *wpm = (uint8_t) (c >> 2);  // the first data byte contains the wpm info in the first six bits, and actual morse in the remaining two bits
-                                            // now take remaining two bits and store them in CWword as ASCII
-                *cwword = (char) ((c & B011) +48); 
-                break;
-      default:                              // decode the rest of the packet; we do this for all but the first byte  /// we need to handle end of word!!! therefore the break
-                for (int j = 0; j < 4; ++j) {
-                    char cc = ((c >> 2*(3-j)) & B011) ;                // we store them as ASCII characters 0,1,2,3 !
-                    if (cc != 3) {
-                        *cwword  += (char) (cc + 48);
-                    }
-                    else break;
-                }
-                break;
-    } // end switch
-  }   // end for
-  return header;
-}      // end decodePacket
-
-/////////////////////////////////////   MORSE DECODER ///////////////////////////////
-
-
-////////////////////////////
-///// Routines for morse decoder - to a certain degree based on code by Hjalmar Skovholm Hansen OZ1JHM - copyleft licence
-////////////////////////////
-
-//void setupMorseDecoder() {
-//  /// here we will do the init for decoder mode
-//  //trainerMode = false;
-//  encoderState = volumeSettingMode;
-//
-//  display.clear();
-//  printOnScroll(1, REGULAR, 0, "Start Decoder" );
-//  delay(750);
-//  display.clear();
-//  displayTopLine();
-//  drawInputStatus(false);
-//  printToScroll(REGULAR,"");      // clear the buffer
-//
-//  speedChanged = true;
-//  displayCWspeed();
-//  displayVolume();
-//
-//  /// set up variables for Goertzel Morse Decoder
-//  setupGoertzel();
-//  filteredState = filteredStateBefore = false;
-//  decoderState = LOW_;
-//  ditAvg = 60;
-//  dahAvg = 180;
-//}
-
-//const float sampling_freq = 106000.0;
-//const float target_freq = 698.0; /// adjust for your needs see above
-//const int goertzel_n = 304; //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()//
-
-
-#define straightPin leftPin
-
-boolean straightKey() {            // return true if a straight key was closed, or a touch paddle touched
-if ((morseState == morseDecoder) && ((!digitalRead(straightPin)) || leftKey || rightKey) )
-    return true;
-else return false;
-}
-
-boolean checkTone() {              /// check if we have a tone signal at A6 with Gortzel's algorithm, and apply some noise blanking as well
-                                   /// the result will be in globale variable filteredState
-                                   /// we return true when we detected a change in state, false otherwise!
-  
-  float magnitude ;
-
-  static boolean realstate = false;
-  static boolean realstatebefore = false;
-  static unsigned long lastStartTime = 0;
-  
-  uint16_t testData[1216];         /// buffer for freq analysis - max. 608 samples; you could increase this (and n) to a max of 1216, for sample time 10 ms, and bw 88 Hz
-
-///// check straight key first before you check audio in.... (unless we are in transceiver mode)
-///// straight key is connected to external paddle connector (tip), i.e. the same as the left pin (dit normally)
-
-if (straightKey() ) {
-    realstate = true;
-    //Serial.println("Straight Key!");
-    //keyTx = true;
-    }
-else {
-    realstate = false;
-    //keyTx = false;
-    for (int index = 0; index < goertzel_n ; index++)
-        testData[index] = analogRead(audioInPin);
-    //Serial.println("Read and stored analog values!");
-    for (int index = 0; index < goertzel_n ; index++) {
-      float Q0;
-      Q0 = coeff * Q1 - Q2 + (float) testData[index];
-      Q2 = Q1;
-      Q1 = Q0;
-    }
-    //Serial.println("Calculated Q1 and Q2!");
-
-    float magnitudeSquared = (Q1 * Q1) + (Q2 * Q2) - (Q1 * Q2 * coeff); // we do only need the real part //
-    magnitude = sqrt(magnitudeSquared);
-    Q2 = 0;
-    Q1 = 0;
-  
-   //Serial.println("Magnitude: " + String(magnitude) + " Limit: " + String(magnitudelimit));   //// here you can measure magnitude for setup..
-  
-    ///////////////////////////////////////////////////////////
-    // here we will try to set the magnitude limit automatic //
-    ///////////////////////////////////////////////////////////
-  
-    if (magnitude > magnitudelimit_low) {
-      magnitudelimit = (magnitudelimit + ((magnitude - magnitudelimit) / 6)); /// moving average filter
-    }
-  
-    if (magnitudelimit < magnitudelimit_low)
-      magnitudelimit = magnitudelimit_low;
-  
-    ////////////////////////////////////
-    // now we check for the magnitude //
-    ////////////////////////////////////
-  
-    if (magnitude > magnitudelimit * 0.6) // just to have some space up
-      realstate = true;
-    else
-      realstate = false;
-  }
-
-
-
-  /////////////////////////////////////////////////////
-  // here we clean up the state with a noise blanker //
-  // (debouncing)                                    //
-  /////////////////////////////////////////////////////
-
-  if (realstate != realstatebefore)
-    lastStartTime = millis();
-  if ((millis() - lastStartTime) > nbtime) {
-    if (realstate != filteredState) {
-      filteredState = realstate;
-    }
-  }
-  realstatebefore = realstate;
-
- if (filteredState == filteredStateBefore)
-  return false;                                 // no change detected in filteredState
- else {
-    filteredStateBefore = filteredState;
-    return true;                                // change detected in filteredState
- }
-}   /// end checkTone()
-
-
-void doDecode() {
-  float lacktime;
-  int wpm;
-
-    switch(decoderState) {
-      case INTERELEMENT_: if (checkTone()) {
-                              ON_();
-                              decoderState = HIGH_;
-                          } else {
-                              lowDuration = millis() - startTimeLow;                        // we record the length of the pause
-                              lacktime = 2.2;                                               ///  when high speeds we have to have a little more pause before new letter 
-                              //if (p_wpm > 35) lacktime = 2.7;
-                              //  else if (p_wpm > 30) lacktime = 2.6;
-                              if (lowDuration > (lacktime * ditAvg)) {
-                                displayMorse();                                             /// decode the morse character and display it
-                                wpm = (p_wpm + (int) (7200 / (dahAvg + 3*ditAvg))) / 2;     //// recalculate speed in wpm
-                                if (p_wpm != wpm) {
-                                  p_wpm = wpm;
-                                  speedChanged = true;
-                                }
-                                decoderState = INTERCHAR_;
-                              }
-                          }
-                          break;
-      case INTERCHAR_:    if (checkTone()) {
-                              ON_();
-                              decoderState = HIGH_;
-                          } else {
-                              lowDuration = millis() - startTimeLow;             // we record the length of the pause
-                              lacktime = 5;                 ///  when high speeds we have to have a little more pause before new word
-                              if (p_wpm > 35) lacktime = 6;
-                                else if (p_wpm > 30) lacktime = 5.5;
-                              if (lowDuration > (lacktime * ditAvg)) {
-                                   printToScroll(REGULAR, " ");                       // output a blank                                
-                                   decoderState = LOW_;
-                              }
-                          }
-                          break;
-      case LOW_:          if (checkTone()) {
-                              ON_();
-                              decoderState = HIGH_;
-                          }
-                          break;
-      case HIGH_:         if (checkTone()) {
-                              OFF_();
-                              decoderState = INTERELEMENT_;
-                          }
-                          break;
-    } 
-}
-
-void ON_() {                                  /// what we do when we just detected a rising flank, from low to high
-   unsigned long timeNow = millis();
-   lowDuration = timeNow - startTimeLow;             // we record the length of the pause
-   startTimeHigh = timeNow;                          // prime the timer for the high state
-
-   keyOut(true, false, notes[p_sidetoneFreq], p_sidetoneVolume);
-
-   drawInputStatus(true);
-   
-   if (lowDuration < ditAvg * 2.4)                    // if we had an inter-element pause,
-      recalculateDit(lowDuration);                    // use it to adjust speed
-}
-
-void OFF_() {                                 /// what we do when we just detected a falling flank, from high to low
-  unsigned long timeNow = millis();
-  unsigned int threshold = (int) ( ditAvg * sqrt( dahAvg / ditAvg));
-
-  //Serial.print("threshold: ");
-  //Serial.println(threshold);
-  highDuration = timeNow - startTimeHigh;
-  startTimeLow = timeNow;
-
-  if (highDuration > (ditAvg * 0.5) && highDuration < (dahAvg * 2.5)) {    /// filter out VERY short and VERY long highs
-      if (highDuration < threshold) { /// we got a dit -
-            treeptr = CWtree[treeptr].dit;
-            //Serial.print(".");
-            recalculateDit(highDuration);
-      }
-      else  {        /// we got a dah
-            treeptr = CWtree[treeptr].dah;   
-            //Serial.print("-");   
-            recalculateDah(highDuration);                 
-      }
-  }
-  //pwmNoTone();                     // stop side tone
-  //digitalWrite(keyerPin, LOW);      // stop keying Tx
-  keyOut(false, false, 0, 0);
-  ///////
-  drawInputStatus(false);
-
-}
-
-void drawInputStatus( boolean on) {
-  if (on)
-    display.setColor(BLACK);
-  else
-      display.setColor(WHITE);
-  display.fillRect(1, 1, 20, 13);   
-  display.display();
-}
-
-
-
-void recalculateDit(unsigned long duration) {       /// recalculate the average dit length
-  ditAvg = (4*ditAvg + duration) / 5;
-  //Serial.print("ditAvg: ");
-  //Serial.println(ditAvg);
-  //nbtime =ditLength / 5; 
-  nbtime = constrain(ditAvg/5, 7, 20);
-  //Serial.println(nbtime);
-}
-
-void recalculateDah(unsigned long duration) {       /// recalculate the average dah length
-  //static uint8_t rot = 0;
-  //static unsigned long collector;
-
-  if (duration > 2* dahAvg)   {                       /// very rapid decrease in speed!
-      dahAvg = (dahAvg + 2* duration) / 3;            /// we adjust faster, ditAvg as well!
-      ditAvg = ditAvg/2 + dahAvg/6;
-  }
-  else { 
-      dahAvg = (3* ditAvg + dahAvg + duration) / 3;
-  }
-    //Serial.print("dahAvg: ");
-    //Serial.println(dahAvg);
-    
-}
-
-
-void keyOut(boolean on,  boolean fromHere, int f, int volume) {                                      
-  //// generate a side-tone with frequency f when on==true, or turn it off
-  //// differentiate external (decoder, sometimes cw_generate) and internal (keyer, sometimes Cw-generate) side tones
-  //// key transmitter (and line-out audio if we are in a suitable mode)
-
-  static boolean intTone = false;
-  static boolean extTone = false;
-
-  static int intPitch, extPitch;
-
-// Serial.println("keyOut: " + String(on) + String(fromHere));
-  if (on) {
-      if (fromHere) {
-        intPitch = f;
-        intTone = true;
-        pwmTone(intPitch, volume, true);
-        keyTransmitter();
-      } else {                    // not from here
-        extTone = true;
-        extPitch = f;
-        if (!intTone) 
-          pwmTone(extPitch, volume, false);
-        }
-  } else {                      // key off
-        if (fromHere) {
-          intTone = false;
-          if (extTone)
-            pwmTone(extPitch, volume, false);
-          else
-            pwmNoTone();
-          digitalWrite(keyerPin, LOW);      // stop keying Tx
-        } else {                 // not from here
-          extTone = false;
-          if (!intTone)
-            pwmNoTone();
-        }
-  }   // end key off
-}
 
 ///////////////// a test function for adjusting audio levels
 
@@ -2732,269 +2308,6 @@ void audioLevelAdjust() {
     keyTx = true;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// stuff using WiFi - ask for access point credentials, upload player file, do OTA software update
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-  server.send(404, "text/plain", message);
-}
-
-void startAP() {
-  //IPaddress a;
-  WiFi.mode(WIFI_AP);
-  WiFi.setHostname(ssid);
-  WiFi.softAP(ssid);
-  //a = WiFi.softAPIP();
-  display.clear();
-  printOnStatusLine(true, 0,    "Enter Wifi Info @");
-  printOnScroll(0, REGULAR, 0,  "AP: morserino");
-  printOnScroll(1, REGULAR, 0,  "URL: m32.local");
-  printOnScroll(2, REGULAR, 0,  "RED to abort");
-
-  //printOnScroll(2, REGULAR, 0, WiFi.softAPIP().toString());
-  //Serial.println(WiFi.softAPIP());
-
-  startMDNS();
-  
-  server.on("/", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", myForm);
-  });
-  
-  server.on("/set", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", "Wifi Info updated - now restarting Morserino-32...");
-    p_wlanSSID = server.arg("ssid");
-    p_wlanPassword = server.arg("pw");
-    //Serial.println("SSID: " + p_wlanSSID + " Password: " + p_wlanPassword);
-    pref.begin("morserino", false);             // open the namespace as read/write
-    pref.putString("wlanSSID", p_wlanSSID);
-    pref.putString("wlanPassword", p_wlanPassword);
-    pref.end();
-    
-    ESP.restart();
-  });
-  
-  server.onNotFound(handleNotFound);
-  
-  server.begin();
-  while (true) {
-      server.handleClient();
-      delay(20);
-      volButton.Update();
-      if (volButton.clicks) {
-        display.clear();
-        printOnStatusLine(true, 0, "Resetting now...");
-        delay(2000);
-        ESP.restart();
-      }
-  }
-}
-
-
-void updateFirmware()   {                   /// start wifi client, web server and upload new binary from a local computer
-  if (! wifiConnect())
-    return;
- 
-  server.on("/", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", updateLoginIndex);
-  });
-  
-  server.on("/serverIndex", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", serverIndex);
-  });
-  
-  /*handling uploading firmware file */
-  server.on("/update", HTTP_POST, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-    ESP.restart();
-  }, []() {
-    HTTPUpload& upload = server.upload();
-    if (upload.status == UPLOAD_FILE_START) {
-      //Serial.printf("Update: %s\n", upload.filename.c_str());
-      if (!Update.begin(UPDATE_SIZE_UNKNOWN)) { //start with max available size
-        Update.printError(Serial);
-      }
-    } else if (upload.status == UPLOAD_FILE_WRITE) {
-      /* flashing firmware to ESP*/
-      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
-        Update.printError(Serial);
-      }
-    } else if (upload.status == UPLOAD_FILE_END) {
-      if (Update.end(true)) { //true to set the size to the current progress
-        Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-      } else {
-        Update.printError(Serial);
-      }
-    }
-  });
-  //Serial.println("Starting web server");
-  server.begin();
-  display.clear();
-  printOnStatusLine(true, 0, "Waiting f. Update ");
-  printOnScroll(0, REGULAR, 0,  "URL: m32.local");
-  printOnScroll(1, REGULAR, 0,  "IP:");
-  printOnScroll(2, REGULAR, 0, WiFi.localIP().toString());
-  while(true) {
-    server.handleClient();
-    delay(10);
-  }
-}
-  
-
-boolean wifiConnect() {                   // connect to local WLAN
-  // Connect to WiFi network
-  if (p_wlanSSID == "") 
-      return errorConnect(String("WiFi Not Conf"));
-    
-  WiFi.begin(p_wlanSSID.c_str(), p_wlanPassword.c_str());
-
-  // Wait for connection
-  long unsigned int wait = millis();
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    if ((millis() - wait) > 20000)
-      return errorConnect(String("No WiFi:"));
-  }
-  //Serial.print("Connected to ");
-  //Serial.println(p_wlanSSID);
-  //Serial.print("IP address: ");
-  //Serial.println(WiFi.localIP());
-  startMDNS();
-  return true;
-}
-
-boolean errorConnect(String msg) {
-  display.clear();
-  printOnStatusLine(true, 0, "Not connected");
-  printOnScroll(0, INVERSE_BOLD, 0, msg);
-  printOnScroll(1, REGULAR, 0, p_wlanSSID);
-  delay(3500);
-  return false;
-}
-
-void startMDNS() {
-  /*use mdns for host name resolution*/
-  if (!MDNS.begin(host)) { //http://m32.local
-    Serial.println("Error setting up MDNS responder!");
-    while (1) {
-      delay(1000);
-      if (MDNS.begin(host))
-        break;
-    }
-  }
-  //Serial.println("mDNS responder started");
-}
-
-void uploadFile() {
-  if (! wifiConnect())
-    return;
-  server.on("/", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", uploadLoginIndex);
-  });
-  server.on("/serverIndex", HTTP_GET, []() {
-    server.sendHeader("Connection", "close");
-    server.send(200, "text/html", serverIndex);
-  });
-
-server.on("/update", HTTP_POST,                       // if the client posts to the upload page
-    [](){ server.sendHeader("Connection", "close");
-    server.send(200, "text/plain", "OK");
-    ESP.restart();},                                  // Send status 200 (OK) to tell the client we are ready to receive; when done, restart the ESP32
-    handleFileUpload                                    // Receive and save the file
-  );
-  
-  server.onNotFound([]() {                              // If the client requests any URI
-    if (!handleFileRead(server.uri()))                  // send it if it exists
-      server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
-  });
-
-  server.begin();                           // Actually start the server
-  //Serial.println("HTTP server started");
-  display.clear();
-  display.clear();
-  printOnStatusLine(true, 0, "Waiting f. Upload ");
-  printOnScroll(0, REGULAR, 0,  "URL: m32.local");
-  printOnScroll(1, REGULAR, 0,  "IP:");
-  printOnScroll(2, REGULAR, 0, WiFi.localIP().toString());  
-  while(true) {
-    server.handleClient();
-    //delay(5);
-  }
-}
-
-
-String getContentType(String filename) { // convert the file extension to the MIME type
-  if (filename.endsWith(".html")) return "text/html";
-  else if (filename.endsWith(".css")) return "text/css";
-  else if (filename.endsWith(".js")) return "application/javascript";
-  else if (filename.endsWith(".ico")) return "image/x-icon";
-  else if (filename.endsWith(".gz")) return "application/x-gzip";
-  return "text/plain";
-}
-
-bool handleFileRead(String path) { // send the right file to the client (if it exists)
-  //Serial.println("handleFileRead: " + path);
-  if (path.endsWith("/")) path += "index.html";          // If a folder is requested, send the index file
-  String contentType = getContentType(path);             // Get the MIME type
-  String pathWithGz = path + ".gz";
-  if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {     // If the file exists, either as a compressed archive, or normal
-    if (SPIFFS.exists(pathWithGz))                            // If there's a compressed version available
-      path += ".gz";                                          // Use the compressed verion
-    File file = SPIFFS.open(path, "r");                       // Open the file
-    server.streamFile(file, contentType);                     // Send it to the client
-    file.close();                                             // Close the file again
-    Serial.println(String("\tSent file: ") + path);
-    return true;
-  }
-  //Serial.println(String("\tFile Not Found: ") + path);   // If the file doesn't exist, return false
-  return false;
-}
-
-void handleFileUpload(){ // upload a new file to the SPIFFS
-  HTTPUpload& upload = server.upload();
-  if(upload.status == UPLOAD_FILE_START){
-    String filename = upload.filename;
-    if(!filename.startsWith("/")) filename = "/"+filename;
-    //Serial.print("handleFileUpload Name: "); Serial.println(filename);
-    fsUploadFile = SPIFFS.open("/player.txt", "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
-    filename = String();
-  } else if(upload.status == UPLOAD_FILE_WRITE){
-    if(fsUploadFile)
-      fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
-  } else if(upload.status == UPLOAD_FILE_END){
-    if(fsUploadFile) {                                    // If the file was successfully created
-      fsUploadFile.close();                               // Close the file again
-      p_fileWordPointer = 0;                              // reset word counter for file player
-      pref.begin("morserino", false);              // open the namespace as read/write
-          pref.putUInt("fileWordPtr", p_fileWordPointer);
-      pref.end(); 
-
-      //Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
-      //server.sendHeader("Location","/success.html");      // Redirect the client to the success page
-      //server.send(303);
-    } else {
-      server.send(500, "text/plain", "500: couldn't create file");
-    }
-  }
-}
-
 
 String getWord() {
   String result = "";
@@ -3006,13 +2319,13 @@ String getWord() {
       if (!isSpace(c))
         result += (char) c;
       else if (result.length() > 0)    {               // end of word
-        ++p_fileWordPointer;
+        ++MorsePreferences::prefs.fileWordPointer;
         //Serial.println("word: " + result);
         return result;
       }
     }
     file.close(); file = SPIFFS.open("/player.txt");
-    p_fileWordPointer = 0;
+    MorsePreferences::prefs.fileWordPointer = 0;
     while (!file.available())
       ;
     return result;                                    // at eof

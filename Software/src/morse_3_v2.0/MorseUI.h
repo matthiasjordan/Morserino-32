@@ -10,7 +10,7 @@
 
 
 namespace MorseUI {
-    void encoderClick();
+    void click();
 }
 
 

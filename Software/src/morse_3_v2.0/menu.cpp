@@ -589,7 +589,7 @@ boolean Menu::adjustKeyerPreference(MorsePreferences::prefPos pos)
         }
         if ((t = MorseRotaryEncoder::checkEncoder()))
         {
-            MorseUI::encoderClick();
+            MorseUI::click();
             switch (pos)
             {
                 case MorsePreferences::posCurtisMode:

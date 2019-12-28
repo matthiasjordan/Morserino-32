@@ -46,7 +46,7 @@ void MorseLoRa::setup() {
     ////////////  Setup for LoRa
       SPI.begin(SCK,MISO,MOSI,SS);
       LoRa.setPins(SS,RST,DI0);
-      if (!LoRa.begin(MorsePreferences::prefs.loraQRG,PABOOST)) {
+      if (!LoRa.begin(MorsePreferences::prefs.loraQRG,PABOOSTx)) {
         Serial.println("Starting LoRa failed!");
         while (1);
       }
@@ -169,4 +169,128 @@ void onReceive(int packetSize)
   //Serial.print(" S-Meter: ");
   //Serial.println(map(LoRa.packetRssi(), -160, -20, 0, 100));
 }
+
+
+
+//// new buffer code: unpack when needed, to save buffer space. We just use 256 bytes of buffer, instead of 32k!
+//// in addition to the received packet, we need to store the RSSI as 8 bit positive number
+//// (it is always between -20 and -150, so an 8bit integer is fine as long as we store it without sign as an unsigned number)
+//// the buffer is a 256 byte ring buffer with two pointers:
+////   nextBuRead where the next packet starts for reading it out; is incremented by l to get the next buffer read position
+////      you can read a packet as long as the buffer is not empty, so we need to check bytesBuFree before we read! if it is 256, the buffer is empty!
+////      with a read, the bytesBuFree has to be increased by the number of bytes read
+////   nextBuWrite where the next packet should be written; @write:
+////       increment nextBuWrite by l to get new pointer; and decrement bytesBuFree by l to get new free space
+//// we also need a variable that shows how many bytes are free (not in use): bytesBuFree
+//// if the next packet to be stored is larger than bytesBuFree, it is discarded
+//// structure of each packet:
+////    l:  1 uint8_t length of packet
+////    r:  1 uint8_t rssi as a positive number
+////    d:  (var. length) data packet as received by LoRa
+//// functions:
+////    int loRaBuWrite(int rssi, String packet): returns length of buffer if successful. otherwise 0
+////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
+////    boolean loRaBuReady():  true if there is something in the buffer, false otherwise
+////      example:
+////        (somewhere else as global var: ourBuffer[256]
+////        uint8_t myIndex;
+////        uint8_t mylength;
+////        foo() {
+////          myLength = loRaBuRead(&myIndex);
+////          if (myLength != 0)
+////            doSomethingWith(ourBuffer[myIndex], myLength);
+////        }
+
+
+uint8_t loRaBuWrite(int rssi, String packet) {
+////   int loRaBuWrite(int rssi, String packet): returns length of buffer if successful. otherwise 0
+////   nextBuWrite where the next packet should be written; @write:
+////       increment nextBuWrite by l to get new pointer; and decrement bytesBuFree by l to get new free space
+  uint8_t l, posRssi;
+
+  posRssi = (uint8_t) abs(rssi);
+  l = 2 + packet.length();
+  if (byteBuFree < l)                               // buffer full - discard packet
+      return 0;
+  loRaRxBuffer[nextBuWrite++] = l;
+  loRaRxBuffer[nextBuWrite++] = posRssi;
+  for (int i = 0; i < packet.length(); ++i) {       // do this for all chars in the packet
+    loRaRxBuffer [nextBuWrite++] = packet[i];       // at end nextBuWrite is alread where it should be
+  }
+  byteBuFree -= l;
+  //Serial.println(byteBuFree);
+  //Serial.println((String)loRaRxBuffer[0]);
+  return l;
+}
+
+boolean loRaBuReady() {
+  if (byteBuFree == 256)
+    return (false);
+  else
+    return true;
+}
+
+
+uint8_t loRaBuRead(uint8_t* buIndex) {
+////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
+  uint8_t l;
+  if (byteBuFree == 256)
+    return 0;
+  else {
+    l = loRaRxBuffer[nextBuRead++];
+    *buIndex = nextBuRead;
+    byteBuFree += l;
+    --l;
+    nextBuRead += l;
+    return l;
+  }
+}
+
+
+
+
+void storePacket(int rssi, String packet) {             // whenever we receive something, we just store it in our buffer
+  if (loRaBuWrite(rssi, packet) == 0)
+    Serial.println("LoRa Buffer full");
+}
+
+
+/// decodePacket analyzes packet as received and stored in buffer
+/// returns the header byte (protocol version*64 + 6bit packet serial number
+//// byte 0 (added by receiver): RSSI
+//// byte 1: header; first two bits are the protocol version (curently 01), plus 6 bit packet serial number (starting from random)
+//// byte 2: first 6 bits are wpm (must be between 5 and 60; values 00 - 04 and 61 to 63 are invalid), the remaining 2 bits are already data payload!
+
+
+uint8_t decodePacket(int* rssi, int* wpm, String* cwword) {
+  uint8_t l, c, header=0;
+  uint8_t index = 0;
+
+  l = loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
+
+  for (int i = 0; i < l; ++i) {     // decoding loop
+    c = loRaRxBuffer[index+i];
+
+    switch (i) {
+      case  0:  * rssi = (int) (-1 * c);    // the rssi byte
+                break;
+      case  1:  header = c;
+                break;
+      case  2:  *wpm = (uint8_t) (c >> 2);  // the first data byte contains the wpm info in the first six bits, and actual morse in the remaining two bits
+                                            // now take remaining two bits and store them in CWword as ASCII
+                *cwword = (char) ((c & B011) +48);
+                break;
+      default:                              // decode the rest of the packet; we do this for all but the first byte  /// we need to handle end of word!!! therefore the break
+                for (int j = 0; j < 4; ++j) {
+                    char cc = ((c >> 2*(3-j)) & B011) ;                // we store them as ASCII characters 0,1,2,3 !
+                    if (cc != 3) {
+                        *cwword  += (char) (cc + 48);
+                    }
+                    else break;
+                }
+                break;
+    } // end switch
+  }   // end for
+  return header;
+}      // end decodePacket
 

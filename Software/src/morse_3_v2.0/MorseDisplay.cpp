@@ -186,6 +186,14 @@ void MorseDisplay::printOnStatusLine(boolean strong, uint8_t xpos, String string
     MorseSystem::resetTOT();
 }
 
+void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, char* format, ...) {
+    va_list arglist;
+    va_start( arglist, format );
+    vsprintf(numBuffer, format, arglist);
+    va_end( arglist );
+    MorseDisplay::printOnStatusLine(strong, xpos, numBuffer);
+}
+
 String printToScroll_buffer = "";
 FONT_ATTRIB printToScroll_lastStyle = REGULAR;
 
@@ -402,10 +410,10 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
 }
 
 
-uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String format, ...) {
+uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, char* format, ...) {
     va_list arglist;
     va_start( arglist, format );
-    vsprintf(numBuffer, "%3i", arglist);
+    vsprintf(numBuffer, format, arglist);
     va_end( arglist );
     MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
 }
@@ -443,6 +451,14 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
     display.display();
     MorseSystem::resetTOT();
     return w;         // we return the actual width of the output, in case of converted UTF8 characters
+}
+
+
+uint8_t MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring) {
+    MorseDisplay::printOnScroll(line, how, xpos, mystring);
+    display();
+    delay(500);
+    clear();
 }
 
 void MorseDisplay::clearLine(uint8_t line)
@@ -541,3 +557,9 @@ void MorseDisplay::displayEmptyBattery()
     MorseSystem::shutMeDown();
 }
 
+void MorseDisplay::dispLoraLogo() {     // display a small logo in the top right corner to indicate we operate with LoRa
+  display.setColor(BLACK);
+  display.drawXbm(121, 2, lora_width, lora_height, lora_bits);
+  display.setColor(WHITE);
+  display.display();
+}
