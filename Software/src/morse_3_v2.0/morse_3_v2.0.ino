@@ -50,7 +50,10 @@
 #include "english_words.h" // common English words
 #include "MorsePreferences.h"
 #include "MorseRotaryEncoder.h"
-
+#include "MorseSound.h"
+#include "koch.h"
+#include "MorseLoRa.h"
+#include "MorseSystem.h"
 
 
 /// we need this for some strange reason: the min definition breaks with WiFi
@@ -204,97 +207,6 @@ boolean kochActive = false;                 // set to true when in Koch trainer 
  
 enum KSTYPE {IDLE_STATE, DIT, DAH, KEY_START, KEYED, INTER_ELEMENT };
 
-// morse code decoder
-
-struct linklist {
-     const char* symb;
-     const uint8_t dit;
-     const uint8_t dah;
-};
-
-
-const struct linklist CWtree[67]  = {
-  {"",1,2},            // 0
-  {"e", 3,4},         // 1
-  {"t",5,6},          // 2
-//
-  {"i", 7, 8},        // 3
-  {"a", 9,10},        // 4
-  {"n", 11,12},       // 5
-  {"m", 13,14},       // 6
-//
-  {"s", 15,16},       // 7
-  {"u", 17,18},       // 8
-  {"r", 19,20},       // 9
-  {"w", 21,22},       //10
-  {"d", 23,24},       //11
-  {"k", 25, 26},      //12
-  {"g", 27, 28},      //13
-  {"o", 29,30},       //14
-//---------------------------------------------
-  {"h", 31,32},       // 15
-  {"v", 33, 34},      // 16
-  {"f", 63, 63},      // 17
-  {"ü", 35, 36},      // 18 german ue
-  {"l", 37, 38},      // 19
-  {"ä", 39, 63},      // 20 german ae
-  {"p", 63, 40},      // 21
-  {"j", 63, 41},      // 22
-  {"b", 42, 43},      // 23
-  {"x", 44, 63},      // 24
-  {"c", 63, 45},      // 25
-  {"y", 46, 63},      // 26
-  {"z", 47, 48},      // 27
-  {"q", 63, 63},      // 28
-  {"ö", 49, 63},      // 29 german oe
-  {"<ch>", 50, 51},        // 30 !!! german "ch" 
-//---------------------------------------------
-  {"5", 64, 63},      // 31
-  {"4", 63, 63},      // 32
-  {"<ve>", 63, 52},      // 33  or <sn>, sometimes "*"
-  {"3", 63,63},       // 34
-  {"*", 53,63,},      // 35 ¬ used for all unidentifiable characters ¬
-  {"2", 63, 63},      // 36 
-  {"<as>", 63,63},         // 37 !! <as>
-  {"*", 54, 63},      // 38
-  {"+", 63, 55},      // 39
-  {"*", 56, 63},      // 40
-  {"1", 57, 63},      // 41
-  {"6", 63, 58},      // 42
-  {"=", 63, 63},      // 43
-  {"/", 63, 63},      // 44
-  {"<ka>", 59, 60},        // 45 !! <ka>
-  {"<kn>", 63, 63},        // 46 !! <kn>
-  {"7", 63, 63},      // 47
-  {"*", 63, 61},      // 48
-  {"8", 62, 63},      // 49
-  {"9", 63, 63},      // 50
-  {"0", 63, 63},      // 51
-//
-  {"<sk>", 63, 63},        // 52 !! <sk>
-  {"?", 63, 63},      // 53
-  {"\"", 63, 63},      // 54
-  {".", 63, 63},      // 55
-  {"@", 63, 63},      // 56
-  {"\'",63, 63},      // 57
-  {"-", 63, 63},      // 58
-  {";", 63, 63},      // 59
-  {"!", 63, 63},      // 60
-  {",", 63, 63},      // 61
-  {":", 63, 63},      // 62
-//
-  {"*", 63, 63},       // 63 Default for all unidentified characters
-  {"*", 65, 63},       // 64
-  {"*", 66, 63},       // 65
-  {"<err>", 66, 63}      // 66 !! Error - backspace
-};
-
-
-byte treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
-
-unsigned long interWordTimer = 0;      // timer to detect interword spaces
-unsigned long acsTimer = 0;            // timer to use for automatic character spacing (ACS)
-
 
 const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 //                      0....5....1....5....2....5....3....5....4....5....5...    
@@ -426,162 +338,6 @@ boolean keyTx = false;             // when state is set by manual key or touch p
 
 
 
-////////////////// Variables for file handling and WiFi functions
-
-File file;
-
-WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
-
-File fsUploadFile;              // a File object to temporarily store the received file
-
-String getContentType(String filename); // convert the file extension to the MIME type
-bool handleFileRead(String path);       // send the right file to the client (if it exists)
-void handleFileUpload();                // upload a new file to the SPIFFS
-const char* host = "m32";               // hostname of the webserver
-
-
-/// WiFi constants
-const char* ssid = "morserino";
-const char* password = "";
-
-
-                          // HTML for the AP server - ued to get SSID and Password for local WiFi network - needed for file upload and OTA SW updates
-const char* myForm = "<html><head><meta charset='utf-8'><title>Get AP Info</title><style> form {width: 420px;}div { margin-bottom: 20px;}"
-                "label {display: inline-block; width: 240px; text-align: right; padding-right: 10px;} button, input {float: right;}</style>"
-                "</head><body>"
-                "<form action='/set' method='get'><div>"
-                "<label for='ssid'>SSID of WiFi network?</label>"
-                "<input name='ssid' id='ssid' ></div> <div>"
-                "<label for='pw'>WiFi Password?</label> <input name='pw' id='pw'>"
-                "</div><div><button>Submit</button></div></form></body></html>";
-
-
-
-/*
- * HTML for Upload Login page
- */
-
-const char* uploadLoginIndex = 
- "<form name='loginForm'>"
-    "<table width='20%' bgcolor='A09F9F' align='center'>"
-        "<tr>"
-            "<td colspan=2>"
-                "<center><font size=4><b>M32 File Upload - Login Page</b></font></center>"
-                "<br>"
-            "</td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<td>Username:</td>"
-        "<td><input type='text' size=25 name='userid'><br></td>"
-        "</tr>"
-        "<br>"
-        "<br>"
-        "<tr>"
-            "<td>Password:</td>"
-            "<td><input type='Password' size=25 name='pwd'><br></td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<tr>"
-            "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
-        "</tr>"
-    "</table>"
-"</form>"
-"<script>"
-    "function check(form)"
-    "{"
-    "if(form.userid.value=='m32' && form.pwd.value=='upload')"
-    "{"
-    "window.open('/serverIndex')"
-    "}"
-    "else"
-    "{"
-    " alert('Error Password or Username')/*displays error message*/"
-    "}"
-    "}"
-"</script>";
-
-
-const char* updateLoginIndex = 
- "<form name='loginForm'>"
-    "<table width='20%' bgcolor='A09F9F' align='center'>"
-        "<tr>"
-            "<td colspan=2>"
-                "<center><font size=4><b>M32 Firmware Update Login Page</b></font></center>"
-                "<br>"
-            "</td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<td>Username:</td>"
-        "<td><input type='text' size=25 name='userid'><br></td>"
-        "</tr>"
-        "<br>"
-        "<br>"
-        "<tr>"
-            "<td>Password:</td>"
-            "<td><input type='Password' size=25 name='pwd'><br></td>"
-            "<br>"
-            "<br>"
-        "</tr>"
-        "<tr>"
-            "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
-        "</tr>"
-    "</table>"
-"</form>"
-"<script>"
-    "function check(form)"
-    "{"
-    "if(form.userid.value=='m32' && form.pwd.value=='update')"
-    "{"
-    "window.open('/serverIndex')"
-    "}"
-    "else"
-    "{"
-    " alert('Error Password or Username')/*displays error message*/"
-    "}"
-    "}"
-"</script>";
-
- 
-const char* serverIndex = 
-"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
-"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
-   "<input type='file' name='update'>"
-        "<input type='submit' value='Begin'>"
-    "</form>"
- "<div id='prg'>Progress: 0%</div>"
- "<script>"
-  "$('form').submit(function(e){"
-  "e.preventDefault();"
-  "var form = $('#upload_form')[0];"
-  "var data = new FormData(form);"
-  " $.ajax({"
-  "url: '/update',"
-  "type: 'POST',"
-  "data: data,"
-  "contentType: false,"
-  "processData:false,"
-  "xhr: function() {"
-  "var xhr = new window.XMLHttpRequest();"
-  "xhr.upload.addEventListener('progress', function(evt) {"
-  "if (evt.lengthComputable) {"
-  "var per = evt.loaded / evt.total;"
-  "$('#prg').html('progress: ' + Math.round(per*100) + '%');"
-  "}"
-  "}, false);"
-  "return xhr;"
-  "},"
-  "success:function(d, s) {"
-  "console.log('success!')" 
- "},"
- "error: function (a, b, c) {"
- "}"
- "});"
- "});"
- "</script>";
-
 
 
 ////////////////////////////////////////////////////////////////////
@@ -679,7 +435,7 @@ MorseRotaryEncoder::setup();
 
 
   /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
-  quickStart = p_quickStart;
+  quickStart = MorsePreferences::prefs.quickStart;
 
   
   ///////////////////////// mount (or create) SPIFFS file system
@@ -694,7 +450,7 @@ MorseRotaryEncoder::setup();
                              "Did you not upload your own file? Hast du keine eigene Datei hochgeladen?";
                              
     if (!SPIFFS.exists("/player.txt")) {                                    // file does not exist, therefor we create it from the text above
-        file = SPIFFS.open("/player.txt", FILE_WRITE);
+        File file = SPIFFS.open("/player.txt", FILE_WRITE);
         if(!file){
             Serial.println("- failed to open file for writing");
             return;
@@ -706,7 +462,7 @@ MorseRotaryEncoder::setup();
         }
         file.close();
     }    
-    displayStartUp();
+    MorseDisplay::displayStartUp();
 
     ///delay(2500);  //// just to be able to see the startup screen for a while - is contained in displayStartUp()
 
@@ -723,7 +479,7 @@ MorseRotaryEncoder::setup();
 
 enum AutoStopModes {off, stop1, stop2}  autoStop = off;
 
-uint8_t effectiveTrainerDisplay = p_trainerDisplay;
+uint8_t effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
 void setupHeadCopying() {
   effectiveAutoStop = true;
@@ -775,7 +531,7 @@ void loop() {
                                   break;
                                 }
                               case stop2: {
-                                  printToScroll(REGULAR, "\n");
+                                  MorseDisplay::printToScroll(REGULAR, "\n");
                                   autoStop = off;
                                   break;
                                 }
@@ -796,7 +552,7 @@ void loop() {
                           if (activeOld != active) {
                             if (!active) {
                                keyOut(false, true, 0, 0);
-                               printOnStatusLine(true, 0, "Continue w/ Paddle");
+                               MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                             }
                           else {
                                //cleanStartSettings();        
@@ -811,7 +567,7 @@ void loop() {
                           if (stopFlag) {
                             active = stopFlag = false;
                             keyOut(false, true, 0, 0);
-                            printOnStatusLine(true, 0, "Continue w/ Paddle");
+                            MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                           }
                           if (!active && (leftKey  || rightKey))   {                       // touching a paddle starts  the generation of code
                               // for debouncing:
@@ -862,27 +618,27 @@ void loop() {
                 } else if (encoderState == volumeSettingMode && morseState != morseDecoder) {          //  single click toggles encoder between speed and volume
                   encoderState = speedSettingMode;
                   pref.begin("morserino", false);                     // open the namespace as read/write
-                  if (pref.getUChar("sidetoneVolume") != p_sidetoneVolume)
-                      pref.putUChar("sidetoneVolume", p_sidetoneVolume);  // store the last volume, if it has changed
+                  if (pref.getUChar("sidetoneVolume") != MorsePreferences::prefs.sidetoneVolume)
+                      pref.putUChar("sidetoneVolume", MorsePreferences::prefs.sidetoneVolume);  // store the last volume, if it has changed
                   pref.end();
                   displayCWspeed();
-                  displayVolume();
+                  MorseDisplay::displayVolume();
                 }
                 else {
                   encoderState = volumeSettingMode;
                   displayCWspeed();
-                  displayVolume();
+                  MorseDisplay::displayVolume();
                 }
                 break;
       case -1:  if (encoderState == scrollMode) {
                     encoderState = (morseState == morseDecoder ? volumeSettingMode : speedSettingMode);
                     relPos = maxPos;
                     refreshScrollArea((bottomLine + 1 + relPos) % NoOfLines);
-                    displayScrollBar(false);
+                    MorseDisplay::displayScrollBar(false);
                 }       
                 else {
                     encoderState = scrollMode;
-                    displayScrollBar(true);
+                    MorseDisplay::displayScrollBar(true);
                 }
                 break;
     }
@@ -896,7 +652,7 @@ void loop() {
                         //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
                         //pwmNoTone(); 
                         keyOut(false, true, 0, 0);
-                        printOnStatusLine(true, 0, "Continue w/ Paddle");
+                        MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                   }
                   else {
                     cleanStartSettings();
@@ -905,7 +661,7 @@ void loop() {
               }
               break;
        case 2:  setupPreferences(p_menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
-                display.clear();                                  // restore display
+                MorseDisplay::clear();                                  // restore display
                 displayTopLine();
                 if (morseState == morseGenerator || morseState == echoTrainer) 
                     stopFlag = true;                                  // we stop what we had been doing
@@ -919,14 +675,14 @@ void loop() {
 /// and we have time to check the encoder
      if ((t = checkEncoder())) {
         //Serial.println("t: " + String(t));
-        pwmClick(p_sidetoneVolume);         /// click
+        pwmClick(MorsePreferences::prefs.sidetoneVolume);         /// click
         switch (encoderState) {
           case speedSettingMode:  
                                   changeSpeed(t);
                                   break;
           case volumeSettingMode: 
                                   p_sidetoneVolume += (t*10)+11;
-                                  p_sidetoneVolume = constrain(p_sidetoneVolume, 11, 111) -11;
+                                  p_sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) -11;
                                   //Serial.println(p_sidetoneVolume);
                                   displayVolume();
                                   break;
@@ -941,11 +697,11 @@ void loop() {
                                   }
                                   //encoderPos = 0;
                                   //portEXIT_CRITICAL(&mux);
-                                  displayScrollBar(true);
+                                  MorseDisplay::displayScrollBar(true);
                                   break;
           }
     } // encoder 
-    checkShutDown(false);         // check for time out
+    MorseSystem::checkShutDown(false);         // check for time out
     
 }     /////////////////////// end of loop() /////////
 

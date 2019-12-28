@@ -13,7 +13,7 @@ namespace MorseDisplay
     void display();
     void clearDisplay();
     void sleep();
-    void clearAll();
+    void clear();
     void clearStatusLine();
     String cleanUpProSigns(String &input);
     void printOnStatusLine(boolean strong, uint8_t xpos, String string);

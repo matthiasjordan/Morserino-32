@@ -107,7 +107,7 @@ void MorseDisplay::displayStartUp()
 }
 
 
-void MorseDisplay::clearAll() {
+void MorseDisplay::clear() {
     display.clear();
 }
 
@@ -117,8 +117,8 @@ void MorseDisplay::display() {
 
 
 void MorseDisplay::clearDisplay() {
-    display.clear();
-    display.display();
+    MorseDisplay::clear();
+    MorseDisplay::display();
 }
 
 

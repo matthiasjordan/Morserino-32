@@ -1,10 +1,3 @@
-/*
- * decoder.cpp
- *
- *  Created on: 07.12.2019
- *      Author: mj
- */
-
 #include "decoder.h"
 
 #include "MorsePreferences.h"
