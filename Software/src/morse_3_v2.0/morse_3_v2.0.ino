@@ -49,6 +49,7 @@
 #include "abbrev.h"        // common CW abbreviations
 #include "english_words.h" // common English words
 #include "MorsePreferences.h"
+#include "MorseRotaryEncoder.h"
 
 
 
@@ -423,17 +424,6 @@ String kochChars;
 boolean keyTx = false;             // when state is set by manual key or touch paddle, then true!
                                    // we use this to decide if Tx should be keyed or not
 
-/////////////////// Variables for LoRa: Buffer management etc
-
-char loraTxBuffer[32];
-
-uint8_t loRaRxBuffer[256];
-uint16_t byteBuFree = 256;
-uint8_t nextBuWrite = 0;
-uint8_t nextBuRead = 0;
-
-uint8_t loRaSerial;                                     /// a 6 bit serial number, start with some random value, will be incremented witch each sent LoRa packet
-                                                        /// the first two bits in teh byte will be the protocol id (CWLORAVERSION)
 
 
 ////////////////// Variables for file handling and WiFi functions
@@ -600,46 +590,13 @@ const char* serverIndex =
 /// interrupt service routine
 
 void IRAM_ATTR isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
-//if (micros()  > (IRTime + 1000) ) {
-portENTER_CRITICAL_ISR(&mux);
-
-    int sig2 = digitalRead(PinDT); //MSB = most significant bit
-    int sig1 = digitalRead(PinCLK); //LSB = least significant bit
-    delayMicroseconds(125);                 // this seems to improve the responsiveness of the encoder and avoid any bouncing
-
-    int8_t thisState = sig1 | (sig2 << 1);
-    if (_oldState != thisState) {
-      stateRegister = (stateRegister << 2) | thisState;
-      if (thisState == LATCHSTATE) {
-        
-          if (stateRegister == 135 )
-            encoderPos = 1;
-          else if (stateRegister == 75)
-            encoderPos = -1;
-          else
-            encoderPos = 0;
-        }
-    _oldState = thisState;
-    } 
-portEXIT_CRITICAL_ISR(&mux);
+    MorseRotaryEncoder::isr();
 }
 
 
 
 int IRAM_ATTR checkEncoder() {
-  int t;
-  
-  portENTER_CRITICAL(&mux);
-
-  t = encoderPos;
-  if (encoderPos) {
-    encoderPos = 0;
-    portEXIT_CRITICAL(&mux);
-    return t;
-  } else {
-    portEXIT_CRITICAL(&mux);
-    return 0;
-  }
+    return MorseRotaryEncoder::checkEncoder();
 }
 
 
@@ -682,25 +639,14 @@ void setup()
   
   MorseDisplay::init();
 
-// set up PWMs for tone generation
-  ledcSetup(toneChannel, toneFreq, pwmResolution);
-  ledcAttachPin(LF_Pin, toneChannel);
+  MorseSound::setup();
   
-  ledcSetup(lineOutChannel, toneFreq, pwmResolution);
-  ledcAttachPin(lineOutPin, lineOutChannel);                                      ////// change this for real version - no line out currntly
-  
-  ledcSetup(volChannel, volFreq, pwmResolution);
-  ledcAttachPin(HF_Pin, volChannel);
-  
-  ledcWrite(toneChannel,0);
-  ledcWrite(lineOutChannel,0);
-
   //call ISR when any high/low changed seen
   //on any of the enoder pins
   attachInterrupt (digitalPinToInterrupt(PinDT), isr, CHANGE);   
   attachInterrupt (digitalPinToInterrupt(PinCLK), isr, CHANGE);
  
-  encoderPos = 0;           /// this is the encoder position
+MorseRotaryEncoder::setup();
 
 /// set up for encoder button
   pinMode(modeButtonPin, INPUT);
@@ -724,49 +670,16 @@ void setup()
   
   // read preferences from non-volatile storage
   // if version cannot be read, we have a new ESP32 and need to write the preferences first
-  readPreferences("morserino");
+  MorsePreferences::readPreferences("morserino");
 
-  if (p_lcwoKochSeq) kochChars = lcwoKochChars;
-  else kochChars = morserinoKochChars;
-
-   
-  //// populate the array for abbreviations and words according to length and Koch filter
-  createKochWords(p_wordLength, p_kochFilter) ;  // 
-  createKochAbbr(p_abbrevLength, p_kochFilter);
+  Koch::setup();
 
 
-/// check if BLACK knob has been pressed on startup - if yes, we have to perform LoRa Setup
-  delay(50);
-  if (SPIFFS.begin() && digitalRead(modeButtonPin) == LOW)   {        // BLACK was pressed at start-up - checking for SPIFF so that programming 1st time w/o pull-up shows menu
-     display.clear();
-     display.display();
-     printOnStatusLine(true, 0,  "Release BLACK");
-      while (digitalRead(modeButtonPin) == LOW)      // wait until released
-      ;
-    loraSystemSetup();
-  }
+  MorseLoRa::setup();
+
 
   /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
   quickStart = p_quickStart;
-
-
-////////////  Setup for LoRa
-  SPI.begin(SCK,MISO,MOSI,SS);
-  LoRa.setPins(SS,RST,DI0);
-  if (!LoRa.begin(p_loraQRG,PABOOST)) {
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
-  LoRa.setFrequency(p_loraQRG);                       /// default = 434.150 MHz - Region 1 ISM Band, can be changed by system setup
-  LoRa.setSpreadingFactor(7);                         /// default
-  LoRa.setSignalBandwidth(250E3);                     /// 250 kHz
-  LoRa.noCrc();                                       /// we use error correction
-  LoRa.setSyncWord(p_loraSyncW);                      /// the default would be 0x34
-  
-  // register the receive callback
-  LoRa.onReceive(onReceive);
-  /// initialise the serial number
-  loRaSerial = random(64);
 
   
   ///////////////////////// mount (or create) SPIFFS file system
@@ -803,20 +716,6 @@ void setup()
 } /////////// END setup()
 
 
-
-//////// System Setup / LoRa Setup ///// Called when BALCK knob is pressed @ startup
-
-void loraSystemSetup() {
-    displayKeyerPreferencesMenu(posLoraBand);
-    adjustKeyerPreference(posLoraBand);
-    displayKeyerPreferencesMenu(posLoraQRG);
-    adjustKeyerPreference(posLoraQRG);
-    /// now store chosen values in Preferences
-    pref.begin("morserino", false);             // open the namespace as read/write
-    pref.putUChar("loraBand", p_loraBand);
-    pref.putUInt("loraQRG", p_loraQRG);
-    pref.end();
-}
 
 
 
@@ -2568,99 +2467,6 @@ void keyTransmitter() {
 
 
 
-
-
-/// cwForLora packs element info (dit, dah, interelement space) into a String that can be sent via LoRA
-///  element can be:
-///  0: inter-element space
-///  1: dit
-///  2: dah
-///  3: end of word -: cwForLora returns a string that is ready for sending to the LoRa transceiver
-
-//  char loraTxBuffer[32];
-
-void cwForLora (int element) {
-  //static String result;
-  //result.reserve(36);
-  //static char buf[32];
-  static int pairCounter = 0;
-  uint8_t temp;
-  uint8_t header;
-
-  if (pairCounter == 0) {   // we start a brand new word for LoRA - clear buffer and set speed first
-      for (int i=0; i<32; ++i)
-          loraTxBuffer[i] = (char) 0;
-          
-      /// 1st byte: version + serial number
-      header = ++loRaSerial % 64;
-      //Serial.println("loRaSerial: " + String(loRaSerial));
-      header += CWLORAVERSION * 64;        //// shift VERSION left 6 bits and add to the serial number
-      loraTxBuffer[0] = header;
-
-      temp = p_wpm * 4;                   /// shift left 2 bits
-      loraTxBuffer[1] |= temp;
-      pairCounter = 7;                    /// so far we have used 7 bit pairs: 4 in the first byte (protocol version+serial); 3 in the 2nd byte (wpm)
-      //Serial.println(temp);
-      //Serial.println(loraBuffer);
-      }
-
-  temp = element & B011;      /// take the two left bits
-      //Serial.println("Temp before shift: " + String(temp));
-  /// now store these two bits in the correct location in loraBuffer
-
-  if (temp && (temp != 3)) {                 /// no need to do the operation with 0, nor with B11
-      temp = temp << (2*(3-(pairCounter % 4)));
-      loraTxBuffer[pairCounter/4] |= temp;
-  }
-
-  /// now increment, unless we got end of word
-  /// have we get end of word, we got end of character (0) before
-
-  if (temp != 3)
-      ++pairCounter;
-  else {  
-      --pairCounter; /// we are at end of word and step back to end of character
-      if (pairCounter % 4 != 0)      {           // do nothing if we have a zero in the topmost two bits already, as this was end of character
-          temp = temp << (2*(3-(pairCounter % 4)));
-          loraTxBuffer[pairCounter/4] |= temp;
-      }
-      pairCounter = 0;
-  }
-}
-
-
-void sendWithLora() {           // hand this string over as payload to the LoRA transceiver
-  // send packet
-  LoRa.beginPacket();
-  LoRa.print(loraTxBuffer);
-  LoRa.endPacket();
-  if (morseState == loraTrx)
-      LoRa.receive();
-}
-
-void onReceive(int packetSize)
-{
-  String result;
-  result.reserve(64);
-  result = "";
-  
-  // received a packet
-  // read packet
-  for (int i = 0; i < packetSize; i++)
-  {
-    result += (char)LoRa.read();
-    //Serial.print((char)LoRa.read());
-  }
-  if (packetSize < 49)
-      storePacket(LoRa.packetRssi(), result);
-  else
-      Serial.println("LoRa Packet longer than 48 bytes! Discarded...");
-  // print RSSI of packet
-  //Serial.print("' with RSSI ");
-  //Serial.println(LoRa.packetRssi());
-  //Serial.print(" S-Meter: ");
-  //Serial.println(map(LoRa.packetRssi(), -160, -20, 0, 100));
-}
 
 
 

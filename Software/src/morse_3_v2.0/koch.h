@@ -11,6 +11,7 @@ namespace Koch
 
     String kochChars;
 
+    void setup();
     void updateKochChars(boolean lcwoKochSeq);
 
     uint8_t wordIsKoch(String thisWord);

@@ -25,6 +25,20 @@ using namespace MorseSound;
     //// functions for generating a tone....
 
 
+void MorseSound::setup() {
+    // set up PWMs for tone generation
+      ledcSetup(toneChannel, toneFreq, pwmResolution);
+      ledcAttachPin(LF_Pin, toneChannel);
+
+      ledcSetup(lineOutChannel, toneFreq, pwmResolution);
+      ledcAttachPin(lineOutPin, lineOutChannel);                                      ////// change this for real version - no line out currntly
+
+      ledcSetup(volChannel, volFreq, pwmResolution);
+      ledcAttachPin(HF_Pin, volChannel);
+
+      ledcWrite(toneChannel,0);
+      ledcWrite(lineOutChannel,0);
+  }
 
 
 

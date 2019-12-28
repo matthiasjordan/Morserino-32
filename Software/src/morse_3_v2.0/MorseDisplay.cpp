@@ -51,8 +51,8 @@ void MorseDisplay::init()
 {
     display.init();
     display.flipScreenVertically();  // rotate 180°  when USB is to the left of the module
-    display.clear();
-    display.display();
+    clearDisplay();
+
     adcAttachPin(batteryPin);
     analogSetPinAttenuation(batteryPin, ADC_11db);
 }
@@ -63,8 +63,8 @@ char numBuffer[16];                // for number to string conversion with sprin
 void MorseDisplay::displayStartUp()
 {
     String stat = "Morserino-32m ";
-    display.clear();
-    display.display();
+    clearDisplay();
+
     stat += String(MorsePreferences::prefs.loraQRG / 10000);
     /*
      switch (p_loraBand) {
@@ -96,8 +96,7 @@ void MorseDisplay::displayStartUp()
 
     if (volt < 3150)
     {
-        display.clear();
-        display.display();
+        clearDisplay();
         MorseDisplay::displayEmptyBattery();                            // warn about empty battery and go to deep sleep (again)
     }
     else
@@ -115,6 +114,14 @@ void MorseDisplay::clearAll() {
 void MorseDisplay::display() {
     display.display();
 }
+
+
+void MorseDisplay::clearDisplay() {
+    display.clear();
+    display.display();
+}
+
+
 
 void MorseDisplay::sleep() {
     display.sleep();

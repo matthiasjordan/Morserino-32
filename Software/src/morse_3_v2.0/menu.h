@@ -7,7 +7,6 @@ namespace Menu
 {
     void displayKeyerPreferencesMenu(int pos);
     boolean adjustKeyerPreference(MorsePreferences::prefPos pos);
-
 }
 
 #endif /* MENU_H_ */

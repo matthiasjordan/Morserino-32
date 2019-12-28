@@ -190,6 +190,8 @@ namespace MorsePreferences
     uint8_t wordIsKoch(String thisWord);
     void createKochAbbr(uint8_t maxl, uint8_t koch);
 
+    void writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG);
+
 }
 
 #endif

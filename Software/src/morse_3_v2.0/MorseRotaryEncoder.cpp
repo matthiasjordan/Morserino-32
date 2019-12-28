@@ -6,6 +6,11 @@
 using namespace MorseRotaryEncoder;
 
 
+void MorseRotaryEncoder::setup() {
+    encoderPos = 0;           /// this is the encoder position
+}
+
+
 void IRAM_ATTR MorseRotaryEncoder::isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
 //if (micros()  > (IRTime + 1000) ) {
 portENTER_CRITICAL_ISR(&mux);

@@ -47,38 +47,6 @@ namespace Menu::internal {
     void displayLoraQRG();
     void displaySnapRecall();
     void displaySnapStore();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 //////// Display the preferences menu - we display the following preferences

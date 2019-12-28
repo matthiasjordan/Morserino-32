@@ -443,3 +443,10 @@ void MorsePreferences::clearMemory(uint8_t ptr)
     updateMemory(prefs.snapShots);
     delay(1000);
 }
+
+void MorsePreferences::writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG) {
+    pref.begin("morserino", false);             // open the namespace as read/write
+    pref.putUChar("loraBand", loraBand);
+    pref.putUInt("loraQRG", loraQRG);
+    pref.end();
+}

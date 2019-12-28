@@ -19,8 +19,8 @@ namespace MorseRotaryEncoder {
     volatile uint8_t stateRegister = 0;
 
 
-    void IRAM_ATTR isr ();
-
+    void setup();
+    void IRAM_ATTR isr();
     int IRAM_ATTR checkEncoder() ;
 }
 
