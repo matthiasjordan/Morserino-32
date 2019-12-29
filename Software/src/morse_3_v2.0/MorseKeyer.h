@@ -28,6 +28,7 @@ unsigned int interCharacterSpace, interWordSpace;   // need to be properly initi
 unsigned int effWpm;                                // calculated effective speed in WpM
 
 void updateTimings();
+void keyTransmitter();
 
 
 }

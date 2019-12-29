@@ -197,7 +197,6 @@ void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, char* format
 String printToScroll_buffer = "";
 FONT_ATTRIB printToScroll_lastStyle = REGULAR;
 
-boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
 
 void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
 {
@@ -562,4 +561,25 @@ void MorseDisplay::dispLoraLogo() {     // display a small logo in the top right
   display.drawXbm(121, 2, lora_width, lora_height, lora_bits);
   display.setColor(WHITE);
   display.display();
+}
+
+
+////// S Meter for Trx modus
+
+void MorseDisplay::updateSMeter(int rssi) {
+
+  static boolean wasZero = false;
+
+  if (rssi == 0)
+      if (wasZero)
+          return;
+       else {
+           MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, 0);
+          wasZero = true;
+       }
+   else {
+       MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
+      wasZero = false;
+   }
+  MorseDisplay::display();
 }

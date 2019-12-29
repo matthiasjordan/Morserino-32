@@ -179,6 +179,9 @@ namespace MorsePreferences
 
     MorsePrefs prefs;
 
+    prefPos *currentOptions = allOptions;
+
+
     MorsePrefs readPreferences(String repository);
     void writePreferences(String repository, MorsePrefs p);
     boolean recallSnapshot();

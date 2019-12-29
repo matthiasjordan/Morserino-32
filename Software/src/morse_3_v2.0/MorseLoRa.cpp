@@ -6,6 +6,7 @@
 #include "morsedefs.h"
 #include "MorseDisplay.h"
 #include "MorsePreferences.h"
+#include "MorseMachine.h"
 #include "MorseLoRa.h"
 #include "menu.h"
 
@@ -26,8 +27,9 @@ uint8_t loRaSerial;                                     /// a 6 bit serial numbe
 
 
 namespace MorseLoRa::internal {
-    void MorseLoRa::internal::loraSystemSetup();
+    void loraSystemSetup();
     void onReceive(int packetSize);
+    void storePacket(int rssi, String packet);
 }
 
 
@@ -87,7 +89,7 @@ void MorseLoRa::internal::loraSystemSetup() {
 
 //  char loraTxBuffer[32];
 
-void cwForLora (int element) {
+void MorseLoRa::cwForLora (int element) {
   //static String result;
   //result.reserve(36);
   //static char buf[32];
@@ -142,7 +144,7 @@ void sendWithLora() {           // hand this string over as payload to the LoRA 
   LoRa.beginPacket();
   LoRa.print(loraTxBuffer);
   LoRa.endPacket();
-  if (morseState == loraTrx)
+  if (MorseMachine::isMode(loraTrx))
       LoRa.receive();
 }
 
@@ -160,7 +162,7 @@ void onReceive(int packetSize)
     //Serial.print((char)LoRa.read());
   }
   if (packetSize < 49)
-      storePacket(LoRa.packetRssi(), result);
+      internal::storePacket(LoRa.packetRssi(), result);
   else
       Serial.println("LoRa Packet longer than 48 bytes! Discarded...");
   // print RSSI of packet
@@ -223,7 +225,7 @@ uint8_t loRaBuWrite(int rssi, String packet) {
   return l;
 }
 
-boolean loRaBuReady() {
+boolean MorseLoRa::loRaBuReady() {
   if (byteBuFree == 256)
     return (false);
   else
@@ -262,7 +264,7 @@ void storePacket(int rssi, String packet) {             // whenever we receive s
 //// byte 2: first 6 bits are wpm (must be between 5 and 60; values 00 - 04 and 61 to 63 are invalid), the remaining 2 bits are already data payload!
 
 
-uint8_t decodePacket(int* rssi, int* wpm, String* cwword) {
+uint8_t MorseLoRa::decodePacket(int* rssi, int* wpm, String* cwword) {
   uint8_t l, c, header=0;
   uint8_t index = 0;
 

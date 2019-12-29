@@ -36,6 +36,10 @@ namespace MorseDisplay
     void displayBatteryStatus(int v);
     void displayEmptyBattery();
     void dispLoraLogo();
+    void updateSMeter(int rssi);
+
+
+
 }
 
 #endif /* MORSEDISPLAY_H_ */
