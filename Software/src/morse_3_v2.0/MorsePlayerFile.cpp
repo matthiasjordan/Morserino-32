@@ -16,6 +16,36 @@ namespace MorsePlayerFile::internal {
 
 File file;
 
+
+void MorsePlayerFile::setup() {
+    ///////////////////////// mount (or create) SPIFFS file system
+      #define FORMAT_SPIFFS_IF_FAILED true
+
+      if(!SPIFFS.begin(FORMAT_SPIFFS_IF_FAILED)){     ///// if SPIFFS cannot be mounted, it does not exist. So create  (format) it, and mount it
+          //Serial.println("SPIFFS Mount Failed");
+          return;
+      }
+    //////////////////////// create file player.txt if it does not exist|
+    const char * defaultFile = "This is just an initial dummy file for the player. Dies ist nur die anfänglich enthaltene Standarddatei für den Player.\n"
+                               "Did you not upload your own file? Hast du keine eigene Datei hochgeladen?";
+
+      if (!SPIFFS.exists("/player.txt")) {                                    // file does not exist, therefor we create it from the text above
+          File file = SPIFFS.open("/player.txt", FILE_WRITE);
+          if(!file){
+              Serial.println("- failed to open file for writing");
+              return;
+          }
+          if(file.print(defaultFile)){
+              ;
+          } else {
+              Serial.println("- write failed");
+          }
+          file.close();
+      }
+
+}
+
+
 String MorsePlayerFile::getWord() {
   String result = "";
   byte c;

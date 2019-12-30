@@ -16,7 +16,6 @@ using namespace Decoder;
 uint32_t magnitudelimit;                                   // magnitudelimit_low = ( p_goertzelBandwidth? 80000 : 30000);
 uint32_t magnitudelimit_low;                               // magnitudelimit = magnitudelimit_low;
 
-boolean speedChanged = true;
 boolean filteredState = false;
 boolean filteredStateBefore = false;
 unsigned long interWordTimer = 0;      // timer to detect interword spaces
@@ -145,7 +144,7 @@ void setupGoertzel()
 #define straightPin leftPin
 
 boolean straightKey() {            // return true if a straight key was closed, or a touch paddle touched
-if ((MorseMachine::isMode(morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey) )
+if ((MorseMachine::isMode(MorseMachine::morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey) )
     return true;
 else return false;
 }
@@ -240,7 +239,7 @@ else {
 }   /// end checkTone()
 
 
-void doDecode() {
+void Decoder::doDecode() {
   float lacktime;
   int wpm;
 
@@ -371,7 +370,7 @@ void displayMorse() {
   symbol = CWtree[treeptr].symb;
   //Serial.println("Symbol: " + symbol + " treeptr: " + String(treeptr));
   MorseDisplay::printToScroll( REGULAR, symbol);
-  if (MorseMachine::isMode(echoTrainer)) {                /// store the character in the response string
+  if (MorseMachine::isMode(MorseMachine::echoTrainer)) {                /// store the character in the response string
       MorseEchoTrainer::storeCharInResponse(symbol);
   }
   treeptr = 0;                                    // reset tree pointer

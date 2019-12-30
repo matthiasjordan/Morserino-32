@@ -644,3 +644,7 @@ String MorseGenerator::internal::getRandomAbbrev( int maxLength) {        //// g
 }
 
 
+void MorseGenerator::setupHeadCopying() {
+  effectiveAutoStop = true;
+  effectiveTrainerDisplay = DISPLAY_BY_CHAR;
+}

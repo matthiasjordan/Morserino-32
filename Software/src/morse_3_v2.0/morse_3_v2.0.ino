@@ -54,7 +54,12 @@
 #include "koch.h"
 #include "MorseLoRa.h"
 #include "MorseSystem.h"
+#include "MorseMachine.h"
 #include "MorseUI.h"
+#include "MorseGenerator.h"
+#include "MorsePlayerFile.h"
+#include "MorseKeyer.h"
+#include "decoder.h"
 
 
 /// we need this for some strange reason: the min definition breaks with WiFi
@@ -92,68 +97,68 @@ typedef struct MenuItem {
   String text;
   menuNo no;
   uint8_t nav[5];
-  GEN_TYPE generatorMode;
+  MorseGenerator::GEN_TYPE generatorMode;
   boolean remember;
 } menuItem_t;
 
 
 const menuItem_t menuItems [] = {
-  {"",_dummy, { 0,0,0,0,0}, NA, true},
-  {"CW Keyer",_keyer, {0,_goToSleep,_gen,_dummy,0}, NA, true},
+  {"",_dummy, { 0,0,0,0,0}, MorseGenerator::NA, true},
+  {"CW Keyer",_keyer, {0,_goToSleep,_gen,_dummy,0}, MorseGenerator::NA, true},
   
-  {"CW Generator",_gen, {0,_keyer,_echo,_dummy,_genRand}, NA, true},
-  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}, RANDOMS, true},
-  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}, ABBREVS, true},
-  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}, WORDS, true},
-  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}, CALLS, true},
-  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}, MIXED, true},
-  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}, PLAYER, true},
+  {"CW Generator",_gen, {0,_keyer,_echo,_dummy,_genRand}, MorseGenerator::NA, true},
+  {"Random",_genRand, {1,_genPlayer,_genAbb,_gen,0}, MorseGenerator::RANDOMS, true},
+  {"CW Abbrevs",_genAbb, {1,_genRand,_genWords,_gen,0}, MorseGenerator::ABBREVS, true},
+  {"English Words",_genWords, {1,_genAbb,_genCalls,_gen,0}, MorseGenerator::WORDS, true},
+  {"Call Signs",_genCalls, {1,_genWords,_genMixed,_gen,0}, MorseGenerator::CALLS, true},
+  {"Mixed",_genMixed, {1,_genCalls,_genPlayer,_gen,0}, MorseGenerator::MIXED, true},
+  {"File Player",_genPlayer, {1,_genMixed,_genRand,_gen,0}, MorseGenerator::PLAYER, true},
 
-  {"Echo Trainer",_echo, {0,_gen,_koch,_dummy,_echoRand}, NA, true},
-  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}, RANDOMS, true},
-  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}, ABBREVS, true},
-  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}, WORDS, true},
-  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}, CALLS, true},
-  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}, MIXED, true},
-  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}, PLAYER, true},
+  {"Echo Trainer",_echo, {0,_gen,_koch,_dummy,_echoRand}, MorseGenerator::NA, true},
+  {"Random",_echoRand, {1,_echoPlayer,_echoAbb,_echo,0}, MorseGenerator::RANDOMS, true},
+  {"CW Abbrevs",_echoAbb, {1,_echoRand,_echoWords,_echo,0}, MorseGenerator::ABBREVS, true},
+  {"English Words",_echoWords, {1,_echoAbb,_echoCalls,_echo,0}, MorseGenerator::WORDS, true},
+  {"Call Signs",_echoCalls, {1,_echoWords,_echoMixed,_echo,0}, MorseGenerator::CALLS, true},
+  {"Mixed",_echoMixed, {1,_echoCalls,_echoPlayer,_echo,0}, MorseGenerator::MIXED, true},
+  {"File Player",_echoPlayer, {1,_echoMixed,_echoRand,_echo,0}, MorseGenerator::PLAYER, true},
 
-  {"Koch Trainer",_koch,  {0,_echo,_head,_dummy,_kochSel}, NA, true},
-  {"Select Lesson",_kochSel, {1,_kochEcho,_kochLearn,_koch,0}, NA, true},
-  {"Learn New Chr",_kochLearn, {1,_kochSel,_kochGen,_koch,0}, NA, true},
-  {"CW Generator",_kochGen, {1,_kochLearn,_kochEcho,_koch,_kochGenRand}, NA, true},
-  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}, RANDOMS, true},
-  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}, ABBREVS, true},
-  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}, WORDS, true},
-  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}, MIXED, true},
+  {"Koch Trainer",_koch,  {0,_echo,_head,_dummy,_kochSel}, MorseGenerator::NA, true},
+  {"Select Lesson",_kochSel, {1,_kochEcho,_kochLearn,_koch,0}, MorseGenerator::NA, true},
+  {"Learn New Chr",_kochLearn, {1,_kochSel,_kochGen,_koch,0}, MorseGenerator::NA, true},
+  {"CW Generator",_kochGen, {1,_kochLearn,_kochEcho,_koch,_kochGenRand}, MorseGenerator::NA, true},
+  {"Random",_kochGenRand, {2,_kochGenMixed,_kochGenAbb,_kochGen,0}, MorseGenerator::RANDOMS, true},
+  {"CW Abbrevs",_kochGenAbb, {2,_kochGenRand,_kochGenWords,_kochGen,0}, MorseGenerator::ABBREVS, true},
+  {"English Words",_kochGenWords, {2,_kochGenAbb,_kochGenMixed,_kochGen,0}, MorseGenerator::WORDS, true},
+  {"Mixed",_kochGenMixed, {2,_kochGenWords,_kochGenRand,_kochGen,0}, MorseGenerator::MIXED, true},
 
-  {"Echo Trainer",_kochEcho, {1,_kochGen,_kochSel,_koch,_kochEchoRand}, NA, true},
-  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}, RANDOMS, true},
-  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}, ABBREVS, true},
-  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}, WORDS, true},
-  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}, MIXED, true},
+  {"Echo Trainer",_kochEcho, {1,_kochGen,_kochSel,_koch,_kochEchoRand}, MorseGenerator::NA, true},
+  {"Random",_kochEchoRand, {2,_kochEchoMixed,_kochEchoAbb,_kochEcho,0}, MorseGenerator::RANDOMS, true},
+  {"CW Abbrevs",_kochEchoAbb, {2,_kochEchoRand,_kochEchoWords,_kochEcho,0}, MorseGenerator::ABBREVS, true},
+  {"English Words",_kochEchoWords, {2,_kochEchoAbb,_kochEchoMixed,_kochEcho,0}, MorseGenerator::WORDS, true},
+  {"Mixed",_kochEchoMixed, {2,_kochEchoWords,_kochEchoRand,_kochEcho,0}, MorseGenerator::MIXED, true},
 
-  {"Head Copying",_head, {0,_koch,_trx,_dummy,_headRand}, NA, true},
-  {"Random",_headRand, {1,_headPlayer,_headAbb,_head,0}, RANDOMS, true},
-  {"CW Abbrevs",_headAbb, {1,_headRand,_headWords,_head,0}, ABBREVS, true},
-  {"English Words",_headWords, {1,_headAbb,_headCalls,_head,0}, WORDS, true},
-  {"Call Signs",_headCalls, {1,_headWords,_headMixed,_head,0}, CALLS, true},
-  {"Mixed",_headMixed, {1,_headCalls,_headPlayer,_head,0}, MIXED, true},
-  {"File Player",_headPlayer, {1,_headMixed,_headRand,_head,0}, PLAYER, true},
+  {"Head Copying",_head, {0,_koch,_trx,_dummy,_headRand}, MorseGenerator::NA, true},
+  {"Random",_headRand, {1,_headPlayer,_headAbb,_head,0}, MorseGenerator::RANDOMS, true},
+  {"CW Abbrevs",_headAbb, {1,_headRand,_headWords,_head,0}, MorseGenerator::ABBREVS, true},
+  {"English Words",_headWords, {1,_headAbb,_headCalls,_head,0}, MorseGenerator::WORDS, true},
+  {"Call Signs",_headCalls, {1,_headWords,_headMixed,_head,0}, MorseGenerator::CALLS, true},
+  {"Mixed",_headMixed, {1,_headCalls,_headPlayer,_head,0}, MorseGenerator::MIXED, true},
+  {"File Player",_headPlayer, {1,_headMixed,_headRand,_head,0}, MorseGenerator::PLAYER, true},
 
-  {"Transceiver",_trx, {0,_head,_decode,_dummy,_trxLora}, NA, true},
-  {"LoRa Trx",_trxLora, {1,_trxIcw,_trxIcw,_trx,0}, NA, true},
-  {"iCW/Ext Trx",_trxIcw, {1,_trxLora,_trxLora,_trx,0}, NA, true},
+  {"Transceiver",_trx, {0,_head,_decode,_dummy,_trxLora}, MorseGenerator::NA, true},
+  {"LoRa Trx",_trxLora, {1,_trxIcw,_trxIcw,_trx,0}, MorseGenerator::NA, true},
+  {"iCW/Ext Trx",_trxIcw, {1,_trxLora,_trxLora,_trx,0}, MorseGenerator::NA, true},
 
-  {"CW Decoder",_decode, {0,_trx,_wifi,_dummy,0}, NA, true},
+  {"CW Decoder",_decode, {0,_trx,_wifi,_dummy,0}, MorseGenerator::NA, true},
 
-  {"WiFi Functions",_wifi, {0,_decode,_goToSleep,_dummy,_wifi_mac}, NA, false},
-  {"Disp MAC Addr",_wifi_mac, {1,_wifi_update,_wifi_config,_wifi,0}, NA, false},
-  {"Config WiFi",_wifi_config, {1,_wifi_mac,_wifi_check,_wifi,0}, NA, false},
-  {"Check WiFi",_wifi_check, {1,_wifi_config,_wifi_upload,_wifi,0}, NA, false},
-  {"Upload File",_wifi_upload, {1,_wifi_check,_wifi_update,_wifi,0}, NA, false},
-  {"Update Firmw",_wifi_update, {1,_wifi_upload,_wifi_mac,_wifi,0}, NA, false},
+  {"WiFi Functions",_wifi, {0,_decode,_goToSleep,_dummy,_wifi_mac}, MorseGenerator::NA, false},
+  {"Disp MAC Addr",_wifi_mac, {1,_wifi_update,_wifi_config,_wifi,0}, MorseGenerator::NA, false},
+  {"Config WiFi",_wifi_config, {1,_wifi_mac,_wifi_check,_wifi,0}, MorseGenerator::NA, false},
+  {"Check WiFi",_wifi_check, {1,_wifi_config,_wifi_upload,_wifi,0}, MorseGenerator::NA, false},
+  {"Upload File",_wifi_upload, {1,_wifi_check,_wifi_update,_wifi,0}, MorseGenerator::NA, false},
+  {"Update Firmw",_wifi_update, {1,_wifi_upload,_wifi_mac,_wifi,0}, MorseGenerator::NA, false},
 
-  {"Go To Sleep",_goToSleep, {0,_wifi,_keyer,_dummy,0}, NA, false}
+  {"Go To Sleep",_goToSleep, {0,_wifi,_keyer,_dummy,0}, MorseGenerator::NA, false}
 
 };
 
@@ -329,31 +334,8 @@ MorseRotaryEncoder::setup();
   quickStart = MorsePreferences::prefs.quickStart;
 
   
-  ///////////////////////// mount (or create) SPIFFS file system
-    #define FORMAT_SPIFFS_IF_FAILED true
-
-    if(!SPIFFS.begin(FORMAT_SPIFFS_IF_FAILED)){     ///// if SPIFFS cannot be mounted, it does not exist. So create  (format) it, and mount it
-        //Serial.println("SPIFFS Mount Failed");
-        return;
-    }
-  //////////////////////// create file player.txt if it does not exist|
-  const char * defaultFile = "This is just an initial dummy file for the player. Dies ist nur die anfänglich enthaltene Standarddatei für den Player.\n"
-                             "Did you not upload your own file? Hast du keine eigene Datei hochgeladen?";
-                             
-    if (!SPIFFS.exists("/player.txt")) {                                    // file does not exist, therefor we create it from the text above
-        File file = SPIFFS.open("/player.txt", FILE_WRITE);
-        if(!file){
-            Serial.println("- failed to open file for writing");
-            return;
-        }
-        if(file.print(defaultFile)){
-            ;
-        } else {
-            Serial.println("- write failed");
-        }
-        file.close();
-    }    
-    MorseDisplay::displayStartUp();
+MorsePlayerFile::setup();
+  MorseDisplay::displayStartUp();
 
     ///delay(2500);  //// just to be able to see the startup screen for a while - is contained in displayStartUp()
 
@@ -370,10 +352,6 @@ MorseRotaryEncoder::setup();
 
 
 
-void setupHeadCopying() {
-  effectiveAutoStop = true;
-  effectiveTrainerDisplay = DISPLAY_BY_CHAR;
-}
 
 
 ///////////////////////// THE MAIN LOOP - do this OFTEN! /////////////////////////////////
@@ -384,26 +362,26 @@ void loop() {
 
    boolean activeOld = active;
    checkPaddles();
-   switch (morseState) {
-      case morseKeyer:    if (doPaddleIambic(leftKey, rightKey)) {
+   switch (MorseMachine::getMode()) {
+      case MorseMachine::morseKeyer:    if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }
                           break;
-      case loraTrx:      if (doPaddleIambic(leftKey, rightKey)) {
+      case MorseMachine::loraTrx:      if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }
-                          generateCW();
+                          MorseGenerator::generateCW();
                           break;
-      case morseTrx:      if (doPaddleIambic(leftKey, rightKey)) {
+      case MorseMachine::morseTrx:      if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }  
-                          doDecode();
-                          if (speedChanged) {
-                            speedChanged = false;
+                          Decoder::doDecode();
+                          if (Decoder::speedChanged) {
+                            Decoder::speedChanged = false;
                             displayCWspeed();
                           }
                           break;    
-      case morseGenerator:  if ((autoStop == stop1) || leftKey  || rightKey)   {                                    // touching a paddle starts and stops the generation of code
+      case MorseMachine::morseGenerator:  if ((autoStop == stop1) || MorseKeyer::leftKey  || MorseKeyer::rightKey)   {                                    // touching a paddle starts and stops the generation of code
                           // for debouncing:
                           while (checkPaddles() )
                               ;                                                           // wait until paddles are released
@@ -440,7 +418,7 @@ void loop() {
                           }
                           if (activeOld != active) {
                             if (!active) {
-                               keyOut(false, true, 0, 0);
+                               MorseGenerator::keyOut(false, true, 0, 0);
                                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                             }
                           else {
@@ -452,13 +430,13 @@ void loop() {
                           if (active)
                             generateCW();
                           break;
-      case echoTrainer:                             ///// check stopFlag triggered by maxSequence
+      case MorseMachine::echoTrainer:                             ///// check stopFlag triggered by maxSequence
                           if (stopFlag) {
                             active = stopFlag = false;
-                            keyOut(false, true, 0, 0);
+                            MorseGenerator::keyOut(false, true, 0, 0);
                             MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                           }
-                          if (!active && (leftKey  || rightKey))   {                       // touching a paddle starts  the generation of code
+                          if (!active && (MorseKeyer::leftKey  || MorseKeyer::rightKey))   {                       // touching a paddle starts  the generation of code
                               // for debouncing:
                               while (checkPaddles() )
                                   ;                                                           // wait until paddles are released
@@ -475,12 +453,12 @@ void loop() {
                             case  EVAL_ANSWER:  echoTrainerEval();
                                                 break;
                             case  COMPLETE_ANSWER:                    
-                            case  GET_ANSWER:   if (doPaddleIambic(leftKey, rightKey)) 
+                            case  GET_ANSWER:   if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
                                                     return;                             // we are busy keying and so need a very tight loop !
                                                 break;
                             }                              
                             break;
-      case morseDecoder: doDecode();
+      case MorseMachine::morseDecoder: doDecode();
                          if (speedChanged) {
                             speedChanged = false;
                             displayCWspeed();
@@ -540,7 +518,7 @@ void loop() {
                   if (!active) {
                         //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
                         //pwmNoTone(); 
-                        keyOut(false, true, 0, 0);
+                        MorseGenerator::keyOut(false, true, 0, 0);
                         MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                   }
                   else {

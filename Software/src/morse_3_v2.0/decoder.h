@@ -103,10 +103,11 @@ namespace Decoder
     byte treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
 
     unsigned long acsTimer = 0;            // timer to use for automatic character spacing (ACS)
+    boolean speedChanged = true;
 
 
 
-
+    void doDecode();
     void setupGoertzel();
     void drawInputStatus( boolean on);
     void interWordTimerOff();
