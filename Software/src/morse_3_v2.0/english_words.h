@@ -220,8 +220,7 @@ const String words[WORDS_NUMBER_OF_ELEMENTS]  = {
 };
 
 
-void createKochWords(uint8_t maxl, uint8_t koch);
-
+String EnglishWords::getRandomWord(int maxLength);
 
 }
 

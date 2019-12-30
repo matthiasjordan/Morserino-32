@@ -16,6 +16,14 @@ namespace Koch
 
     uint8_t wordIsKoch(String thisWord);
     String getChar(uint8_t maxKochLevel);
+    String getRandomChars(int maxLength);
+    String getRandomWord();
+    String getRandomAbbrev();
+    boolean isKochActive();
+    void setKochActive(boolean newActive);
+    void createKochWords(uint8_t maxl, uint8_t koch);
+    void createKochAbbr(uint8_t maxl, uint8_t koch);
+    String filterNonKoch(String input);
 }
 
 #endif

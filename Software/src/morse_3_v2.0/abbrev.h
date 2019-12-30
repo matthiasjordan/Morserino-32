@@ -257,8 +257,7 @@ const String abbreviations[ABBREV_NUMBER_OF_ELEMENTS]  = {
 };
 
 
-void createKochAbbr(uint8_t maxl, uint8_t koch);
-
+String Abbrev::getRandomAbbrev(int maxLength);
 }
 
 #endif

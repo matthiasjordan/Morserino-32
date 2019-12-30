@@ -11,6 +11,8 @@
 #include "decoder.h"
 #include "koch.h"
 #include "MorsePlayerFile.h"
+#include "english_words.h"
+#include "abbrev.h"
 
 
 using namespace MorseGenerator;
@@ -388,7 +390,6 @@ void fetchNewWord() {
                                                       }
                                                       ++MorsePreferences::prefs.fileWordPointer;
                                                       */
-                                                      clearText = internal::cleanUpText(clearText);
                                                       break;
                                       case NA: break;
                                     }   // end switch (generatorMode)
@@ -529,14 +530,8 @@ String MorseGenerator::internal::getRandomChars( int maxLength, int option) {   
     if (maxLength > 6) {                                        // we use a random length!
       maxLength = random(2, maxLength - 3);                     // maxLength is max 10, so random upper limit is 7, means max 6 chars...
     }
-    if (kochActive) {                                           // kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:"
-        int endk =  MorsePreferences::prefs.kochFilter;                               //              1   5    1    5    2    5    3    5    4    5    5
-        for (i = 0; i < maxLength; ++i) {
-        if (random(2))                                          // in Koch mode, we generate the last third of the chars learned  a bit more often
-            result += kochChars.charAt(random(2*endk/3, endk));
-        else
-            result += kochChars.charAt(random(endk));
-        }
+    if (Koch::isKochActive()) {                                           // kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:"
+        result += Koch::getRandomChars(maxLength);
     } else {
          switch (option) {
           case OPT_NUM:
@@ -633,54 +628,19 @@ String MorseGenerator::internal::getRandomCall( int maxLength) {            // r
 String MorseGenerator::internal::getRandomWord( int maxLength) {        //// give me a random English word, max maxLength chars long (1-5) - 0 returns any length
   if (maxLength > 5)
     maxLength = 0;
-    if (kochActive)
-        return kochWords[random(numberOfWords)];
+    if (Koch::isKochActive())
+        return Koch::getRandomWord();
     else
-        return words[random(WORDS_POINTER[maxLength], WORDS_NUMBER_OF_ELEMENTS)];
+        return EnglishWords::getRandomWord(maxLength);
 }
 
 String MorseGenerator::internal::getRandomAbbrev( int maxLength) {        //// give me a random CW abbreviation , max maxLength chars long (1-5) - 0 returns any length
   if (maxLength > 5)
     maxLength = 0;
-    if (kochActive)
-        return kochAbbr[random(numberOfAbbr)];
+    if (Koch::isKochActive())
+        return  Koch::getRandomAbbrev();
     else
-        return abbreviations[random(ABBREV_POINTER[maxLength], ABBREV_NUMBER_OF_ELEMENTS)];
+        return Abbrev::getRandomAbbrev(maxLength);
 }
 
-
-String MorseGenerator::internal::cleanUpText(String w) {                        // all to lower case, and convert umlauts
-  String result = "";
-  char c;
-  result.reserve(64);
-  w.toLowerCase();
-  w = utf8umlaut(w);
-
-  for (unsigned int i = 0; i<w.length(); ++i) {
-    if (kochChars.indexOf(c = w.charAt(i)) != -1)
-      result += c;
-  }
-  return result;
-}
-
-
-String MorseGenerator::internal::utf8umlaut(String s) { /// replace umtf umlauts with digraphs, and interpret pro signs, written e.g. as [kn] or <kn>
-      s.replace("ä", "ae");
-      s.replace("ö", "oe");
-      s.replace("ü", "ue");
-      s.replace("Ä", "ae");
-      s.replace("Ö", "oe");
-      s.replace("Ü", "ue");
-      s.replace("ß", "ss");
-      s.replace("[", "<");
-      s.replace("]", ">");
-      s.replace("<ar>", "+");
-      s.replace("<bt>", "=");
-      s.replace("<as>", "S");
-      s.replace("<ka>", "K");
-      s.replace("<kn>", "N");
-      s.replace("<sk>", "K");
-      s.replace("<ve>", "V");
-      return s;
-}
 

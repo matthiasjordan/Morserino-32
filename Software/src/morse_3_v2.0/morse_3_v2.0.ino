@@ -197,7 +197,6 @@ unsigned int rUntouched = 0;
 
 
 
-boolean kochActive = false;                 // set to true when in Koch trainer mode
 
 ///////////////////////////////////////////////////////////////////////////////
 //
