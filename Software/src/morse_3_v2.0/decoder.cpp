@@ -1,6 +1,11 @@
 #include "decoder.h"
 
 #include "MorsePreferences.h"
+#include "MorseMachine.h"
+#include "MorseKeyer.h"
+#include "MorseGenerator.h"
+#include "MorseDisplay.h"
+#include "MorseEchoTrainer.h"
 
 using namespace Decoder;
 
@@ -14,6 +19,7 @@ uint32_t magnitudelimit_low;                               // magnitudelimit = m
 boolean speedChanged = true;
 boolean filteredState = false;
 boolean filteredStateBefore = false;
+unsigned long interWordTimer = 0;      // timer to detect interword spaces
 
 /// state machine for decoding CW
 enum DECODER_STATES
@@ -64,6 +70,20 @@ unsigned long ditAvg, dahAvg;     /// average values of dit and dah lengths to d
 
 volatile uint8_t dit_rot = 0;
 volatile unsigned long dit_collector = 0;
+
+
+
+namespace Decoder::internal {
+    void ON_();
+    void OFF_();
+    void displayMorse();
+
+    void recalculateDit(unsigned long duration);
+    void recalculateDah(unsigned long duration);
+    String encodeProSigns( String &input );
+}
+
+
 
 void setupGoertzel()
 {                 /// pre-compute some values that are compute-imntensive and won't change anyway
@@ -125,10 +145,13 @@ void setupGoertzel()
 #define straightPin leftPin
 
 boolean straightKey() {            // return true if a straight key was closed, or a touch paddle touched
-if ((morseState == morseDecoder) && ((!digitalRead(straightPin)) || leftKey || rightKey) )
+if ((MorseMachine::isMode(morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey) )
     return true;
 else return false;
 }
+
+
+
 
 boolean checkTone() {              /// check if we have a tone signal at A6 with Gortzel's algorithm, and apply some noise blanking as well
                                    /// the result will be in globale variable filteredState
@@ -223,7 +246,7 @@ void doDecode() {
 
     switch(decoderState) {
       case INTERELEMENT_: if (checkTone()) {
-                              ON_();
+                              internal::ON_();
                               decoderState = HIGH_;
                           } else {
                               lowDuration = millis() - startTimeLow;                        // we record the length of the pause
@@ -231,7 +254,7 @@ void doDecode() {
                               //if (MorsePreferences::prefs.wpm > 35) lacktime = 2.7;
                               //  else if (MorsePreferences::prefs.wpm > 30) lacktime = 2.6;
                               if (lowDuration > (lacktime * ditAvg)) {
-                                displayMorse();                                             /// decode the morse character and display it
+                                internal::displayMorse();                                             /// decode the morse character and display it
                                 wpm = (MorsePreferences::prefs.wpm + (int) (7200 / (dahAvg + 3*ditAvg))) / 2;     //// recalculate speed in wpm
                                 if (MorsePreferences::prefs.wpm != wpm) {
                                   MorsePreferences::prefs.wpm = wpm;
@@ -242,7 +265,7 @@ void doDecode() {
                           }
                           break;
       case INTERCHAR_:    if (checkTone()) {
-                              ON_();
+          internal::ON_();
                               decoderState = HIGH_;
                           } else {
                               lowDuration = millis() - startTimeLow;             // we record the length of the pause
@@ -250,18 +273,18 @@ void doDecode() {
                               if (MorsePreferences::prefs.wpm > 35) lacktime = 6;
                                 else if (MorsePreferences::prefs.wpm > 30) lacktime = 5.5;
                               if (lowDuration > (lacktime * ditAvg)) {
-                                   printToScroll(REGULAR, " ");                       // output a blank
+                                   MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
                                    decoderState = LOW_;
                               }
                           }
                           break;
       case LOW_:          if (checkTone()) {
-                              ON_();
+          internal::ON_();
                               decoderState = HIGH_;
                           }
                           break;
       case HIGH_:         if (checkTone()) {
-                              OFF_();
+          internal::OFF_();
                               decoderState = INTERELEMENT_;
                           }
                           break;
@@ -273,12 +296,12 @@ void ON_() {                                  /// what we do when we just detect
    lowDuration = timeNow - startTimeLow;             // we record the length of the pause
    startTimeHigh = timeNow;                          // prime the timer for the high state
 
-   keyOut(true, false, notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
+   MorseGenerator::keyOut(true, false, notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
 
    drawInputStatus(true);
 
    if (lowDuration < ditAvg * 2.4)                    // if we had an inter-element pause,
-      recalculateDit(lowDuration);                    // use it to adjust speed
+      internal::recalculateDit(lowDuration);                    // use it to adjust speed
 }
 
 void OFF_() {                                 /// what we do when we just detected a falling flank, from high to low
@@ -294,30 +317,22 @@ void OFF_() {                                 /// what we do when we just detect
       if (highDuration < threshold) { /// we got a dit -
             treeptr = CWtree[treeptr].dit;
             //Serial.print(".");
-            recalculateDit(highDuration);
+            internal::recalculateDit(highDuration);
       }
       else  {        /// we got a dah
             treeptr = CWtree[treeptr].dah;
             //Serial.print("-");
-            recalculateDah(highDuration);
+            internal::recalculateDah(highDuration);
       }
   }
   //pwmNoTone();                     // stop side tone
   //digitalWrite(keyerPin, LOW);      // stop keying Tx
-  keyOut(false, false, 0, 0);
+  MorseGenerator::keyOut(false, false, 0, 0);
   ///////
   drawInputStatus(false);
 
 }
 
-void drawInputStatus( boolean on) {
-  if (on)
-    display.setColor(BLACK);
-  else
-      display.setColor(WHITE);
-  display.fillRect(1, 1, 20, 13);
-  display.display();
-}
 
 
 
@@ -346,4 +361,69 @@ void recalculateDah(unsigned long duration) {       /// recalculate the average 
 
 }
 
+
+/// display decoded morse code (and store it in echoTrainer
+void displayMorse() {
+  String symbol;
+  symbol.reserve(6);
+  if (treeptr == 0)
+    return;
+  symbol = CWtree[treeptr].symb;
+  //Serial.println("Symbol: " + symbol + " treeptr: " + String(treeptr));
+  MorseDisplay::printToScroll( REGULAR, symbol);
+  if (MorseMachine::isMode(echoTrainer)) {                /// store the character in the response string
+      MorseEchoTrainer::storeCharInResponse(symbol);
+  }
+  treeptr = 0;                                    // reset tree pointer
+}   /// end of displayMorse()
+
+
+void Decoder::interWordTimerOff() {
+    interWordTimer = 4294967000;                   /// interword timer should not trigger something now
+}
+
+
+String Decoder::CWwordToClearText(String cwword) {             // decode the Morse code character in cwword to clear text
+  int ptr = 0;
+  String result;
+  result.reserve(40);
+  String symbol;
+  symbol.reserve(6);
+
+
+  result = "";
+  for (int i = 0; i < cwword.length(); ++i) {
+      char c = cwword[i];
+      switch (c) {
+          case '1': ptr = CWtree[ptr].dit;
+                    break;
+          case '2': ptr = CWtree[ptr].dah;
+                    break;
+          case '0': symbol = CWtree[ptr].symb;
+
+                    ptr = 0;
+                    result += symbol;
+                    break;
+      }
+  }
+  symbol = CWtree[ptr].symb;
+  //Serial.println("Symbol: " + symbol + " ptr: " + String(ptr));
+  result += symbol;
+  return internal::encodeProSigns(result);
+}
+
+
+String Decoder::internal::encodeProSigns( String &input ) {
+    /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch - V <ve>;
+    input.replace("<as>", "S");
+    input.replace("<ka>","A");
+    input.replace("<kn>","N");
+    input.replace("<sk>","K");
+    input.replace("<ve>","V");
+    input.replace("<ch>","H");
+    input.replace("<err>","E");
+    input.replace("¬", "U");
+    //Serial.println(input);
+    return input;
+}
 

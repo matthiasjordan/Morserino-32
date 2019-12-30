@@ -195,6 +195,7 @@ namespace MorsePreferences
 
     void writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG);
 
+    void MorsePreferences::fireCharSeen(boolean wpmOnly);
 }
 
 #endif

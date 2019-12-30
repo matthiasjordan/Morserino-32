@@ -33,3 +33,6 @@ uint8_t Koch::wordIsKoch(String thisWord)
     return thisKoch;
 }
 
+String Koch::getChar(uint8_t maxKochLevel) {
+return (String) kochChars.charAt(maxKochLevel - 1);
+}

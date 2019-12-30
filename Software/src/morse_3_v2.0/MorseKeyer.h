@@ -21,7 +21,6 @@ boolean DIT_FIRST = false; // first latched was dit?
 unsigned int ditLength ;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
 unsigned int dahLength ;        // dahs are 3 dits long
 unsigned char keyerState;
-unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 uint8_t sensor;                 // what we read from checking the touch sensors
 boolean leftKey, rightKey;
 unsigned int interCharacterSpace, interWordSpace;   // need to be properly initialised!

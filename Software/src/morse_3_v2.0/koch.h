@@ -15,7 +15,7 @@ namespace Koch
     void updateKochChars(boolean lcwoKochSeq);
 
     uint8_t wordIsKoch(String thisWord);
-
+    String getChar(uint8_t maxKochLevel);
 }
 
 #endif

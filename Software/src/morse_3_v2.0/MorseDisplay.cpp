@@ -583,3 +583,12 @@ void MorseDisplay::updateSMeter(int rssi) {
    }
   MorseDisplay::display();
 }
+
+void MorseDisplay::drawInputStatus( boolean on) {
+  if (on)
+    display.setColor(BLACK);
+  else
+      display.setColor(WHITE);
+  display.fillRect(1, 1, 20, 13);
+  display.display();
+}

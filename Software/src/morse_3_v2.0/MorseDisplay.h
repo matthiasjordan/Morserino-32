@@ -37,7 +37,7 @@ namespace MorseDisplay
     void displayEmptyBattery();
     void dispLoraLogo();
     void updateSMeter(int rssi);
-
+    void drawInputStatus( boolean on);
 
 
 }

@@ -102,13 +102,15 @@ namespace Decoder
 
     byte treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
 
-    unsigned long interWordTimer = 0;      // timer to detect interword spaces
     unsigned long acsTimer = 0;            // timer to use for automatic character spacing (ACS)
 
 
 
 
     void setupGoertzel();
+    void drawInputStatus( boolean on);
+    void interWordTimerOff();
+    String CWwordToClearText(String cwword);
 
 }
 

@@ -14,6 +14,7 @@ Preferences pref;               // use the Preferences library for storing and r
 
 using namespace MorsePreferences;
 
+unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
 //MorsePrefs prefs;
 
@@ -449,4 +450,21 @@ void MorsePreferences::writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG) {
     pref.putUChar("loraBand", loraBand);
     pref.putUInt("loraQRG", loraQRG);
     pref.end();
+}
+
+
+void MorsePreferences::fireCharSeen(boolean wpmOnly) {
+    ++charCounter;                         // count this character
+
+   // if we have seen 12 chars since changing speed, we write the config to Preferences
+   if (charCounter == 12) {
+      pref.begin("morserino", false);             // open the namespace as read/write
+      pref.putUChar("wpm", MorsePreferences::prefs.wpm);
+      if (!wpmOnly) {
+          pref.putUChar("tLeft", MorsePreferences::prefs.tLeft);
+          pref.putUChar("tRight", MorsePreferences::prefs.tRight);
+      }
+      pref.end();
+   }
+
 }
