@@ -79,13 +79,6 @@
 
 
 
-// defines for keyer modi
-//
-
-#define    IAMBICA      1          // Curtis Mode A
-#define    IAMBICB      2          // Curtis Mode B (with enhanced Curtis timing, set as parameter
-#define    ULTIMATIC    3          // Ultimatic mode
-#define    NONSQUEEZE   4          // Non-squeeze mode of dual-lever paddles - simulate a single-lever paddle
 
 
 //// for adjusting preferences
@@ -115,11 +108,6 @@ unsigned int rUntouched = 0;
 
 
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  Iambic Keyer State Machine Defines
- 
-enum KSTYPE {IDLE_STATE, DIT, DAH, KEY_START, KEYED, INTER_ELEMENT };
 
 
 
@@ -141,8 +129,6 @@ String kochChars;
 
 ////// variables for CW decoder
 
-boolean keyTx = false;             // when state is set by manual key or touch paddle, then true!
-                                   // we use this to decide if Tx should be keyed or not
 
 
 
