@@ -181,9 +181,11 @@ namespace MorsePreferences
 
     prefPos *currentOptions = allOptions;
 
+    int currentOptionSize;
+
 
     MorsePrefs readPreferences(String repository);
-    void writePreferences(String repository, MorsePrefs p);
+    void writePreferences(String repository);
     boolean recallSnapshot();
     boolean storeSnapshot(uint8_t menu);
     void updateMemory(uint8_t temp);

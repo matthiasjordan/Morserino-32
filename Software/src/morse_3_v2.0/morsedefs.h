@@ -161,3 +161,8 @@ const int notes[] = {0, 233, 262, 294, 311, 349, 392, 440, 466, 523, 587, 622, 6
 #endif
 
 
+#define SizeOfArray(x)       (sizeof(x) / sizeof(x[0]))
+
+// we need this for some strange reason: the min definition breaks with WiFi
+#define _min(a,b) ((a)<(b)?(a):(b))
+#define _max(a,b) ((a)>(b)?(a):(b))

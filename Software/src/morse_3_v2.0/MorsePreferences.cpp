@@ -7,8 +7,8 @@
 #include "morsedefs.h"
 #include "decoder.h"
 #include "MorsePreferences.h"
+#include "MorsePreferencesMenu.h"
 #include "MorseDisplay.h"
-#include "menu.h"
 
 Preferences pref;               // use the Preferences library for storing and retrieving objects
 
@@ -232,8 +232,9 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     return p;
 }
 
-void MorsePreferences::writePreferences(String repository, MorsePrefs p)
+void MorsePreferences::writePreferences(String repository)
 {
+    MorsePrefs p = prefs;
     unsigned int l = 15;
     char repName[l];
     uint8_t temp;
@@ -274,13 +275,13 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
     {
         pref.putUChar("abbrevLength", p.abbrevLength);
         if (morserino)
-            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter); // update the abbrev array!
+            Koch::createKochAbbr(p.abbrevLength, p.kochFilter); // update the abbrev array!
     }
     if (p.wordLength != pref.getUChar("wordLength"))
     {
         pref.putUChar("wordLength", p.wordLength);
         if (morserino)
-            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the word array!
+            Koch::createKochWords(p.wordLength, p.kochFilter);  // update the word array!
     }
     if (p.trainerDisplay != pref.getUChar("trainerDisplay"))
         pref.putUChar("trainerDisplay", p.trainerDisplay);
@@ -303,8 +304,8 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
         if (p.kochFilter != pref.getUChar("kochFilter"))
         {
             pref.putUChar("kochFilter", p.kochFilter);
-            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
-            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter);
+            Koch::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
+            Koch::createKochAbbr(p.abbrevLength, p.kochFilter);
         }
     }
     if (p.lcwoKochSeq != pref.getBool("lcwoKochSeq"))
@@ -313,8 +314,8 @@ void MorsePreferences::writePreferences(String repository, MorsePrefs p)
         if (morserino)
         {
             Koch::updateKochChars(p.lcwoKochSeq);
-            EnglishWords::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
-            Abbrev::createKochAbbr(p.abbrevLength, p.kochFilter);
+            Koch::createKochWords(p.wordLength, p.kochFilter);  // update the arrays!
+            Koch::createKochAbbr(p.abbrevLength, p.kochFilter);
         }
     }
     if (p.wordDoubler != pref.getBool("wordDoubler"))
@@ -365,8 +366,8 @@ boolean MorsePreferences::recallSnapshot()
     String text;
 
     memPtr = 0;
-    Menu::displayKeyerPreferencesMenu(posSnapRecall);
-    if (!Menu::adjustKeyerPreference(posSnapRecall))
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(posSnapRecall);
+    if (!MorsePreferencesMenu::adjustKeyerPreference(posSnapRecall))
     {
         //Serial.println("recall memPtr: " + String(memPtr));
         text = "Snap " + String(memories[memPtr] + 1) + " RECALLD";
@@ -396,8 +397,8 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
     String text;
 
     memPtr = 0;
-    Menu::displayKeyerPreferencesMenu(posSnapStore);
-    Menu::adjustKeyerPreference(posSnapStore);
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(posSnapStore);
+    MorsePreferencesMenu::adjustKeyerPreference(posSnapStore);
     volButton.Update();
     //Serial.println("store memPtr: " + String(memPtr));
     if (memPtr != 8)
@@ -408,7 +409,7 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
         snapname = "snap" + String(memPtr);
         //Serial.println("store snapname: " + snapname);
         //Serial.println("store: p.menuPtr = " + String(p.menuPtr));
-        writePreferences(snapname, prefs);
+        writePreferences(snapname);
         /// insert the correct bit into p.snapShots & update memory variables
         mask = mask << memPtr;
         prefs.snapShots = MorsePreferences::prefs.snapShots | mask;

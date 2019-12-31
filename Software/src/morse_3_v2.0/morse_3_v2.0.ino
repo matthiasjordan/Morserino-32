@@ -49,6 +49,7 @@
 #include "abbrev.h"        // common CW abbreviations
 #include "english_words.h" // common English words
 #include "MorsePreferences.h"
+#include "MorsePreferencesMenu.h"
 #include "MorseRotaryEncoder.h"
 #include "MorseSound.h"
 #include "koch.h"
@@ -62,9 +63,6 @@
 #include "decoder.h"
 
 
-/// we need this for some strange reason: the min definition breaks with WiFi
-#define _min(a,b) ((a)<(b)?(a):(b))
-#define _max(a,b) ((a)>(b)?(a):(b))
 
 
 
@@ -96,9 +94,7 @@
 
 
 
-#define SizeOfArray(x)       (sizeof(x) / sizeof(x[0]))
 
-int currentOptionSize;
 
 
 ///////////////////////////////////
@@ -630,86 +626,6 @@ void initSensors() {
 
 
 
-
-////// setup preferences ///////
-
-             
-boolean setupPreferences(uint8_t atMenu) {
-  // enum morserinoMode {morseKeyer, loraTrx, morseGenerator, echoTrainer, shutDown, morseDecoder, invalid };
-  static int oldPos = 1;
-  int t;
-
-  int ptrIndex, ptrMax;
-  prefPos posPtr;
- 
-  ptrMax = currentOptionSize;
-
-  ///// we should check here if the old ptr (oldIndex) is contained in the current preferences collection (currentOptions)
-  ptrIndex = 1;
-  for (int i = 0; i < ptrMax; ++i) {
-      if (currentOptions[i] == oldPos) {
-          ptrIndex = i;
-          break;
-      }
-  }
-  posPtr = currentOptions[ptrIndex];  
-  keyOut(false, true, 0, 0);                // turn the LED off, unkey transmitter, or whatever; just in case....
-  keyOut(false,false, 0, 0);  
-  displayKeyerPreferencesMenu(posPtr);
-  MorseDisplay::printOnScroll(2, REGULAR, 0,  " ");
-
-  while (true) {                            // we wait for single click = selection or long click = exit - or single or long click or RED button
-        modeButton.Update();
-        switch (modeButton.clicks) {            // button was clicked
-          case 1:     // change the option corresponding to pos
-                      if (adjustKeyerPreference(posPtr))
-                         goto exitFromHere;
-                      break;
-          case -1:    //////// long press indicates we are done with setting preferences - check if we need to store some of the preferences
-          exitFromHere: writePreferences("morserino");
-                        //delay(200);
-                        return false;
-                        break;
-          }
-
-          volButton.Update();                 // RED button
-          switch (volButton.clicks) {         // was clicked
-            case 1:     // recall snapshot
-                        if (recallSnapshot())
-                          writePreferences("morserino");
-                        //delay(100);
-                        return true;
-                        break;
-            case -1:    //store snapshot
-                        
-                        if (storeSnapshot(atMenu))
-                          writePreferences("morserino");
-                        while(volButton.clicks)
-                          volButton.Update();
-                        return false;
-                        break;
-          }
-
-          
-          //// display the value of the preference in question
-
-         if ((t=checkEncoder())) {
-            MorseUI::click();
-            ptrIndex = (ptrIndex +ptrMax + t) % ptrMax;
-            //Serial.println("ptrIndex: " + String(ptrIndex));
-            posPtr = currentOptions[ptrIndex];
-            //oldIndex = ptrIndex;                                                              // remember menu position
-            oldPos = posPtr;
-            
-            displayKeyerPreferencesMenu(posPtr);
-            //printOnScroll(1, BOLD, 0, ">");
-            MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
-
-            MorseDisplay::display();                                                        // update the display
-         }    // end if (encoderPos)
-         MorseSystem::checkShutDown(false);         // check for time out
-  } // end while - we leave as soon as the button has been pressed long
-}   // end function setupKeyerPreferences()
 
 
 
