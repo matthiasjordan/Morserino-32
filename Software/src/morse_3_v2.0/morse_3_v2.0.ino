@@ -94,8 +94,6 @@
 //// Other Global VARIABLES ////////////
 /////////////////////////////////
 
-unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
-unsigned int rUntouched = 0;
 
 
 
@@ -116,20 +114,6 @@ unsigned int rUntouched = 0;
   //CWword.reserve(144);
   //clearText.reserve(50);
 boolean active = false;                           // flag for trainer mode
-
-
-
-
-
-
-/////////////////// Variables for Koch modes
-
-
-String kochChars;
-
-////// variables for CW decoder
-
-
 
 
 
@@ -543,67 +527,6 @@ void displayCWspeed () {
   MorseDisplay::display();
 }
 
-
-/// function to read sensors:
-/// read both left and right twice, repeat reading if it returns 0
-/// return a binary value, depending on a (adaptable?) threshold:
-/// 0 = nothing touched,  1= right touched, 2 = left touched, 3 = both touched
-/// binary:   00          01                10                11
-
-uint8_t readSensors(int left, int right) {
-  //static boolean first = true;
-  uint8_t v, lValue, rValue;
-  
-  while ( !(v=touchRead(left)) )
-    ;                                       // ignore readings with value 0
-  lValue = v;
-   while ( !(v=touchRead(right)) )
-    ;                                       // ignore readings with value 0
-  rValue = v;
-  while ( !(v=touchRead(left)) )
-    ;                                       // ignore readings with value 0
-  lValue = (lValue+v) /2;
-   while ( !(v=touchRead(right)) )
-    ;                                       // ignore readings with value 0
-  rValue = (rValue+v) /2;
-
-  if (lValue < (MorsePreferences::prefs.tLeft+10))     {           //adaptive calibration
-      //if (first) Serial.println("p-tLeft " + String(MorsePreferences::prefs.tLeft));
-      //if (first) Serial.print("lValue: "); if (first) Serial.println(lValue);
-      //printOnScroll(0, INVERSE_BOLD, 0,  String(lValue) + " " + String(MorsePreferences::prefs.tLeft));
-      MorsePreferences::prefs.tLeft = ( 7*MorsePreferences::prefs.tLeft +  ((lValue+lUntouched) / SENS_FACTOR) ) / 8;
-      //Serial.print("MorsePreferences::prefs.tLeft: "); Serial.println(MorsePreferences::prefs.tLeft);
-  }
-  if (rValue < (MorsePreferences::prefs.tRight+10))     {           //adaptive calibration
-      //if (first) Serial.println("p-tRight " + String(MorsePreferences::prefs.tRight));
-      //if (first) Serial.print("rValue: "); if (first) Serial.println(rValue);
-      //printOnScroll(1, INVERSE_BOLD, 0,  String(rValue) + " " + String(MorsePreferences::prefs.tRight));
-      MorsePreferences::prefs.tRight = ( 7*MorsePreferences::prefs.tRight +  ((rValue+rUntouched) / SENS_FACTOR) ) / 8;
-      //Serial.print("MorsePreferences::prefs.tRight: "); Serial.println(MorsePreferences::prefs.tRight);
-  }
-  //first = false;
-  return ( lValue < MorsePreferences::prefs.tLeft ? 2 : 0 ) + (rValue < MorsePreferences::prefs.tRight ? 1 : 0 );
-}
-
-
-void initSensors() {
-  int v;
-  lUntouched = rUntouched = 60;       /// new: we seek minimum
-  for (int i=0; i<8; ++i) {
-      while ( !(v=touchRead(LEFT)) )
-        ;                                       // ignore readings with value 0
-        lUntouched += v;
-        //lUntouched = _min(lUntouched, v);
-       while ( !(v=touchRead(RIGHT)) )
-        ;                                       // ignore readings with value 0
-        rUntouched += v;
-        //rUntouched = _min(rUntouched, v);
-  }
-  lUntouched /= 8;
-  rUntouched /= 8;
-  MorsePreferences::prefs.tLeft = lUntouched - 9;
-  MorsePreferences::prefs.tRight = rUntouched - 9;
-}
 
 
 

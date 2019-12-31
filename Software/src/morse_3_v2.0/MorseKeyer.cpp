@@ -2,6 +2,10 @@
 #include "MorseMachine.h"
 #include "MorsePreferences.h"
 #include "MorseGenerator.h"
+#include "decoder.h"
+#include "MorseLoRa.h"
+#include "MorseEchoTrainer.h"
+#include "MorseDisplay.h"
 
 using namespace MorseKeyer;
 
@@ -13,8 +17,14 @@ namespace MorseKeyer::internal {
     void setDITstate();
     void setDAHstate();
 
+    uint8_t readSensors(int left, int right);
+    void initSensors();
 
 }
+
+
+unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
+unsigned int rUntouched = 0;
 
 
 void updateTimings() {
@@ -59,15 +69,15 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
   switch (keyerState) {                                         // this is the keyer state machine
      case IDLE_STATE:
          // display the interword space, if necessary
-         if (millis() > interWordTimer) {
+         if (millis() > Decoder::interWordTimer) {
              if (MorseMachine::isMode(MorseMachine::loraTrx))    {                    // when in Trx mode
-                 cwForLora(3);
-                 sendWithLora();                        // finalise the string and send it to LoRA
+                 MorseLoRa::cwForLora(3);
+                 MorseLoRa::sendWithLora();                        // finalise the string and send it to LoRA
              }
              MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
-             interWordTimer = 4294967000;                       // almost the biggest possible unsigned long number :-) - do not output extra spaces!
-             if (echoTrainerState == COMPLETE_ANSWER)   {       // change the state of the trainer at end of word
-                echoTrainerState = EVAL_ANSWER;
+             Decoder::interWordTimer = 4294967000;                       // almost the biggest possible unsigned long number :-) - do not output extra spaces!
+             if (MorseEchoTrainer::isState(MorseEchoTrainer::COMPLETE_ANSWER))   {       // change the state of the trainer at end of word
+                 MorseEchoTrainer::setState(MorseEchoTrainer::EVAL_ANSWER);
                 return false;
              }
          }
@@ -76,21 +86,21 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
         if (dit || dah ) {
             internal::updatePaddleLatch(dit, dah);  // trigger the paddle latches
             if (MorseMachine::isMode(MorseMachine::echoTrainer))   {      // change the state of the trainer at end of word
-                echoTrainerState = COMPLETE_ANSWER;
+                MorseEchoTrainer::setState(MorseEchoTrainer::COMPLETE_ANSWER);
              }
-            treeptr = 0;
+            Decoder::treeptr = 0;
             if (dit) {
-                setDITstate();          // set next state
+                internal::setDITstate();          // set next state
                 DIT_FIRST = true;          // first paddle pressed after IDLE was a DIT
             }
             else {
-                setDAHstate();
+                internal::setDAHstate();
                 DIT_FIRST = false;         // first paddle was a DAH
             }
         }
         else {
-           if (echoTrainerState == GET_ANSWER && millis() > genTimer) {
-            echoTrainerState = EVAL_ANSWER;
+           if (MorseEchoTrainer::isState(MorseEchoTrainer::GET_ANSWER) && millis() > MorseGenerator::genTimer) {
+               MorseEchoTrainer::setState(MorseEchoTrainer::EVAL_ANSWER);
          }
          return false;                // we return false if there was no paddle press in IDLE STATE - Arduino can do other tasks for a bit
         }
@@ -98,7 +108,7 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
 
     case DIT:
     /// first we check that we have waited as defined by ACS settings
-            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
+            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))  // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
               break;
             internal::clearPaddleLatches();                           // always clear the paddle latches at beginning of new element
             keyerControl |= DIT_LAST;                        // remember that we process a DIT
@@ -118,7 +128,7 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
             break;
 
     case DAH:
-            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= acsTimer))  // if we do automatic character spacing, and haven't waited for 3 dits...
+            if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))  // if we do automatic character spacing, and haven't waited for 3 dits...
               break;
             internal::clearPaddleLatches();                          // clear the paddle latches
             keyerControl &= ~(DIT_LAST);                    // clear dit latch  - we are not processing a DIT
@@ -218,18 +228,18 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
                           case 0:
                           case 4:
                                    keyerState = IDLE_STATE;               // we are at the end of the character and go back into IDLE STATE
-                                   displayMorse();                        // display the decoded morse character(s)
+                                   Decoder::displayMorse();                        // display the decoded morse character(s)
                                    if (MorseMachine::isMode(MorseMachine::loraTrx))
-                                      cwForLora(0);
+                                      MorseLoRa::cwForLora(0);
 
                                    MorsePreferences::fireCharSeen(false);
 
                                    if (MorsePreferences::prefs.ACSlength > 0)
-                                        acsTimer = millis() + MorsePreferences::prefs.ACSlength * ditLength; // prime the ACS timer
+                                        Decoder::acsTimer = millis() + MorsePreferences::prefs.ACSlength * ditLength; // prime the ACS timer
                                    if (MorseMachine::isMode(MorseMachine::morseKeyer) || MorseMachine::isMode(MorseMachine::loraTrx) || MorseMachine::isMode(MorseMachine::morseTrx))
-                                      interWordTimer = millis() + 5*ditLength;
+                                      Decoder::interWordTimer = millis() + 5*ditLength;
                                    else
-                                       interWordTimer = millis() + interWordSpace;  // prime the timer to detect a space between characters
+                                       Decoder::interWordTimer = millis() + interWordSpace;  // prime the timer to detect a space between characters
                                                                               // nominally 7 dit-lengths, but we are not quite so strict here in keyer or TrX mode,
                                                                               // use the extended time in echo trainer mode to allow longer space between characters,
                                                                               // like in listening
@@ -262,7 +272,7 @@ boolean MorseKeyer::checkPaddles() {
   */
   left = MorsePreferences::prefs.useExtPaddle ? rightPin : leftPin;
   right = MorsePreferences::prefs.useExtPaddle ? leftPin : rightPin;
-  sensor = readSensors(LEFT, RIGHT);
+  sensor = internal::readSensors(LEFT, RIGHT);
   newL = (sensor >> 1) | (!digitalRead(left)) ;
   newR = (sensor & 0x01) | (!digitalRead(right)) ;
 
@@ -308,15 +318,78 @@ void MorseKeyer::internal::clearPaddleLatches ()
 // functions to set DIT and DAH keyer states
 void MorseKeyer::internal::setDITstate() {
   keyerState = DIT;
-  treeptr = CWtree[treeptr].dit;
+  Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
   if (MorseMachine::isMode(MorseMachine::loraTrx))
-      cwForLora(1);                         // build compressed string for LoRA
+      MorseLoRa::cwForLora(1);                         // build compressed string for LoRA
 }
 
 void MorseKeyer::internal::setDAHstate() {
   keyerState = DAH;
-  treeptr = CWtree[treeptr].dah;
+  Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
   if (MorseMachine::isMode(MorseMachine::loraTrx))
-      cwForLora(2);
+      MorseLoRa::cwForLora(2);
+}
+
+
+
+/// function to read sensors:
+/// read both left and right twice, repeat reading if it returns 0
+/// return a binary value, depending on a (adaptable?) threshold:
+/// 0 = nothing touched,  1= right touched, 2 = left touched, 3 = both touched
+/// binary:   00          01                10                11
+
+uint8_t MorseKeyer::internal::readSensors(int left, int right) {
+  //static boolean first = true;
+  uint8_t v, lValue, rValue;
+
+  while ( !(v=touchRead(left)) )
+    ;                                       // ignore readings with value 0
+  lValue = v;
+   while ( !(v=touchRead(right)) )
+    ;                                       // ignore readings with value 0
+  rValue = v;
+  while ( !(v=touchRead(left)) )
+    ;                                       // ignore readings with value 0
+  lValue = (lValue+v) /2;
+   while ( !(v=touchRead(right)) )
+    ;                                       // ignore readings with value 0
+  rValue = (rValue+v) /2;
+
+  if (lValue < (MorsePreferences::prefs.tLeft+10))     {           //adaptive calibration
+      //if (first) Serial.println("p-tLeft " + String(MorsePreferences::prefs.tLeft));
+      //if (first) Serial.print("lValue: "); if (first) Serial.println(lValue);
+      //printOnScroll(0, INVERSE_BOLD, 0,  String(lValue) + " " + String(MorsePreferences::prefs.tLeft));
+      MorsePreferences::prefs.tLeft = ( 7*MorsePreferences::prefs.tLeft +  ((lValue+lUntouched) / SENS_FACTOR) ) / 8;
+      //Serial.print("MorsePreferences::prefs.tLeft: "); Serial.println(MorsePreferences::prefs.tLeft);
+  }
+  if (rValue < (MorsePreferences::prefs.tRight+10))     {           //adaptive calibration
+      //if (first) Serial.println("p-tRight " + String(MorsePreferences::prefs.tRight));
+      //if (first) Serial.print("rValue: "); if (first) Serial.println(rValue);
+      //printOnScroll(1, INVERSE_BOLD, 0,  String(rValue) + " " + String(MorsePreferences::prefs.tRight));
+      MorsePreferences::prefs.tRight = ( 7*MorsePreferences::prefs.tRight +  ((rValue+rUntouched) / SENS_FACTOR) ) / 8;
+      //Serial.print("MorsePreferences::prefs.tRight: "); Serial.println(MorsePreferences::prefs.tRight);
+  }
+  //first = false;
+  return ( lValue < MorsePreferences::prefs.tLeft ? 2 : 0 ) + (rValue < MorsePreferences::prefs.tRight ? 1 : 0 );
+}
+
+
+void MorseKeyer::internal::initSensors() {
+  int v;
+  lUntouched = rUntouched = 60;       /// new: we seek minimum
+  for (int i=0; i<8; ++i) {
+      while ( !(v=touchRead(LEFT)) )
+        ;                                       // ignore readings with value 0
+        lUntouched += v;
+        //lUntouched = _min(lUntouched, v);
+       while ( !(v=touchRead(RIGHT)) )
+        ;                                       // ignore readings with value 0
+        rUntouched += v;
+        //rUntouched = _min(rUntouched, v);
+  }
+  lUntouched /= 8;
+  rUntouched /= 8;
+  MorsePreferences::prefs.tLeft = lUntouched - 9;
+  MorsePreferences::prefs.tRight = rUntouched - 9;
 }
 

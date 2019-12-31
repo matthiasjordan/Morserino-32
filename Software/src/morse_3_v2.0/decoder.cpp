@@ -18,7 +18,6 @@ uint32_t magnitudelimit_low;                               // magnitudelimit = m
 
 boolean filteredState = false;
 boolean filteredStateBefore = false;
-unsigned long interWordTimer = 0;      // timer to detect interword spaces
 
 /// state machine for decoding CW
 enum DECODER_STATES

@@ -105,6 +105,8 @@ namespace Decoder
     unsigned long acsTimer = 0;            // timer to use for automatic character spacing (ACS)
     boolean speedChanged = true;
 
+    unsigned long interWordTimer = 0;      // timer to detect interword spaces
+
 
 
     void doDecode();
@@ -112,6 +114,7 @@ namespace Decoder
     void drawInputStatus( boolean on);
     void interWordTimerOff();
     String CWwordToClearText(String cwword);
+    void displayMorse();
 
 }
 

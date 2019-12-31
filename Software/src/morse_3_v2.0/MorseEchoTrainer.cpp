@@ -13,7 +13,7 @@ void MorseEchoTrainer::setState(echoStates newState) {
     echoTrainerState = newState;
 }
 
-MorseEchoTrainer::echoStates getState() {
+echoStates MorseEchoTrainer::getState() {
     return echoTrainerState;
 }
 
