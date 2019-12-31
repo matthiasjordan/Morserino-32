@@ -710,62 +710,62 @@ void MorseMenu::internal::displayCurtisMode()
     MorseDisplay::printOnScroll(2, REGULAR, 1, keyerModus[MorsePreferences::prefs.keyermode - 1]);
 }
 
-void displayCurtisBTiming()
+void MorseMenu::internal::displayCurtisBTiming()
 {
     // display start timing when paddles are being checked in Curtis B mode during dah: between 0 and 100
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", MorsePreferences::prefs.curtisBTiming);
 }
 
-void displayCurtisBDotTiming()
+void MorseMenu::internal::displayCurtisBDotTiming()
 {
     // display start timing when paddles are being checked in Curtis B modeduring dit : between 0 and 100
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", MorsePreferences::prefs.curtisBDotTiming);
 }
 
-void displayACS()
+void MorseMenu::internal::displayACS()
 {
     String ACSmode[] =
     {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, ACSmode[MorsePreferences::prefs.ACSlength]);
 }
 
-void displayPitch()
+void MorseMenu::internal::displayPitch()
 {
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", notes[MorsePreferences::prefs.sidetoneFreq]);
 }
 
-void displayClicks()
+void MorseMenu::internal::displayClicks()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.encoderClicks ? "On " : "Off");
 }
 
-void displayExtPaddles()
+void MorseMenu::internal::displayExtPaddles()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.useExtPaddle ? "Reversed    " : "Normal      ");
 }
 
-void displayPolarity()
+void MorseMenu::internal::displayPolarity()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.didah ? ".- di-dah  " : "-. dah-dit ");
 }
 
-void displayLatency()
+void MorseMenu::internal::displayLatency()
 {
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%1i/8 of dit", MorsePreferences::prefs.latency - 1);
 }
-void displayInterWordSpace()
+void MorseMenu::internal::displayInterWordSpace()
 {
     // display interword space in ditlengths
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i", MorsePreferences::prefs.interWordSpace);
 }
 
-void displayInterCharSpace()
+void MorseMenu::internal::displayInterCharSpace()
 {
     // display intercharacter space in ditlengths
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i", MorsePreferences::prefs.interCharSpace);
 }
 
-void displayRandomOption()
+void MorseMenu::internal::displayRandomOption()
 {
     String texts[] =
     {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ", "Interp+ProSn",
@@ -773,7 +773,7 @@ void displayRandomOption()
     MorseDisplay::printOnScroll(2, REGULAR, 1, texts[MorsePreferences::prefs.randomOption]);
 }
 
-void displayRandomLength()
+void MorseMenu::internal::displayRandomLength()
 {
     // display length of random character groups - 2 - 6
     if (MorsePreferences::prefs.randomLength <= 6) {
@@ -784,7 +784,7 @@ void displayRandomLength()
     }
 }
 
-void displayCallLength()
+void MorseMenu::internal::displayCallLength()
 {
     // display length of calls - 3 - 6, 0 = all
     if (MorsePreferences::prefs.callLength == 0)
@@ -795,7 +795,7 @@ void displayCallLength()
     }
 }
 
-void displayAbbrevLength()
+void MorseMenu::internal::displayAbbrevLength()
 {
     // display length of abbrev - 2 - 6, 0 = all
     if (MorsePreferences::prefs.abbrevLength == 0)
@@ -806,7 +806,7 @@ void displayAbbrevLength()
     }
 }
 
-void displayWordLength()
+void MorseMenu::internal::displayWordLength()
 {
     // display length of english words - 2 - 6, 0 = all
     if (MorsePreferences::prefs.wordLength == 0)
@@ -817,7 +817,7 @@ void displayWordLength()
     }
 }
 
-void displayMaxSequence()
+void MorseMenu::internal::displayMaxSequence()
 {
     // display max # of words; 0 = no limit, 5, 10, 15, 20... 250; 255 = no limit
     if ((MorsePreferences::prefs.maxSequence == 0) || (MorsePreferences::prefs.maxSequence == 255))
@@ -828,7 +828,7 @@ void displayMaxSequence()
     }
 }
 
-void displayTrainerDisplay()
+void MorseMenu::internal::displayTrainerDisplay()
 {
     switch (MorsePreferences::prefs.trainerDisplay)
     {
@@ -844,7 +844,7 @@ void displayTrainerDisplay()
     }
 }
 
-void displayEchoDisplay()
+void MorseMenu::internal::displayEchoDisplay()
 {
     switch (MorsePreferences::prefs.echoDisplay)
     {
@@ -860,7 +860,7 @@ void displayEchoDisplay()
 
     }
 }
-void displayKeyTrainerMode()
+void MorseMenu::internal::displayKeyTrainerMode()
 {
     String option;
     switch (MorsePreferences::prefs.keyTrainerMode)
@@ -878,7 +878,7 @@ void displayKeyTrainerMode()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void displayLoraTrainerMode()
+void MorseMenu::internal::displayLoraTrainerMode()
 {
     String option;
     switch (MorsePreferences::prefs.loraTrainerMode)
@@ -893,7 +893,7 @@ void displayLoraTrainerMode()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void displayLoraSyncW()
+void MorseMenu::internal::displayLoraSyncW()
 {
     String option;
     switch (MorsePreferences::prefs.loraSyncW)
@@ -908,7 +908,7 @@ void displayLoraSyncW()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void displayEchoRepeats()
+void MorseMenu::internal::displayEchoRepeats()
 {
     if (MorsePreferences::prefs.echoRepeats < 7)
     {
@@ -918,7 +918,7 @@ void displayEchoRepeats()
         MorseDisplay::printOnScroll(2, REGULAR, 1, "Forever");
 }
 
-void displayEchoToneShift()
+void MorseMenu::internal::displayEchoToneShift()
 {
     String option;
     switch (MorsePreferences::prefs.echoToneShift)
@@ -935,12 +935,12 @@ void displayEchoToneShift()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void displayEchoConf()
+void MorseMenu::internal::displayEchoConf()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.echoConf ? "On " : "Off");
 }
 
-void displayKochFilter()
+void MorseMenu::internal::displayKochFilter()
 {                          // const String kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:";
     String str;
     str.reserve(6);
@@ -949,17 +949,17 @@ void displayKochFilter()
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i %s   ", MorsePreferences::prefs.kochFilter, str.c_str());
 }
 
-void displayWordDoubler()
+void MorseMenu::internal::displayWordDoubler()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.wordDoubler ? "On  " : "Off ");
 }
 
-void displayRandomFile()
+void MorseMenu::internal::displayRandomFile()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.randomFile ? "On  " : "Off ");
 }
 
-void displayGoertzelBandwidth()
+void MorseMenu::internal::displayGoertzelBandwidth()
 {
     String option;
     switch (MorsePreferences::prefs.goertzelBandwidth)
@@ -974,17 +974,17 @@ void displayGoertzelBandwidth()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void displaySpeedAdapt()
+void MorseMenu::internal::displaySpeedAdapt()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.speedAdapt ? "ON         " : "OFF        ");
 }
 
-void displayKochSeq()
+void MorseMenu::internal::displayKochSeq()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.lcwoKochSeq ? "LCWO      " : "M32 / JLMC");
 }
 
-void displayTimeOut()
+void MorseMenu::internal::displayTimeOut()
 {
     String TOValue;
 
@@ -1006,12 +1006,12 @@ void displayTimeOut()
     MorseDisplay::printOnScroll(2, REGULAR, 1, TOValue);
 }
 
-void displayQuickStart()
+void MorseMenu::internal::displayQuickStart()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.quickStart ? "ON         " : "OFF        ");
 }
 
-void displayLoraBand()
+void MorseMenu::internal::displayLoraBand()
 {
     String bandName;
     switch (MorsePreferences::prefs.loraBand)
@@ -1029,7 +1029,7 @@ void displayLoraBand()
     MorseDisplay::printOnScroll(2, REGULAR, 1, bandName);
 }
 
-void displayLoraQRG()
+void MorseMenu::internal::displayLoraQRG()
 {
     const int a = (int) QRG433;
     const int b = (int) QRG866;
@@ -1049,7 +1049,7 @@ void displayLoraQRG()
     }
 }
 
-void displaySnapRecall()
+void MorseMenu::internal::displaySnapRecall()
 {
     if (MorsePreferences::memCounter)
     {
@@ -1064,7 +1064,7 @@ void displaySnapRecall()
         MorseDisplay::printOnScroll(2, REGULAR, 1, "NO SNAPSHOTS");
 }
 
-void displaySnapStore()
+void MorseMenu::internal::displaySnapStore()
 {
     uint8_t mask = 1;
     mask = mask << MorsePreferences::memPtr;
@@ -1119,73 +1119,73 @@ boolean MorseMenu::adjustKeyerPreference(MorsePreferences::prefPos pos)
                 case MorsePreferences::posCurtisBDahTiming:
                     MorsePreferences::prefs.curtisBTiming += (t * 5);                          // Curtis B timing dah (enhanced Curtis mode)
                     MorsePreferences::prefs.curtisBTiming = constrain(MorsePreferences::prefs.curtisBTiming, 0, 100);
-                    displayCurtisBTiming();
+                    internal::displayCurtisBTiming();
                     break;
                 case MorsePreferences::posCurtisBDotTiming:
                     MorsePreferences::prefs.curtisBDotTiming += (t * 5);                   // Curtis B timing dit (enhanced Curtis mode)
                     MorsePreferences::prefs.curtisBDotTiming = constrain(MorsePreferences::prefs.curtisBDotTiming, 0, 100);
-                    displayCurtisBDotTiming();
+                    internal::displayCurtisBDotTiming();
                     break;
                 case MorsePreferences::posACS:
                     MorsePreferences::prefs.ACSlength += (t + 1);                       // ACS
                     if (MorsePreferences::prefs.ACSlength == 2)
                         MorsePreferences::prefs.ACSlength += t;
                     MorsePreferences::prefs.ACSlength = constrain(MorsePreferences::prefs.ACSlength - 1, 0, 4);
-                    displayACS();
+                    internal::displayACS();
                     break;
                 case MorsePreferences::posPitch:
                     MorsePreferences::prefs.sidetoneFreq += t;                             // sidetone pitch
                     MorsePreferences::prefs.sidetoneFreq = constrain(MorsePreferences::prefs.sidetoneFreq, 1, 15);
-                    displayPitch();
+                    internal::displayPitch();
                     break;
                 case MorsePreferences::posClicks:
                     MorsePreferences::prefs.encoderClicks = !MorsePreferences::prefs.encoderClicks;
-                    displayClicks();
+                    internal::displayClicks();
                     break;
                 case MorsePreferences::posExtPaddles:
                     MorsePreferences::prefs.useExtPaddle = !MorsePreferences::prefs.useExtPaddle;                           // ext paddle on/off
-                    displayExtPaddles();
+                    internal::displayExtPaddles();
                     break;
                 case MorsePreferences::posPolarity:
                     MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;                                            // polarity
-                    displayPolarity();
+                    internal::displayPolarity();
                     break;
                 case MorsePreferences::posLatency:
                     MorsePreferences::prefs.latency += t;
                     MorsePreferences::prefs.latency = constrain(MorsePreferences::prefs.latency, 1, 8);
-                    displayLatency();
+                    internal::displayLatency();
                     break;
                 case MorsePreferences::posKeyTrainerMode:
                     MorsePreferences::prefs.keyTrainerMode += (t + 1);                     // Key TRX: 0=never, 1= keyer only, 2 = keyer & trainer
                     MorsePreferences::prefs.keyTrainerMode = constrain(MorsePreferences::prefs.keyTrainerMode - 1, 0, 2);
-                    displayKeyTrainerMode();
+                    internal::displayKeyTrainerMode();
                     break;
                 case MorsePreferences::posInterWordSpace:
                     MorsePreferences::prefs.interWordSpace += t;                         // interword space in lengths of dit
                     MorsePreferences::prefs.interWordSpace = constrain(MorsePreferences::prefs.interWordSpace, 6, 45);            // has to be between 6 and 45 dits
-                    displayInterWordSpace();
+                    internal::displayInterWordSpace();
                     MorseKeyer::updateTimings();
                     break;
                 case MorsePreferences::posInterCharSpace:
                     MorsePreferences::prefs.interCharSpace = constrain(MorsePreferences::prefs.interCharSpace + t, 3, 24);  // set Interchar space - 3 - 24 dits
-                    displayInterCharSpace();
+                    internal::displayInterCharSpace();
                     MorseKeyer::updateTimings();
                     break;
                 case MorsePreferences::posKochFilter:
                     MorsePreferences::prefs.kochFilter = constrain(MorsePreferences::prefs.kochFilter + t, 1, Koch::kochChars.length());
-                    displayKochFilter();
+                    internal::displayKochFilter();
                     break;
                     //case  posGenerate : MorsePreferences::prefs.generatorMode = (MorsePreferences::prefs.generatorMode + t + 6) % 6;     // what trainer generates (0 - 5)
                     //               displayGenerate();
                     //               break;
                 case MorsePreferences::posRandomOption:
                     MorsePreferences::prefs.randomOption = (MorsePreferences::prefs.randomOption + t + 10) % 10;     // which char set for random chars?
-                    displayRandomOption();
+                    internal::displayRandomOption();
                     break;
                 case MorsePreferences::posRandomLength:
                     MorsePreferences::prefs.randomLength += t;                                 // length of random char group: 2-6
                     MorsePreferences::prefs.randomLength = constrain(MorsePreferences::prefs.randomLength, 1, 10);                   // 7-10 for rnd length 2 to 3-6
-                    displayRandomLength();
+                    internal::displayRandomLength();
                     break;
                 case MorsePreferences::posCallLength:
                     if (MorsePreferences::prefs.callLength)                                             // length of calls: 0, or 3-6
@@ -1194,21 +1194,21 @@ boolean MorseMenu::adjustKeyerPreference(MorsePreferences::prefPos pos)
                     if (MorsePreferences::prefs.callLength)                                             // length of calls: 0, or 3-6
                         MorsePreferences::prefs.callLength += 2;                                        // expand again if not 0
 
-                    displayCallLength();
+                    internal::displayCallLength();
                     break;
                 case MorsePreferences::posAbbrevLength:
                     MorsePreferences::prefs.abbrevLength += (t + 1);                                 // length of abbreviations: 0, or 2-6
                     if (MorsePreferences::prefs.abbrevLength == 2)                                      // get rid of 1
                         MorsePreferences::prefs.abbrevLength += t;
                     MorsePreferences::prefs.abbrevLength = constrain(MorsePreferences::prefs.abbrevLength - 1, 0, 6);
-                    displayAbbrevLength();
+                    internal::displayAbbrevLength();
                     break;
                 case MorsePreferences::posWordLength:
                     MorsePreferences::prefs.wordLength += (t + 1);                                   // length of English words: 0, or 2-6
                     if (MorsePreferences::prefs.wordLength == 2)                                        // get rid of 1
                         MorsePreferences::prefs.wordLength += t;
                     MorsePreferences::prefs.wordLength = constrain(MorsePreferences::prefs.wordLength - 1, 0, 6);
-                    displayWordLength();
+                    internal::displayWordLength();
                     break;
                 case MorsePreferences::posMaxSequence:
                     switch (MorsePreferences::prefs.maxSequence)
@@ -1229,77 +1229,77 @@ boolean MorseMenu::adjustKeyerPreference(MorsePreferences::prefPos pos)
                             MorsePreferences::prefs.maxSequence += 5 * t;
                             break;
                     }
-                    displayMaxSequence();
+                    internal::displayMaxSequence();
                     break;
                 case MorsePreferences::posTrainerDisplay:
                     MorsePreferences::prefs.trainerDisplay = (MorsePreferences::prefs.trainerDisplay + t + 3) % 3;   // display options for trainer: 0-2
-                    displayTrainerDisplay();
+                    internal::displayTrainerDisplay();
                     break;
                 case MorsePreferences::posEchoDisplay:
                     MorsePreferences::prefs.echoDisplay += t;
                     MorsePreferences::prefs.echoDisplay = constrain(MorsePreferences::prefs.echoDisplay, 1, 3);             // what prompt for echo trainer mode
-                    displayEchoDisplay();
+                    internal::displayEchoDisplay();
                     break;
                 case MorsePreferences::posEchoRepeats:
                     MorsePreferences::prefs.echoRepeats += (t + 1);                                 // no of echo repeats: 0-6, 7=forever
                     MorsePreferences::prefs.echoRepeats = constrain(MorsePreferences::prefs.echoRepeats - 1, 0, 7);
-                    displayEchoRepeats();
+                    internal::displayEchoRepeats();
                     break;
                 case MorsePreferences::posEchoToneShift:
                     MorsePreferences::prefs.echoToneShift += (t + 1);                             // echo tone shift can be 0, 1 (up) or 2 (down)
                     MorsePreferences::prefs.echoToneShift = constrain(MorsePreferences::prefs.echoToneShift - 1, 0, 2);
-                    displayEchoToneShift();
+                    internal::displayEchoToneShift();
                     break;
                 case MorsePreferences::posWordDoubler:
                     MorsePreferences::prefs.wordDoubler = !MorsePreferences::prefs.wordDoubler;
-                    displayWordDoubler();
+                    internal::displayWordDoubler();
                     break;
                 case MorsePreferences::posRandomFile:
                     if (MorsePreferences::prefs.randomFile)
                         MorsePreferences::prefs.randomFile = 0;
                     else
                         MorsePreferences::prefs.randomFile = 255;
-                    displayRandomFile();
+                    internal::displayRandomFile();
                     break;
                 case MorsePreferences::posEchoConf:
                     MorsePreferences::prefs.echoConf = !MorsePreferences::prefs.echoConf;
-                    displayEchoConf();
+                    internal::displayEchoConf();
                     break;
                 case MorsePreferences::posLoraTrainerMode:
                     MorsePreferences::prefs.loraTrainerMode += (t + 2);                    // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
                     MorsePreferences::prefs.loraTrainerMode = (MorsePreferences::prefs.loraTrainerMode % 2);
-                    displayLoraTrainerMode();
+                    internal::displayLoraTrainerMode();
                     break;
                 case MorsePreferences::posLoraSyncW:
                     MorsePreferences::prefs.loraSyncW = (MorsePreferences::prefs.loraSyncW == 0x27 ? 0x66 : 0x27);
-                    displayLoraSyncW();
+                    internal::displayLoraSyncW();
                     break;
                 case MorsePreferences::posGoertzelBandwidth:
                     MorsePreferences::prefs.goertzelBandwidth += (t + 2);                  // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
                     MorsePreferences::prefs.goertzelBandwidth = (MorsePreferences::prefs.goertzelBandwidth % 2);
-                    displayGoertzelBandwidth();
+                    internal::displayGoertzelBandwidth();
                     break;
                 case MorsePreferences::posSpeedAdapt:
                     MorsePreferences::prefs.speedAdapt = !MorsePreferences::prefs.speedAdapt;
-                    displaySpeedAdapt();
+                    internal::displaySpeedAdapt();
                     break;
                 case MorsePreferences::posKochSeq:
                     MorsePreferences::prefs.lcwoKochSeq = !MorsePreferences::prefs.lcwoKochSeq;
-                    displayKochSeq();
+                    internal::displayKochSeq();
                     break;
                 case MorsePreferences::posTimeOut:
                     MorsePreferences::prefs.timeOut += (t + 1);
                     MorsePreferences::prefs.timeOut = constrain(MorsePreferences::prefs.timeOut - 1, 1, 4);
-                    displayTimeOut();
+                    internal::displayTimeOut();
                     break;
                 case MorsePreferences::posQuickStart:
                     MorsePreferences::prefs.quickStart = !MorsePreferences::prefs.quickStart;
-                    displayQuickStart();
+                    internal::displayQuickStart();
                     break;
                 case MorsePreferences::posLoraBand:
                     MorsePreferences::prefs.loraBand += (t + 1);                              // set the LoRa band
                     MorsePreferences::prefs.loraBand = constrain(MorsePreferences::prefs.loraBand - 1, 0, 2);
-                    displayLoraBand();                                // display LoRa band
+                    internal::displayLoraBand();                                // display LoRa band
                     switch (MorsePreferences::prefs.loraBand)
                     {
                         case 0:
@@ -1327,7 +1327,7 @@ boolean MorseMenu::adjustKeyerPreference(MorsePreferences::prefPos pos)
                             MorsePreferences::prefs.loraQRG = constrain(MorsePreferences::prefs.loraQRG, 920.25E6, 923.15E6);
                             break;
                     }
-                    displayLoraQRG();
+                    internal::displayLoraQRG();
                     break;
                 case MorsePreferences::posSnapRecall:
                 case MorsePreferences::posSnapRecall:
@@ -1337,11 +1337,11 @@ boolean MorseMenu::adjustKeyerPreference(MorsePreferences::prefPos pos)
                         //memPtr += (t+1);
                         //memPtr = constrain(memPtr-1, 0, memCounter);
                     }
-                    displaySnapRecall();
+                    internal::displaySnapRecall();
                     break;
                 case MorsePreferences::posSnapStore:
                     MorsePreferences::memPtr = (MorsePreferences::memPtr + t + 9) % 9;
-                    displaySnapStore();
+                    internal::displaySnapStore();
                     break;
             }   // end switch(pos)
             MorseDisplay::display();                                                      // update the display
