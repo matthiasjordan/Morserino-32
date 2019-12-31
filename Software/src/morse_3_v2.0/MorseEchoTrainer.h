@@ -16,6 +16,8 @@ namespace MorseEchoTrainer {
     String echoTrainerWord;
     boolean echoStop = false;                         // for maxSequence
 
+    void echoTrainerEval();
+
     void storeCharInResponse(String symbol);
     boolean isState(echoStates state);
     void setState(echoStates newState);

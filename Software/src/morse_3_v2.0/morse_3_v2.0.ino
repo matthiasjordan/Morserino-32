@@ -538,41 +538,6 @@ void displayCWspeed () {
 
 
 
-///////// evaluate the response in Echo Trainer Mode
-void echoTrainerEval() {
-    delay(interCharacterSpace / 2);
-    if (echoResponse == echoTrainerWord) {
-      echoTrainerState = SEND_WORD;
-      MorseDisplay::printToScroll(BOLD,  "OK");
-      if (MorsePreferences::prefs.echoConf) {
-          pwmTone(440,  MorsePreferences::prefs.sidetoneVolume, false);
-          delay(97);
-          pwmNoTone();
-          pwmTone(587,  MorsePreferences::prefs.sidetoneVolume, false);
-          delay(193);
-          pwmNoTone();
-      }
-      delay(interWordSpace);
-      if (MorsePreferences::prefs.speedAdapt)
-          changeSpeed(1);
-    } else {
-      echoTrainerState = REPEAT_WORD;
-      if (generatorMode != KOCH_LEARN || echoResponse != "") {
-          MorseDisplay::printToScroll(BOLD, "ERR");
-          if (MorsePreferences::prefs.echoConf) {
-              pwmTone(311,  MorsePreferences::prefs.sidetoneVolume, false);
-              delay(193);
-              pwmNoTone();
-          }
-      }
-      delay(interWordSpace);
-      if (MorsePreferences::prefs.speedAdapt)
-          changeSpeed(-1);
-    }
-    echoResponse = "";
-    clearPaddleLatches();
-}   // end of function
-
 
 
 void changeSpeed( int t) {

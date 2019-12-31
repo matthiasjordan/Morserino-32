@@ -66,6 +66,10 @@ void MorseLoRa::setup() {
 }
 
 
+void MorseLoRa::idle() {
+    LoRa.idle();
+}
+
 
 //////// System Setup / LoRa Setup ///// Called when BALCK knob is pressed @ startup
 

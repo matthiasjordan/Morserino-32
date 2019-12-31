@@ -9,6 +9,7 @@
 #include "MorseUI.h"
 #include "MorseRotaryEncoder.h"
 #include "MorseGenerator.h"
+#include "MorseLoRa.h"
 
 
 using namespace MorseMenu;
@@ -121,7 +122,7 @@ void MorseMenu::menu_() {
      //// initialize a few things now
      //Serial.println("THE MENU");
     ///updateTimings(); // now done after reading preferences
-    LoRa.idle();
+    MorseLoRa::idle();
     //keyerState = IDLE_STATE;
     active = false;
     //startFirst = true;

@@ -4,6 +4,7 @@
 namespace MorseLoRa {
 
         void setup();
+        void idle();
 
         void cwForLora (int element);
         void sendWithLora();

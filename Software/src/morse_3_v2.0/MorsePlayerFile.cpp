@@ -1,8 +1,10 @@
 #include <Arduino.h>
+#include "FS.h"
 #include "SPIFFS.h"
 #include "MorsePlayerFile.h"
 #include "MorsePreferences.h"
 #include "koch.h"
+
 
 
 using namespace MorsePlayerFile;
