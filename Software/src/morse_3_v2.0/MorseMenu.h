@@ -1,12 +1,16 @@
-#ifndef MENU_H_
-#define MENU_H_
+#ifndef MORSEMENU_H_
+#define MORSEMENU_H_
 
 #include "MorsePreferences.h"
 
-namespace Menu
-{
+namespace MorseMenu {
+
+    void MorseMenu::menu_();
     void displayKeyerPreferencesMenu(int pos);
     boolean adjustKeyerPreference(MorsePreferences::prefPos pos);
 }
 
-#endif /* MENU_H_ */
+
+
+
+#endif /* MORSEMENU_H_ */

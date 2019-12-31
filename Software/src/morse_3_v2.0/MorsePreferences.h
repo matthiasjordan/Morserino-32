@@ -194,8 +194,10 @@ namespace MorsePreferences
     void createKochAbbr(uint8_t maxl, uint8_t koch);
 
     void writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG);
+    void writeWordPointer();
+    void writeVolume();
 
-    void MorsePreferences::fireCharSeen(boolean wpmOnly);
+    void fireCharSeen(boolean wpmOnly);
 }
 
 #endif

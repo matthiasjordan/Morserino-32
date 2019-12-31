@@ -468,3 +468,19 @@ void MorsePreferences::fireCharSeen(boolean wpmOnly) {
    }
 
 }
+
+
+void MorsePreferences::writeWordPointer() {
+    pref.begin("morserino", false);              // open the namespace as read/write
+    if ((prefs.fileWordPointer != pref.getUInt("fileWordPtr")))   // update word pointer if necessary (if we ran player before)
+       pref.putUInt("fileWordPtr", prefs.fileWordPointer);
+    pref.end();
+}
+
+
+void MorsePreferences::writeVolume() {
+    pref.begin("morserino", false);                     // open the namespace as read/write
+    if (pref.getUChar("sidetoneVolume") != MorsePreferences::prefs.sidetoneVolume)
+        pref.putUChar("sidetoneVolume", MorsePreferences::prefs.sidetoneVolume);  // store the last volume, if it has changed
+    pref.end();
+}
