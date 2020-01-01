@@ -39,7 +39,7 @@ void MorseEchoTrainer::storeCharInResponse(String symbol) {
 
 
 ///////// evaluate the response in Echo Trainer Mode
-void echoTrainerEval() {
+void MorseEchoTrainer::echoTrainerEval() {
     delay(MorseKeyer::interCharacterSpace / 2);
     if (echoResponse == echoTrainerWord) {
       echoTrainerState = SEND_WORD;

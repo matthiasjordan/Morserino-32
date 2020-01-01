@@ -30,6 +30,9 @@ namespace internal {
     void loraSystemSetup();
     void onReceive(int packetSize);
     void storePacket(int rssi, String packet);
+    uint8_t loRaBuRead(uint8_t* buIndex);
+    uint8_t loRaBuWrite(int rssi, String packet);
+
 }
 
 
@@ -147,7 +150,7 @@ void MorseLoRa::cwForLora (int element) {
 }
 
 
-void sendWithLora() {           // hand this string over as payload to the LoRA transceiver
+void MorseLoRa::sendWithLora() {           // hand this string over as payload to the LoRA transceiver
   // send packet
   LoRa.beginPacket();
   LoRa.print(loraTxBuffer);
@@ -156,7 +159,7 @@ void sendWithLora() {           // hand this string over as payload to the LoRA 
       LoRa.receive();
 }
 
-void onReceive(int packetSize)
+void internal::onReceive(int packetSize)
 {
   String result;
   result.reserve(64);
@@ -212,7 +215,7 @@ void onReceive(int packetSize)
 ////        }
 
 
-uint8_t loRaBuWrite(int rssi, String packet) {
+uint8_t internal::loRaBuWrite(int rssi, String packet) {
 ////   int loRaBuWrite(int rssi, String packet): returns length of buffer if successful. otherwise 0
 ////   nextBuWrite where the next packet should be written; @write:
 ////       increment nextBuWrite by l to get new pointer; and decrement bytesBuFree by l to get new free space
@@ -241,7 +244,7 @@ boolean MorseLoRa::loRaBuReady() {
 }
 
 
-uint8_t loRaBuRead(uint8_t* buIndex) {
+uint8_t internal::loRaBuRead(uint8_t* buIndex) {
 ////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
   uint8_t l;
   if (byteBuFree == 256)
@@ -259,7 +262,7 @@ uint8_t loRaBuRead(uint8_t* buIndex) {
 
 
 
-void storePacket(int rssi, String packet) {             // whenever we receive something, we just store it in our buffer
+void internal::storePacket(int rssi, String packet) {             // whenever we receive something, we just store it in our buffer
   if (loRaBuWrite(rssi, packet) == 0)
     Serial.println("LoRa Buffer full");
 }
@@ -276,7 +279,7 @@ uint8_t MorseLoRa::decodePacket(int* rssi, int* wpm, String* cwword) {
   uint8_t l, c, header=0;
   uint8_t index = 0;
 
-  l = loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
+  l = internal::loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
 
   for (int i = 0; i < l; ++i) {     // decoding loop
     c = loRaRxBuffer[index+i];

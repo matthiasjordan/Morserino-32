@@ -17,7 +17,7 @@ namespace MorseMachine {
 
     morserinoMode morseState = morseKeyer;
 
-    boolean getMode();
+    morserinoMode getMode();
     boolean isMode(morserinoMode mode);
     boolean isEncoderMode(encoderMode mode);
 }

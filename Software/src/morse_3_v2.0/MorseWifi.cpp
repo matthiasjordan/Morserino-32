@@ -20,10 +20,13 @@ namespace internal {
     boolean errorConnect(String msg);
     boolean wifiConnect();
     String getContentType(String filename);
+    void handleNotFound();
+    bool handleFileRead(String path);
+    void handleFileUpload();
 }
 
 
-void handleNotFound() {
+void internal::handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -69,7 +72,7 @@ void MorseWifi::startAP() {
     ESP.restart();
   });
 
-  server.onNotFound(handleNotFound);
+  server.onNotFound(internal::handleNotFound);
 
   server.begin();
   while (true) {
@@ -86,7 +89,7 @@ void MorseWifi::startAP() {
 }
 
 
-void updateFirmware()   {                   /// start wifi client, web server and upload new binary from a local computer
+void MorseWifi::updateFirmware()   {                   /// start wifi client, web server and upload new binary from a local computer
   if (! wifiConnect())
     return;
 
@@ -139,7 +142,7 @@ void updateFirmware()   {                   /// start wifi client, web server an
 }
 
 
-boolean internal::wifiConnect() {                   // connect to local WLAN
+boolean MorseWifi::wifiConnect() {                   // connect to local WLAN
   // Connect to WiFi network
   if (MorsePreferences::prefs.wlanSSID == "")
       return internal::errorConnect(String("WiFi Not Conf"));
@@ -170,7 +173,7 @@ boolean internal::errorConnect(String msg) {
   return false;
 }
 
-void startMDNS() {
+void internal::startMDNS() {
   /*use mdns for host name resolution*/
   if (!MDNS.begin(host)) { //http://m32.local
     Serial.println("Error setting up MDNS responder!");
@@ -183,8 +186,8 @@ void startMDNS() {
   //Serial.println("mDNS responder started");
 }
 
-void uploadFile() {
-  if (! internal::wifiConnect())
+void MorseWifi::uploadFile() {
+  if (! MorseWifi::wifiConnect())
     return;
   server.on("/", HTTP_GET, []() {
     server.sendHeader("Connection", "close");
@@ -199,11 +202,11 @@ server.on("/update", HTTP_POST,                       // if the client posts to 
     [](){ server.sendHeader("Connection", "close");
     server.send(200, "text/plain", "OK");
     ESP.restart();},                                  // Send status 200 (OK) to tell the client we are ready to receive; when done, restart the ESP32
-    handleFileUpload                                    // Receive and save the file
+    internal::handleFileUpload                                    // Receive and save the file
   );
 
   server.onNotFound([]() {                              // If the client requests any URI
-    if (!handleFileRead(server.uri()))                  // send it if it exists
+    if (!internal::handleFileRead(server.uri()))                  // send it if it exists
       server.send(404, "text/plain", "404: Not Found"); // otherwise, respond with a 404 (Not Found) error
   });
 
@@ -230,7 +233,7 @@ String internal::getContentType(String filename) { // convert the file extension
   return "text/plain";
 }
 
-bool handleFileRead(String path) { // send the right file to the client (if it exists)
+bool internal::handleFileRead(String path) { // send the right file to the client (if it exists)
   //Serial.println("handleFileRead: " + path);
   if (path.endsWith("/")) path += "index.html";          // If a folder is requested, send the index file
   String contentType = internal::getContentType(path);             // Get the MIME type
@@ -248,7 +251,7 @@ bool handleFileRead(String path) { // send the right file to the client (if it e
   return false;
 }
 
-void handleFileUpload(){ // upload a new file to the SPIFFS
+void internal::handleFileUpload(){ // upload a new file to the SPIFFS
   HTTPUpload& upload = server.upload();
   if(upload.status == UPLOAD_FILE_START){
     String filename = upload.filename;

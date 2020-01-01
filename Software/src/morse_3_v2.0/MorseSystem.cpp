@@ -7,7 +7,7 @@
 using namespace MorseSystem;
 
 //// measure battery voltage in mV
-int16_t batteryVoltage()
+int16_t MorseSystem::batteryVoltage()
 {
     int32_t c, diff;
 
@@ -44,12 +44,12 @@ int16_t batteryVoltage()
 volatile uint64_t TOTcounter;                       // holds millis for Time-Out Timer
 
 
-void resetTOT()
+void MorseSystem::resetTOT()
 {       //// reset the Time Out Timer - we do this whenever there is a screen update
     TOTcounter = millis();
 }
 
-void checkShutDown(boolean enforce)
+void MorseSystem::checkShutDown(boolean enforce)
 {       /// if enforce == true, we shut donw even if there was no time-out
     // unsigend long timeOut = ((morseState == loraTrx) || (morseState == morseTrx)) ? 450000 : 300000;  /// 7,5 or 5 minutes
     unsigned long timeOut;
@@ -74,7 +74,7 @@ void checkShutDown(boolean enforce)
     }
 }
 
-void shutMeDown()
+void MorseSystem::shutMeDown()
 {
     MorseDisplay::sleep();                //OLED sleep
     LoRa.sleep();                   //LORA sleep

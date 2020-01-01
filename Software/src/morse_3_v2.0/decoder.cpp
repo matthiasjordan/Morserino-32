@@ -68,11 +68,14 @@ namespace internal {
     void recalculateDit(unsigned long duration);
     void recalculateDah(unsigned long duration);
     String encodeProSigns( String &input );
+    boolean straightKey();
+    boolean checkTone();
+
 }
 
 
 
-void setupGoertzel()
+void Decoder::setupGoertzel()
 {                 /// pre-compute some values that are compute-imntensive and won't change anyway
     uint8_t bw = MorsePreferences::prefs.goertzelBandwidth;
     goertzel_n = (bw == 0 ? 152 : 608);                 // update Goertzel parameters depending on chosen bandwidth
@@ -131,7 +134,7 @@ void setupGoertzel()
 
 #define straightPin leftPin
 
-boolean straightKey() {            // return true if a straight key was closed, or a touch paddle touched
+boolean internal::straightKey() {            // return true if a straight key was closed, or a touch paddle touched
 if ((MorseMachine::isMode(MorseMachine::morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey) )
     return true;
 else return false;
@@ -140,7 +143,7 @@ else return false;
 
 
 
-boolean checkTone() {              /// check if we have a tone signal at A6 with Gortzel's algorithm, and apply some noise blanking as well
+boolean internal::checkTone() {              /// check if we have a tone signal at A6 with Gortzel's algorithm, and apply some noise blanking as well
                                    /// the result will be in globale variable filteredState
                                    /// we return true when we detected a change in state, false otherwise!
 
@@ -232,7 +235,7 @@ void Decoder::doDecode() {
   int wpm;
 
     switch(decoderState) {
-      case INTERELEMENT_: if (checkTone()) {
+      case INTERELEMENT_: if (internal::checkTone()) {
                               internal::ON_();
                               decoderState = HIGH_;
                           } else {
@@ -251,7 +254,7 @@ void Decoder::doDecode() {
                               }
                           }
                           break;
-      case INTERCHAR_:    if (checkTone()) {
+      case INTERCHAR_:    if (internal::checkTone()) {
           internal::ON_();
                               decoderState = HIGH_;
                           } else {
@@ -265,12 +268,12 @@ void Decoder::doDecode() {
                               }
                           }
                           break;
-      case LOW_:          if (checkTone()) {
+      case LOW_:          if (internal::checkTone()) {
           internal::ON_();
                               decoderState = HIGH_;
                           }
                           break;
-      case HIGH_:         if (checkTone()) {
+      case HIGH_:         if (internal::checkTone()) {
           internal::OFF_();
                               decoderState = INTERELEMENT_;
                           }
@@ -285,7 +288,7 @@ void internal::ON_() {                                  /// what we do when we j
 
    MorseGenerator::keyOut(true, false, MorseSound::notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
 
-   drawInputStatus(true);
+   MorseDisplay::drawInputStatus(true);
 
    if (lowDuration < ditAvg * 2.4)                    // if we had an inter-element pause,
       internal::recalculateDit(lowDuration);                    // use it to adjust speed
@@ -316,14 +319,14 @@ void internal::OFF_() {                                 /// what we do when we j
   //digitalWrite(keyerPin, LOW);      // stop keying Tx
   MorseGenerator::keyOut(false, false, 0, 0);
   ///////
-  drawInputStatus(false);
+  MorseDisplay::drawInputStatus(false);
 
 }
 
 
 
 
-void recalculateDit(unsigned long duration) {       /// recalculate the average dit length
+void internal::recalculateDit(unsigned long duration) {       /// recalculate the average dit length
   ditAvg = (4*ditAvg + duration) / 5;
   //Serial.print("ditAvg: ");
   //Serial.println(ditAvg);
@@ -332,7 +335,7 @@ void recalculateDit(unsigned long duration) {       /// recalculate the average 
   //Serial.println(nbtime);
 }
 
-void recalculateDah(unsigned long duration) {       /// recalculate the average dah length
+void internal::recalculateDah(unsigned long duration) {       /// recalculate the average dah length
   //static uint8_t rot = 0;
   //static unsigned long collector;
 

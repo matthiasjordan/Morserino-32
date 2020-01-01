@@ -107,7 +107,6 @@ const byte pool[][2]  = {
 namespace internal {
     void fetchNewWord();
     void dispGeneratedChar();
-    String CWwordToClearText(String cwword);
 //    String encodeProSigns( String &input );
 
     String getRandomChars( int maxLength, int option);
@@ -120,7 +119,7 @@ namespace internal {
     String generateCWword(String symbols);
 }
 
-void generateCW () {          // this is called from loop() (frequently!)  and generates CW
+void MorseGenerator::generateCW () {          // this is called from loop() (frequently!)  and generates CW
 
   static int l;
   static char c;
@@ -254,7 +253,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
 }
 
 
-void fetchNewWord() {
+void internal::fetchNewWord() {
   int rssi, rxWpm, rv;
 
 //Serial.println("startFirst: " + String((startFirst ? "true" : "false")));
@@ -275,7 +274,7 @@ void fetchNewWord() {
               return;
             if ((rxWpm < 5) || (rxWpm >60))                    // invalid speed
               return;
-            clearText = internal::CWwordToClearText(CWword);
+            clearText = Decoder::CWwordToClearText(CWword);
             //Serial.println("clearText: " + (String) clearText);
             //Serial.println("RX Speed: " + (String)rxWpm);
             //Serial.println("RSSI: " + (String)rssi);

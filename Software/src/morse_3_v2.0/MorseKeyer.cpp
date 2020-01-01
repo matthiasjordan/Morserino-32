@@ -27,11 +27,11 @@ unsigned int lUntouched = 0;                        // sensor values (in untouch
 unsigned int rUntouched = 0;
 
 
-void setup() {
+void MorseKeyer::setup() {
     internal::initSensors();
 }
 
-void updateTimings() {
+void MorseKeyer::updateTimings() {
   ditLength = 1200 / MorsePreferences::prefs.wpm;                    // set new value for length of dits and dahs and other timings
   dahLength = 3 * ditLength;
   interCharacterSpace =  MorsePreferences::prefs.interCharSpace *  ditLength;
@@ -42,7 +42,7 @@ void updateTimings() {
 }
 
 
-void keyTransmitter() {
+void MorseKeyer::keyTransmitter() {
   if (MorsePreferences::prefs.keyTrainerMode == 0 || MorseMachine::isMode(MorseMachine::echoTrainer) || MorseMachine::isMode(MorseMachine::loraTrx) )
       return;                              // we never key Tx under these conditions
   if (MorsePreferences::prefs.keyTrainerMode == 1 && MorseMachine::isMode(MorseMachine::morseGenerator))

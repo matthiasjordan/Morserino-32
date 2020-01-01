@@ -485,13 +485,13 @@ void MorsePreferences::writeVolume() {
 }
 
 
-void writeLastExecuted(uint8_t menuPtr) {
+void MorsePreferences::writeLastExecuted(uint8_t menuPtr) {
     pref.begin("morserino", false);             // open the namespace as read/write
     pref.putUChar("lastExecuted", menuPtr);   // store last executed command
     pref.end();                                 // close namespace
 }
 
-void writeWifiInfo(String SSID, String passwd) {
+void MorsePreferences::writeWifiInfo(String SSID, String passwd) {
     MorsePreferences::prefs.wlanSSID = SSID;
     MorsePreferences::prefs.wlanPassword = passwd;
     //Serial.println("SSID: " + MorsePreferences::prefs.wlanSSID + " Password: " + MorsePreferences::prefs.wlanPassword);

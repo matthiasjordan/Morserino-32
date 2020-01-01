@@ -11,7 +11,7 @@ void MorseRotaryEncoder::setup() {
 }
 
 
-void IRAM_ATTR MorseRotaryEncoder::isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
+void MorseRotaryEncoder::isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
 //if (micros()  > (IRTime + 1000) ) {
 portENTER_CRITICAL_ISR(&mux);
 
@@ -38,7 +38,7 @@ portEXIT_CRITICAL_ISR(&mux);
 
 
 
-int IRAM_ATTR MorseRotaryEncoder::checkEncoder() {
+int MorseRotaryEncoder::checkEncoder() {
   int t;
 
   portENTER_CRITICAL(&mux);

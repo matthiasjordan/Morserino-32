@@ -136,7 +136,7 @@ void MorseMenu::menu_() {
     //keyerState = IDLE_STATE;
     MorseEchoTrainer::active = false;
     //startFirst = true;
-    internal::cleanStartSettings();
+    MorseMenu::cleanStartSettings();
     /*
     clearText = "";
     CWword = "";
@@ -527,7 +527,7 @@ boolean internal::menuExec() {                                          // retur
 }   /// end menuExec()
 
 
-void cleanStartSettings() {
+void MorseMenu::cleanStartSettings() {
     MorseGenerator::clearText = "";
     MorseGenerator::CWword = "";
     MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
