@@ -267,8 +267,6 @@ void internal::menuDisplay(uint8_t ptr) {
 boolean internal::menuExec() {                                          // return true if we should  leave menu after execution, true if we should stay in menu
   //Serial.println("Executing menu item " + String(MorsePreferences::prefs.menuPtr));
 
-  uint32_t wcount = 0;
-
   MorseGenerator::effectiveAutoStop = false;
   MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 

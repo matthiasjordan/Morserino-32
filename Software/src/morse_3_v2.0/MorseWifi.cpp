@@ -17,8 +17,9 @@ using namespace MorseWifi;
 
 namespace internal {
     void startMDNS();
-    boolean internal::errorConnect(String msg);
-
+    boolean errorConnect(String msg);
+    boolean wifiConnect();
+    String getContentType(String filename);
 }
 
 
@@ -138,7 +139,7 @@ void updateFirmware()   {                   /// start wifi client, web server an
 }
 
 
-boolean wifiConnect() {                   // connect to local WLAN
+boolean internal::wifiConnect() {                   // connect to local WLAN
   // Connect to WiFi network
   if (MorsePreferences::prefs.wlanSSID == "")
       return internal::errorConnect(String("WiFi Not Conf"));
@@ -183,7 +184,7 @@ void startMDNS() {
 }
 
 void uploadFile() {
-  if (! wifiConnect())
+  if (! internal::wifiConnect())
     return;
   server.on("/", HTTP_GET, []() {
     server.sendHeader("Connection", "close");
@@ -220,7 +221,7 @@ server.on("/update", HTTP_POST,                       // if the client posts to 
 }
 
 
-String getContentType(String filename) { // convert the file extension to the MIME type
+String internal::getContentType(String filename) { // convert the file extension to the MIME type
   if (filename.endsWith(".html")) return "text/html";
   else if (filename.endsWith(".css")) return "text/css";
   else if (filename.endsWith(".js")) return "application/javascript";
@@ -232,7 +233,7 @@ String getContentType(String filename) { // convert the file extension to the MI
 bool handleFileRead(String path) { // send the right file to the client (if it exists)
   //Serial.println("handleFileRead: " + path);
   if (path.endsWith("/")) path += "index.html";          // If a folder is requested, send the index file
-  String contentType = getContentType(path);             // Get the MIME type
+  String contentType = internal::getContentType(path);             // Get the MIME type
   String pathWithGz = path + ".gz";
   if (SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {     // If the file exists, either as a compressed archive, or normal
     if (SPIFFS.exists(pathWithGz))                            // If there's a compressed version available

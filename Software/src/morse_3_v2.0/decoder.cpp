@@ -6,6 +6,7 @@
 #include "MorseGenerator.h"
 #include "MorseDisplay.h"
 #include "MorseEchoTrainer.h"
+#include "MorseSound.h"
 
 using namespace Decoder;
 
@@ -60,10 +61,9 @@ volatile unsigned long dit_collector = 0;
 
 
 
-namespace Decoder::internal {
+namespace internal {
     void ON_();
     void OFF_();
-    void displayMorse();
 
     void recalculateDit(unsigned long duration);
     void recalculateDah(unsigned long duration);
@@ -241,7 +241,7 @@ void Decoder::doDecode() {
                               //if (MorsePreferences::prefs.wpm > 35) lacktime = 2.7;
                               //  else if (MorsePreferences::prefs.wpm > 30) lacktime = 2.6;
                               if (lowDuration > (lacktime * ditAvg)) {
-                                internal::displayMorse();                                             /// decode the morse character and display it
+                                displayMorse();                                             /// decode the morse character and display it
                                 wpm = (MorsePreferences::prefs.wpm + (int) (7200 / (dahAvg + 3*ditAvg))) / 2;     //// recalculate speed in wpm
                                 if (MorsePreferences::prefs.wpm != wpm) {
                                   MorsePreferences::prefs.wpm = wpm;
@@ -278,12 +278,12 @@ void Decoder::doDecode() {
     }
 }
 
-void ON_() {                                  /// what we do when we just detected a rising flank, from low to high
+void internal::ON_() {                                  /// what we do when we just detected a rising flank, from low to high
    unsigned long timeNow = millis();
    lowDuration = timeNow - startTimeLow;             // we record the length of the pause
    startTimeHigh = timeNow;                          // prime the timer for the high state
 
-   MorseGenerator::keyOut(true, false, notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
+   MorseGenerator::keyOut(true, false, MorseSound::notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
 
    drawInputStatus(true);
 
@@ -291,7 +291,7 @@ void ON_() {                                  /// what we do when we just detect
       internal::recalculateDit(lowDuration);                    // use it to adjust speed
 }
 
-void OFF_() {                                 /// what we do when we just detected a falling flank, from high to low
+void internal::OFF_() {                                 /// what we do when we just detected a falling flank, from high to low
   unsigned long timeNow = millis();
   unsigned int threshold = (int) ( ditAvg * sqrt( dahAvg / ditAvg));
 
@@ -350,7 +350,7 @@ void recalculateDah(unsigned long duration) {       /// recalculate the average 
 
 
 /// display decoded morse code (and store it in echoTrainer
-void displayMorse() {
+void Decoder::displayMorse() {
   String symbol;
   symbol.reserve(6);
   if (treeptr == 0)
@@ -400,7 +400,7 @@ String Decoder::CWwordToClearText(String cwword) {             // decode the Mor
 }
 
 
-String Decoder::internal::encodeProSigns( String &input ) {
+String internal::encodeProSigns( String &input ) {
     /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch - V <ve>;
     input.replace("<as>", "S");
     input.replace("<ka>","A");

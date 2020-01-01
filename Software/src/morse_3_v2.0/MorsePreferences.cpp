@@ -236,8 +236,6 @@ void MorsePreferences::writePreferences(String repository)
     MorsePrefs p = prefs;
     unsigned int l = 15;
     char repName[l];
-    uint8_t temp;
-    uint32_t tempInt;
 
     boolean morserino = false;
 

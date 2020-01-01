@@ -9,6 +9,7 @@
 #include "MorseUI.h"
 #include "MorseRotaryEncoder.h"
 #include "MorseGenerator.h"
+#include "MorseSound.h"
 
 
 using namespace MorsePreferencesMenu;
@@ -221,7 +222,7 @@ void internal::displayACS()
 
 void internal::displayPitch()
 {
-    MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", notes[MorsePreferences::prefs.sidetoneFreq]);
+    MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", MorseSound::notes[MorsePreferences::prefs.sidetoneFreq]);
 }
 
 void internal::displayClicks()
