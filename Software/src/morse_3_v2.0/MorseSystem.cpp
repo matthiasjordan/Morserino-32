@@ -68,7 +68,7 @@ void checkShutDown(boolean enforce)
         MorseDisplay::clearAll();
         MorseDisplay::printOnScroll(1, INVERSE_BOLD, 0, "Power OFF...");
         MorseDisplay::printOnScroll(2, REGULAR, 0, "RED to turn ON");
-        MorseDisplay::display();
+        MorseDisplay::displayDisplay();
         delay(1500);
         shutMeDown();
     }

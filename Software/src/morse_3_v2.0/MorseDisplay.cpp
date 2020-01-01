@@ -2,15 +2,15 @@
 
 #include <Arduino.h>
 #include <Wire.h>          // Only needed for Arduino 1.6.5 and earlier
-#include "ClickButton.h"   // button control library
-#include <SPI.h>           // library for SPI interface
-#include <LoRa.h>          // library for LoRa transceiver
-#include <WiFi.h>          // basic WiFi functionality
-#include <ESPmDNS.h>       // DNS functionality
-#include <WiFiClient.h>    //WiFi clinet library
-#include <Update.h>        // update "over the air" (OTA) functionality
-#include "FS.h"
-#include "SPIFFS.h"
+//#include "ClickButton.h"   // button control library
+//#include <SPI.h>           // library for SPI interface
+//#include <LoRa.h>          // library for LoRa transceiver
+//#include <WiFi.h>          // basic WiFi functionality
+//#include <ESPmDNS.h>       // DNS functionality
+//#include <WiFiClient.h>    //WiFi clinet library
+//#include <Update.h>        // update "over the air" (OTA) functionality
+//#include "FS.h"
+//#include "SPIFFS.h"
 
 #include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
 
@@ -19,6 +19,7 @@
 #include "MorsePreferences.h"
 #include "MorseSystem.h"
 #include "MorseMachine.h"
+#include "MorseGenerator.h"
 
 using namespace MorseDisplay;
 
@@ -107,14 +108,14 @@ void MorseDisplay::clear() {
     display.clear();
 }
 
-void MorseDisplay::display() {
+void MorseDisplay::displayDisplay() {
     display.display();
 }
 
 
 void MorseDisplay::clearDisplay() {
     MorseDisplay::clear();
-    MorseDisplay::display();
+    MorseDisplay::displayDisplay();
 }
 
 
@@ -213,10 +214,10 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     printToScroll_lastStyle = style;
 
     boolean linebreak = text.endsWith("\n");
-    boolean printToScroll_autoflush = !effectiveAutoStop;
+    boolean printToScroll_autoflush = !MorseGenerator::effectiveAutoStop;
     //Serial.println("AUTO: " + String(printToScroll_autoflush));
     //((Serial.println("morseState: " + String(morseState));
-    if (MorseMachine::isMode(morseGenerator))
+    if (MorseMachine::isMode(MorseMachine::morseGenerator))
         printToScroll_autoflush = true;
     if (printToScroll_autoflush || linebreak)
     {
@@ -341,7 +342,7 @@ void MorseDisplay::newLine()
         refreshScrollArea((bottomLine + 1) % NoOfLines);
     else if (relPos == maxPos)
         refreshScrollArea((NoOfLines + bottomLine - 2) % NoOfLines);
-    if (MorseMachine::isEncoderMode(scrollMode))
+    if (MorseMachine::isEncoderMode(MorseMachine::scrollMode))
         displayScrollBar(true);
 
 }
@@ -410,7 +411,7 @@ uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos
     va_start( arglist, format );
     vsprintf(numBuffer, format, arglist);
     va_end( arglist );
-    MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
+    return MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
 }
 
 uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring)
@@ -449,9 +450,9 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
 }
 
 
-uint8_t MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring) {
+void MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring) {
     MorseDisplay::printOnScroll(line, how, xpos, mystring);
-    display();
+    displayDisplay();
     delay(500);
     clear();
 }
@@ -517,7 +518,7 @@ void MorseDisplay::displayScrollBar(boolean visible)
 /// display volume as a progress bar: vol = 1-100
 void MorseDisplay::displayVolume()
 {
-    MorseDisplay::drawVolumeCtrl(MorseMachine::isEncoderMode(speedSettingMode) ? false : true, 93, 0, 28, 15, MorsePreferences::prefs.sidetoneVolume);
+    MorseDisplay::drawVolumeCtrl(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? false : true, 93, 0, 28, 15, MorsePreferences::prefs.sidetoneVolume);
     display.display();
 }
 
@@ -577,7 +578,7 @@ void MorseDisplay::updateSMeter(int rssi) {
        MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
       wasZero = false;
    }
-  MorseDisplay::display();
+  MorseDisplay::displayDisplay();
 }
 
 void MorseDisplay::drawInputStatus( boolean on) {
@@ -600,39 +601,39 @@ void MorseDisplay::displayTopLine() {
     MorseDisplay::clearStatusLine();
 
   // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
-  if (morseState == morseGenerator)
+  if (MorseMachine::isMode(MorseMachine::morseGenerator))
       MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
   else {
     switch (MorsePreferences::prefs.keyermode) {
-      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
-      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
-      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
-      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
+      case MorseKeyer::IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
+      case MorseKeyer::IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
+      case MorseKeyer::ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
+      case MorseKeyer::NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
     }
   }
 
   displayCWspeed();                                     // update display of CW speed
-  if ((morseState == loraTrx ) || (morseState == morseGenerator  && MorsePreferences::prefs.loraTrainerMode == true))
+  if ((MorseMachine::isMode(MorseMachine::loraTrx) ) || (MorseMachine::isMode(MorseMachine::morseGenerator)  && MorsePreferences::prefs.loraTrainerMode == true))
       dispLoraLogo();
 
   MorseDisplay::displayVolume();                                     // sidetone volume
-  MorseDisplay::display();
+  MorseDisplay::displayDisplay();
 }
 
 
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
 void MorseDisplay::displayCWspeed() {
-  if ((MorseMachine::isMode(morseGenerator) || MorseMachine::isMode(echoTrainer) ))
-      sprintf(numBuffer, "(%2i)", effWpm);
+  if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer) ))
+      sprintf(numBuffer, "(%2i)", MorseKeyer::effWpm);
   else sprintf(numBuffer, "    ");
 
   MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
 
   sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
-  MorseDisplay::printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
+  MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(speedSettingMode) ? true : false, 7,  numBuffer);
   MorseDisplay::printOnStatusLine(false, 10,  "WpM");
-  MorseDisplay::display();
+  MorseDisplay::displayDisplay();
 }
 
 

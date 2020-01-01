@@ -188,7 +188,7 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
             internal::displayMaxSequence();
             break;
     } /// switch (pos)
-    MorseDisplay::display();
+    MorseDisplay::displayDisplay();
 } // displayKeyerPreferences()
 
 /// now follow all the menu displays
@@ -834,7 +834,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displaySnapStore();
                     break;
             }   // end switch(pos)
-            MorseDisplay::display();                                                      // update the display
+            MorseDisplay::displayDisplay();                                                      // update the display
 
         }      // end if(encoderPos)
         MorseSystem::checkShutDown(false);         // check for time out
@@ -917,7 +917,7 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
             //printOnScroll(1, BOLD, 0, ">");
             MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
 
-            MorseDisplay::display();                                                        // update the display
+            MorseDisplay::displayDisplay();                                                        // update the display
          }    // end if (encoderPos)
          MorseSystem::checkShutDown(false);         // check for time out
   } // end while - we leave as soon as the button has been pressed long

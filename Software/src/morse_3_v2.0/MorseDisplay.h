@@ -17,7 +17,7 @@ namespace MorseDisplay
 
     void init();
     void displayStartUp();
-    void display();
+    void displayDisplay();
     void clearDisplay();
     void sleep();
     void clear();
@@ -34,7 +34,7 @@ namespace MorseDisplay
     void refreshScrollLine(int bufferLine, int displayLine);
     uint8_t printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring);
     uint8_t vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, char* format, ...);
-    uint8_t printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring);
+    void printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring);
     void clearLine(uint8_t line);
     void clearScroll();
     void drawVolumeCtrl(boolean inverse, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t volume);
