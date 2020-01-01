@@ -48,6 +48,16 @@ void MorsePlayerFile::setup() {
 }
 
 
+void MorsePlayerFile::openAndSkip() {
+    uint32_t wcount = 0;
+    file = SPIFFS.open("/player.txt");                            // open file
+    //skip MorsePreferences::prefs.fileWordPointer words, as they have been played before
+    wcount = MorsePreferences::prefs.fileWordPointer;
+    MorsePreferences::prefs.fileWordPointer = 0;
+    MorsePlayerFile::skipWords(wcount);
+}
+
+
 String MorsePlayerFile::getWord() {
   String result = "";
   byte c;

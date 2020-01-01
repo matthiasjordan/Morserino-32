@@ -16,15 +16,6 @@ using namespace Decoder;
 uint32_t magnitudelimit;                                   // magnitudelimit_low = ( p_goertzelBandwidth? 80000 : 30000);
 uint32_t magnitudelimit_low;                               // magnitudelimit = magnitudelimit_low;
 
-boolean filteredState = false;
-boolean filteredStateBefore = false;
-
-/// state machine for decoding CW
-enum DECODER_STATES
-{
-    LOW_, HIGH_, INTERELEMENT_, INTERCHAR_
-};
-DECODER_STATES decoderState = LOW_;
 
 ///////////////////////////////////////////////////////////
 // The sampling frq will be 106.000 on ESp32             //
@@ -63,7 +54,6 @@ long startTimeLow;
 long lowDuration;
 boolean stop = false;
 
-unsigned long ditAvg, dahAvg;     /// average values of dit and dah lengths to decode as dit or dah and to adapt to speed change
 
 volatile uint8_t dit_rot = 0;
 volatile unsigned long dit_collector = 0;

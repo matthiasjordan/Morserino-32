@@ -33,6 +33,7 @@ namespace MorseGenerator {
 
        boolean stopFlag = false;                         // for maxSequence
        boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
+       boolean firstTime = true;                         /// for word doubler mode
 
        void generateCW();
        void keyOut(boolean on,  boolean fromHere, int f, int volume);

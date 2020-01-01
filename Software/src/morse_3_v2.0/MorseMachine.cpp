@@ -5,7 +5,6 @@ using namespace MorseMachine;
 
 
 
-morserinoMode morseState = morseKeyer;
 
 boolean MorseMachine::getMode() {
     return morseState;

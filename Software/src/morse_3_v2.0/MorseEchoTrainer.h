@@ -15,6 +15,7 @@ namespace MorseEchoTrainer {
     String echoTrainerPrompt;
     String echoTrainerWord;
     boolean echoStop = false;                         // for maxSequence
+    boolean active = false;                           // flag for trainer mode
 
     void echoTrainerEval();
 

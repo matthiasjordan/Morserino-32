@@ -115,7 +115,6 @@
 
   //CWword.reserve(144);
   //clearText.reserve(50);
-boolean active = false;                           // flag for trainer mode
 
 
 
@@ -244,7 +243,7 @@ void loop() {
 // static uint64_t loopC = 0;
    int t;
 
-   boolean activeOld = active;
+   boolean activeOld = MorseEchoTrainer::active;
    MorseKeyer::checkPaddles();
    switch (MorseMachine::getMode()) {
       case MorseMachine::morseKeyer:    if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
@@ -271,7 +270,7 @@ void loop() {
                               ;                                                           // wait until paddles are released
 
                           if (MorseGenerator::effectiveAutoStop) {
-                            active = (MorseGenerator::autoStop == MorseGenerator::off);
+                              MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
                             switch (MorseGenerator::autoStop) {
                               case MorseGenerator::off : {
                                   break;
@@ -289,7 +288,7 @@ void loop() {
                             }
                           }
                           else {
-                            active = !active;
+                              MorseEchoTrainer::active = !MorseEchoTrainer::active;
                             MorseGenerator::autoStop = MorseGenerator::off;
                           }
 
@@ -298,10 +297,10 @@ void loop() {
                           
                           ///// check stopFlag triggered by maxSequence
                           if (MorseGenerator::stopFlag) {
-                            active = MorseGenerator::stopFlag = false;
+                              MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
                           }
-                          if (activeOld != active) {
-                            if (!active) {
+                          if (activeOld != MorseEchoTrainer::active) {
+                            if (!MorseEchoTrainer::active) {
                                MorseGenerator::keyOut(false, true, 0, 0);
                                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                             }
@@ -311,24 +310,24 @@ void loop() {
                               MorseGenerator::genTimer = millis()-1;           // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
                             }
                           }
-                          if (active)
+                          if (MorseEchoTrainer::active)
                             MorseGenerator::generateCW();
                           break;
       case MorseMachine::echoTrainer:                             ///// check stopFlag triggered by maxSequence
                           if (MorseGenerator::stopFlag) {
-                            active = MorseGenerator::stopFlag = false;
+                              MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
                             MorseGenerator::keyOut(false, true, 0, 0);
                             MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                           }
-                          if (!active && (MorseKeyer::leftKey  || MorseKeyer::rightKey))   {                       // touching a paddle starts  the generation of code
+                          if (!MorseEchoTrainer::active && (MorseKeyer::leftKey  || MorseKeyer::rightKey))   {                       // touching a paddle starts  the generation of code
                               // for debouncing:
                               while (MorseKeyer::checkPaddles() )
                                   ;                                                           // wait until paddles are released
-                              active = !active;
+                              MorseEchoTrainer::active = !MorseEchoTrainer::active;
              
-                              cleanStartSettings();
+                              MorseMenu::cleanStartSettings();
                           } /// end touch to start
-                          if (active)
+                          if (MorseEchoTrainer::active)
                           switch (MorseEchoTrainer::getState()) {
                             case  MorseEchoTrainer::START_ECHO:
                             case  MorseEchoTrainer::SEND_WORD:
@@ -398,15 +397,15 @@ void loop() {
        case -1:   MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
                   return;
        case 1:    if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)) {//  start/stop in trainer modi, in others does nothing currently
-                  active = !active;
-                  if (!active) {
+           MorseEchoTrainer::active = !MorseEchoTrainer::active;
+                  if (!MorseEchoTrainer::active) {
                         //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
                         //pwmNoTone(); 
                         MorseGenerator::keyOut(false, true, 0, 0);
                         MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                   }
                   else {
-                    cleanStartSettings();
+                      MorseMenu::cleanStartSettings();
                   }
                         
               }
@@ -458,20 +457,6 @@ void loop() {
 }     /////////////////////// end of loop() /////////
 
 
-void cleanStartSettings() {
-    MorseGenerator::clearText = "";
-    MorseGenerator::CWword = "";
-    MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
-    MorseGenerator::generatorState = MorseGenerator::KEY_UP;
-    MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
-    Decoder::interWordTimer = 4294967000;                 // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
-    MorseGenerator::genTimer = millis()-1;                       // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-    MorseGenerator::wordCounter = 0;                             // reset word counter for maxSequence
-    MorseGenerator::startFirst = true;
-    MorseDisplay::displayTopLine();
-}
-
-
 
 
 
@@ -508,41 +493,6 @@ void cleanStartSettings() {
 
 
 
-
-
-
-
-
-
-///////////////// a test function for adjusting audio levels
-
-void audioLevelAdjust() {
-    uint16_t i, maxi, mini;
-    uint16_t testData[1216];
-
-    MorseDisplay::clear();
-    MorseDisplay::printOnScroll(0, BOLD, 0, "Audio Adjust");
-    MorseDisplay::printOnScroll(1, REGULAR, 0, "End with RED");
-    MorseKeyer::keyTx = true;
-    MorseGenerator::keyOut(true,  true, 698, 0);                                  /// we generate a side tone, f=698 Hz, also on line-out, but with vol down on speaker
-    while (true) {
-        volButton.Update();
-        if (volButton.clicks)
-            break;                                                /// pressing the red button gets you out of this mode!
-        for (i = 0; i < Decoder::goertzel_n ; ++i)
-            testData[i] = analogRead(audioInPin);                 /// read analog input
-        maxi = mini = testData[0];
-        for (i = 1; i< Decoder::goertzel_n ; ++i) {
-            if (testData[i] < mini)
-              mini = testData[i];
-            if (testData[i] > maxi)
-              maxi = testData[i];
-        }
-        MorseDisplay::showVolumeBar(mini, maxi);
-    } // end while
-    MorseGenerator::keyOut(false,  true, 698, 0);                                  /// stop keying
-    MorseKeyer::keyTx = true;
-}
 
 
 

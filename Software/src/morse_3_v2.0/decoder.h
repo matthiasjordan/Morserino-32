@@ -99,6 +99,17 @@ namespace Decoder
       {"<err>", 66, 63}      // 66 !! Error - backspace
     };
 
+    boolean filteredState = false;
+    boolean filteredStateBefore = false;
+
+    /// state machine for decoding CW
+    enum DECODER_STATES
+    {
+        LOW_, HIGH_, INTERELEMENT_, INTERCHAR_
+    };
+    DECODER_STATES decoderState = LOW_;
+
+    unsigned long ditAvg, dahAvg;     /// average values of dit and dah lengths to decode as dit or dah and to adapt to speed change
 
     byte treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
 

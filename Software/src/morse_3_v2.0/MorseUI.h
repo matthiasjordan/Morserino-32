@@ -11,6 +11,8 @@
 
 namespace MorseUI {
     void click();
+    void audioLevelAdjust();
+
 }
 
 

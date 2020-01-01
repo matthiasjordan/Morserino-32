@@ -15,6 +15,7 @@ namespace MorseMachine {
 
     encoderMode encoderState = speedSettingMode;    // we start with adjusting the speed
 
+    morserinoMode morseState = morseKeyer;
 
     boolean getMode();
     boolean isMode(morserinoMode mode);

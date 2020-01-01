@@ -471,10 +471,11 @@ void MorsePreferences::fireCharSeen(boolean wpmOnly) {
 
 
 void MorsePreferences::writeWordPointer() {
-    pref.begin("morserino", false);              // open the namespace as read/write
-    if ((prefs.fileWordPointer != pref.getUInt("fileWordPtr")))   // update word pointer if necessary (if we ran player before)
+    if ((prefs.fileWordPointer != pref.getUInt("fileWordPtr"))) {   // update word pointer if necessary (if we ran player before)
+        pref.begin("morserino", false);              // open the namespace as read/write
        pref.putUInt("fileWordPtr", prefs.fileWordPointer);
-    pref.end();
+       pref.end();
+    }
 }
 
 
@@ -483,4 +484,22 @@ void MorsePreferences::writeVolume() {
     if (pref.getUChar("sidetoneVolume") != MorsePreferences::prefs.sidetoneVolume)
         pref.putUChar("sidetoneVolume", MorsePreferences::prefs.sidetoneVolume);  // store the last volume, if it has changed
     pref.end();
+}
+
+
+void writeLastExecuted(uint8_t menuPtr) {
+    pref.begin("morserino", false);             // open the namespace as read/write
+    pref.putUChar("lastExecuted", menuPtr);   // store last executed command
+    pref.end();                                 // close namespace
+}
+
+void writeWifiInfo(String SSID, String passwd) {
+    MorsePreferences::prefs.wlanSSID = SSID;
+    MorsePreferences::prefs.wlanPassword = passwd;
+    //Serial.println("SSID: " + MorsePreferences::prefs.wlanSSID + " Password: " + MorsePreferences::prefs.wlanPassword);
+    pref.begin("morserino", false);             // open the namespace as read/write
+    pref.putString("wlanSSID", MorsePreferences::prefs.wlanSSID);
+    pref.putString("wlanPassword", MorsePreferences::prefs.wlanPassword);
+    pref.end();
+
 }

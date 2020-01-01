@@ -199,6 +199,8 @@ namespace MorsePreferences
     void writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG);
     void writeWordPointer();
     void writeVolume();
+    void writeLastExecuted(uint8_t menuPtr);
+    void writeWifiInfo(String SSID, String passwd);
 
     void fireCharSeen(boolean wpmOnly);
 }

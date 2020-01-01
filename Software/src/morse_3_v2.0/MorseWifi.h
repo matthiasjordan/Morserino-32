@@ -8,9 +8,6 @@
 //#include <LoRa.h>          // library for LoRa transceiver
 #include <WiFi.h>          // basic WiFi functionality
 #include <WebServer.h>     // simple web sever
-//#include <ESPmDNS.h>       // DNS functionality
-//#include <WiFiClient.h>    //WiFi clinet library
-//#include <Update.h>        // update "over the air" (OTA) functionality
 //#include "FS.h"
 #include "SPIFFS.h"
 
@@ -173,6 +170,10 @@ namespace MorseWifi {
      "</script>";
 
 
+    void startAP();
+    boolean wifiConnect();
+    void uploadFile();
+    void updateFirmware();
 }
 
 

@@ -10,7 +10,7 @@ namespace MorseLoRa {
         void sendWithLora();
         boolean loRaBuReady();
         uint8_t decodePacket(int* rssi, int* wpm, String* cwword);
-
+        void receive();
 }
 
 

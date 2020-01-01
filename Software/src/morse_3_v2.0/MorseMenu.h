@@ -5,7 +5,8 @@
 
 namespace MorseMenu {
 
-    void MorseMenu::menu_();
+    void menu_();
+    void cleanStartSettings();
 }
 
 

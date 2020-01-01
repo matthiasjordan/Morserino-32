@@ -26,7 +26,7 @@ uint8_t loRaSerial;                                     /// a 6 bit serial numbe
                                                         /// the first two bits in teh byte will be the protocol id (CWLORAVERSION)
 
 
-namespace MorseLoRa::internal {
+namespace internal {
     void loraSystemSetup();
     void onReceive(int packetSize);
     void storePacket(int rssi, String packet);
@@ -71,9 +71,13 @@ void MorseLoRa::idle() {
 }
 
 
+void MorseLoRa::receive() {
+    LoRa.receive();
+}
+
 //////// System Setup / LoRa Setup ///// Called when BALCK knob is pressed @ startup
 
-void MorseLoRa::internal::loraSystemSetup() {
+void internal::loraSystemSetup() {
     MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posLoraBand);
     MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posLoraBand);
     MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posLoraQRG);
