@@ -436,7 +436,7 @@ boolean internal::menuExec() {                                          // retur
                 MorseKeyer::clearPaddleLatches();
                 MorseKeyer::keyTx = false;
                 MorseGenerator::clearText = "";
-                MorseLoRa.receive();
+                MorseLoRa::receive();
                 return true;
                 break;
       case  _trxIcw: /// icw/ext TRX

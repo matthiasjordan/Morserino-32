@@ -1,5 +1,5 @@
-#ifndef MORSEMENU_H_
-#define MORSEMENU_H_
+#ifndef MORSEPREFERENCESMENU_H_
+#define MORSEPREFERENCESMENU_H_
 
 #include "MorsePreferences.h"
 
@@ -14,4 +14,4 @@ namespace MorsePreferencesMenu {
 
 
 
-#endif /* MORSEMENU_H_ */
+#endif /* MORSEPREFERENCESMENU_H_ */

@@ -24,7 +24,7 @@ namespace MorseDisplay
     void clearStatusLine();
     String cleanUpProSigns(String &input);
     void printOnStatusLine(boolean strong, uint8_t xpos, String string);
-    void vprintOnStatusLine(boolean strong, uint8_t xpos, char* format, ...);
+    void vprintOnStatusLine(boolean strong, uint8_t xpos, const char* format, ...);
     void printToScroll(FONT_ATTRIB style, String text);
     void clearScrollBuffer();
     void flushScroll();
@@ -33,7 +33,7 @@ namespace MorseDisplay
     void refreshScrollArea(int pos);
     void refreshScrollLine(int bufferLine, int displayLine);
     uint8_t printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring);
-    uint8_t vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, char* format, ...);
+    uint8_t vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, const char* format, ...);
     void printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring);
     void clearLine(uint8_t line);
     void clearScroll();

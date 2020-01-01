@@ -184,7 +184,7 @@ void MorseDisplay::printOnStatusLine(boolean strong, uint8_t xpos, String string
     MorseSystem::resetTOT();
 }
 
-void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, char* format, ...) {
+void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, const char* format, ...) {
     va_list arglist;
     va_start( arglist, format );
     vsprintf(numBuffer, format, arglist);
@@ -407,7 +407,7 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
 }
 
 
-uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, char* format, ...) {
+uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, const char* format, ...) {
     va_list arglist;
     va_start( arglist, format );
     vsprintf(numBuffer, format, arglist);

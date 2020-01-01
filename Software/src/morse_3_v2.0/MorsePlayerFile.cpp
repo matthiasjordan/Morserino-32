@@ -10,7 +10,7 @@
 using namespace MorsePlayerFile;
 
 
-namespace MorsePlayerFile::internal {
+namespace internal {
     String cleanUpText(String w);
     String utf8umlaut(String s);
 
@@ -91,7 +91,7 @@ void MorsePlayerFile::skipWords(uint32_t count) {             /// just skip coun
 }
 
 
-String MorsePlayerFile::internal::cleanUpText(String w) {                        // all to lower case, and convert umlauts
+String internal::cleanUpText(String w) {                        // all to lower case, and convert umlauts
   w.toLowerCase();
   w = utf8umlaut(w);
 
@@ -99,7 +99,7 @@ String MorsePlayerFile::internal::cleanUpText(String w) {                       
 }
 
 
-String MorsePlayerFile::internal::utf8umlaut(String s) { /// replace umtf umlauts with digraphs, and interpret pro signs, written e.g. as [kn] or <kn>
+String internal::utf8umlaut(String s) { /// replace umtf umlauts with digraphs, and interpret pro signs, written e.g. as [kn] or <kn>
       s.replace("ä", "ae");
       s.replace("ö", "oe");
       s.replace("ü", "ue");

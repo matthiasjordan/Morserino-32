@@ -6,6 +6,7 @@
 #include "MorseLoRa.h"
 #include "MorseEchoTrainer.h"
 #include "MorseDisplay.h"
+#include "MorseSound.h"
 
 using namespace MorseKeyer;
 
@@ -154,7 +155,7 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
 
     case KEY_START:
           // Assert key down, start timing, state shared for dit or dah
-          pitch = notes[MorsePreferences::prefs.sidetoneFreq];
+          pitch = MorseSound::notes[MorsePreferences::prefs.sidetoneFreq];
           if ((MorseMachine::isMode(MorseMachine::echoTrainer) || MorseMachine::isMode(MorseMachine::loraTrx)) && MorsePreferences::prefs.echoToneShift != 0) {
              pitch = (MorsePreferences::prefs.echoToneShift == 1 ? pitch * 18 / 17 : pitch * 17 / 18);        /// one half tone higher or lower, as set in parameters in echo trainer mode
           }

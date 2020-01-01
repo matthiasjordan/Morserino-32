@@ -14,7 +14,7 @@
 using namespace MorsePreferencesMenu;
 
 
-namespace MorsePreferencesMenu::internal {
+namespace internal {
     void displayCurtisMode();
     void displayCurtisBTiming();
     void displayCurtisBDotTiming();
@@ -193,69 +193,69 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
 
 /// now follow all the menu displays
 
-void MorsePreferencesMenu::internal::displayCurtisMode()
+void internal::displayCurtisMode()
 {
     String keyerModus[] =
     {"Curtis A    ", "Curtis B    ", "Ultimatic   ", "Non-Squeeze "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, keyerModus[MorsePreferences::prefs.keyermode - 1]);
 }
 
-void MorsePreferencesMenu::internal::displayCurtisBTiming()
+void internal::displayCurtisBTiming()
 {
     // display start timing when paddles are being checked in Curtis B mode during dah: between 0 and 100
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", MorsePreferences::prefs.curtisBTiming);
 }
 
-void MorsePreferencesMenu::internal::displayCurtisBDotTiming()
+void internal::displayCurtisBDotTiming()
 {
     // display start timing when paddles are being checked in Curtis B modeduring dit : between 0 and 100
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", MorsePreferences::prefs.curtisBDotTiming);
 }
 
-void MorsePreferencesMenu::internal::displayACS()
+void internal::displayACS()
 {
     String ACSmode[] =
     {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, ACSmode[MorsePreferences::prefs.ACSlength]);
 }
 
-void MorsePreferencesMenu::internal::displayPitch()
+void internal::displayPitch()
 {
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%3i", notes[MorsePreferences::prefs.sidetoneFreq]);
 }
 
-void MorsePreferencesMenu::internal::displayClicks()
+void internal::displayClicks()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.encoderClicks ? "On " : "Off");
 }
 
-void MorsePreferencesMenu::internal::displayExtPaddles()
+void internal::displayExtPaddles()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.useExtPaddle ? "Reversed    " : "Normal      ");
 }
 
-void MorsePreferencesMenu::internal::displayPolarity()
+void internal::displayPolarity()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.didah ? ".- di-dah  " : "-. dah-dit ");
 }
 
-void MorsePreferencesMenu::internal::displayLatency()
+void internal::displayLatency()
 {
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%1i/8 of dit", MorsePreferences::prefs.latency - 1);
 }
-void MorsePreferencesMenu::internal::displayInterWordSpace()
+void internal::displayInterWordSpace()
 {
     // display interword space in ditlengths
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i", MorsePreferences::prefs.interWordSpace);
 }
 
-void MorsePreferencesMenu::internal::displayInterCharSpace()
+void internal::displayInterCharSpace()
 {
     // display intercharacter space in ditlengths
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i", MorsePreferences::prefs.interCharSpace);
 }
 
-void MorsePreferencesMenu::internal::displayRandomOption()
+void internal::displayRandomOption()
 {
     String texts[] =
     {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ", "Interp+ProSn",
@@ -263,7 +263,7 @@ void MorsePreferencesMenu::internal::displayRandomOption()
     MorseDisplay::printOnScroll(2, REGULAR, 1, texts[MorsePreferences::prefs.randomOption]);
 }
 
-void MorsePreferencesMenu::internal::displayRandomLength()
+void internal::displayRandomLength()
 {
     // display length of random character groups - 2 - 6
     if (MorsePreferences::prefs.randomLength <= 6) {
@@ -274,7 +274,7 @@ void MorsePreferencesMenu::internal::displayRandomLength()
     }
 }
 
-void MorsePreferencesMenu::internal::displayCallLength()
+void internal::displayCallLength()
 {
     // display length of calls - 3 - 6, 0 = all
     if (MorsePreferences::prefs.callLength == 0)
@@ -285,7 +285,7 @@ void MorsePreferencesMenu::internal::displayCallLength()
     }
 }
 
-void MorsePreferencesMenu::internal::displayAbbrevLength()
+void internal::displayAbbrevLength()
 {
     // display length of abbrev - 2 - 6, 0 = all
     if (MorsePreferences::prefs.abbrevLength == 0)
@@ -296,7 +296,7 @@ void MorsePreferencesMenu::internal::displayAbbrevLength()
     }
 }
 
-void MorsePreferencesMenu::internal::displayWordLength()
+void internal::displayWordLength()
 {
     // display length of english words - 2 - 6, 0 = all
     if (MorsePreferences::prefs.wordLength == 0)
@@ -307,7 +307,7 @@ void MorsePreferencesMenu::internal::displayWordLength()
     }
 }
 
-void MorsePreferencesMenu::internal::displayMaxSequence()
+void internal::displayMaxSequence()
 {
     // display max # of words; 0 = no limit, 5, 10, 15, 20... 250; 255 = no limit
     if ((MorsePreferences::prefs.maxSequence == 0) || (MorsePreferences::prefs.maxSequence == 255))
@@ -318,7 +318,7 @@ void MorsePreferencesMenu::internal::displayMaxSequence()
     }
 }
 
-void MorsePreferencesMenu::internal::displayTrainerDisplay()
+void internal::displayTrainerDisplay()
 {
     switch (MorsePreferences::prefs.trainerDisplay)
     {
@@ -334,7 +334,7 @@ void MorsePreferencesMenu::internal::displayTrainerDisplay()
     }
 }
 
-void MorsePreferencesMenu::internal::displayEchoDisplay()
+void internal::displayEchoDisplay()
 {
     switch (MorsePreferences::prefs.echoDisplay)
     {
@@ -350,7 +350,7 @@ void MorsePreferencesMenu::internal::displayEchoDisplay()
 
     }
 }
-void MorsePreferencesMenu::internal::displayKeyTrainerMode()
+void internal::displayKeyTrainerMode()
 {
     String option;
     switch (MorsePreferences::prefs.keyTrainerMode)
@@ -368,7 +368,7 @@ void MorsePreferencesMenu::internal::displayKeyTrainerMode()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void MorsePreferencesMenu::internal::displayLoraTrainerMode()
+void internal::displayLoraTrainerMode()
 {
     String option;
     switch (MorsePreferences::prefs.loraTrainerMode)
@@ -383,7 +383,7 @@ void MorsePreferencesMenu::internal::displayLoraTrainerMode()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void MorsePreferencesMenu::internal::displayLoraSyncW()
+void internal::displayLoraSyncW()
 {
     String option;
     switch (MorsePreferences::prefs.loraSyncW)
@@ -398,7 +398,7 @@ void MorsePreferencesMenu::internal::displayLoraSyncW()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void MorsePreferencesMenu::internal::displayEchoRepeats()
+void internal::displayEchoRepeats()
 {
     if (MorsePreferences::prefs.echoRepeats < 7)
     {
@@ -408,7 +408,7 @@ void MorsePreferencesMenu::internal::displayEchoRepeats()
         MorseDisplay::printOnScroll(2, REGULAR, 1, "Forever");
 }
 
-void MorsePreferencesMenu::internal::displayEchoToneShift()
+void internal::displayEchoToneShift()
 {
     String option;
     switch (MorsePreferences::prefs.echoToneShift)
@@ -425,12 +425,12 @@ void MorsePreferencesMenu::internal::displayEchoToneShift()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void MorsePreferencesMenu::internal::displayEchoConf()
+void internal::displayEchoConf()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.echoConf ? "On " : "Off");
 }
 
-void MorsePreferencesMenu::internal::displayKochFilter()
+void internal::displayKochFilter()
 {                          // const String kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:";
     String str;
     str.reserve(6);
@@ -439,17 +439,17 @@ void MorsePreferencesMenu::internal::displayKochFilter()
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i %s   ", MorsePreferences::prefs.kochFilter, str.c_str());
 }
 
-void MorsePreferencesMenu::internal::displayWordDoubler()
+void internal::displayWordDoubler()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.wordDoubler ? "On  " : "Off ");
 }
 
-void MorsePreferencesMenu::internal::displayRandomFile()
+void internal::displayRandomFile()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.randomFile ? "On  " : "Off ");
 }
 
-void MorsePreferencesMenu::internal::displayGoertzelBandwidth()
+void internal::displayGoertzelBandwidth()
 {
     String option;
     switch (MorsePreferences::prefs.goertzelBandwidth)
@@ -464,17 +464,17 @@ void MorsePreferencesMenu::internal::displayGoertzelBandwidth()
     MorseDisplay::printOnScroll(2, REGULAR, 1, option);
 }
 
-void MorsePreferencesMenu::internal::displaySpeedAdapt()
+void internal::displaySpeedAdapt()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.speedAdapt ? "ON         " : "OFF        ");
 }
 
-void MorsePreferencesMenu::internal::displayKochSeq()
+void internal::displayKochSeq()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.lcwoKochSeq ? "LCWO      " : "M32 / JLMC");
 }
 
-void MorsePreferencesMenu::internal::displayTimeOut()
+void internal::displayTimeOut()
 {
     String TOValue;
 
@@ -496,12 +496,12 @@ void MorsePreferencesMenu::internal::displayTimeOut()
     MorseDisplay::printOnScroll(2, REGULAR, 1, TOValue);
 }
 
-void MorsePreferencesMenu::internal::displayQuickStart()
+void internal::displayQuickStart()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.quickStart ? "ON         " : "OFF        ");
 }
 
-void MorsePreferencesMenu::internal::displayLoraBand()
+void internal::displayLoraBand()
 {
     String bandName;
     switch (MorsePreferences::prefs.loraBand)
@@ -519,7 +519,7 @@ void MorsePreferencesMenu::internal::displayLoraBand()
     MorseDisplay::printOnScroll(2, REGULAR, 1, bandName);
 }
 
-void MorsePreferencesMenu::internal::displayLoraQRG()
+void internal::displayLoraQRG()
 {
     const int a = (int) QRG433;
     const int b = (int) QRG866;
@@ -539,7 +539,7 @@ void MorsePreferencesMenu::internal::displayLoraQRG()
     }
 }
 
-void MorsePreferencesMenu::internal::displaySnapRecall()
+void internal::displaySnapRecall()
 {
     if (MorsePreferences::memCounter)
     {
@@ -554,7 +554,7 @@ void MorsePreferencesMenu::internal::displaySnapRecall()
         MorseDisplay::printOnScroll(2, REGULAR, 1, "NO SNAPSHOTS");
 }
 
-void MorsePreferencesMenu::internal::displaySnapStore()
+void internal::displaySnapStore()
 {
     uint8_t mask = 1;
     mask = mask << MorsePreferences::memPtr;
@@ -819,7 +819,6 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     }
                     internal::displayLoraQRG();
                     break;
-                case MorsePreferences::posSnapRecall:
                 case MorsePreferences::posSnapRecall:
                     if (MorsePreferences::memCounter)
                     {

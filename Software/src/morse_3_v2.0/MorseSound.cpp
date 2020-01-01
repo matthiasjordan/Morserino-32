@@ -16,7 +16,6 @@ using namespace MorseSound;
     const int  dutyCycleTwentyPercent = 25;
     const int  dutyCycleZero = 0;
 
-    const int notes[] = {0, 233, 262, 294, 311, 349, 392, 440, 466, 523, 587, 622, 698, 784, 880, 932};
 
 
 

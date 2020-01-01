@@ -183,7 +183,7 @@ void generateCW () {          // this is called from loop() (frequently!)  and g
             if (silentEcho || stopFlag)                                             // we finished maxSequence and so do start output (otherwise we get a short click)
               ;
             else  {
-                keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
+                keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), MorseSound::notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
             }
             /* // replaced by the lines above, to also take care of maxSequence
             if ( ! (morseState == echoTrainer && MorsePreferences::prefs.echoDisplay == DISP_ONLY))
