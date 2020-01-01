@@ -45,7 +45,6 @@ float sine;
 float cosine;
 const float sampling_freq = 106000.0;
 const float target_freq = 698.0; /// adjust for your needs see above
-int goertzel_n = 152;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
                         ///// resulting bandwidth: 700, 350, 233 or 175 Hz, respectively
 float bw;
 

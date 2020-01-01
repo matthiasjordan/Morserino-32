@@ -20,6 +20,7 @@ namespace MorseGenerator {
        String clearText = "";
 
        int repeats = 0;
+       uint8_t wordCounter = 0;                          // for maxSequence
 
        int rxDitLength = 0;                    // set new value for length of dits and dahs and other timings
        int rxDahLength = 0;

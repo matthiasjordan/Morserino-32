@@ -106,6 +106,7 @@ namespace Decoder
     boolean speedChanged = true;
 
     unsigned long interWordTimer = 0;      // timer to detect interword spaces
+    int goertzel_n = 152;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
 
 
 

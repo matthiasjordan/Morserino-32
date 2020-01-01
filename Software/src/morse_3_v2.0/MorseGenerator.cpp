@@ -18,7 +18,6 @@
 using namespace MorseGenerator;
 
 boolean firstTime = true;                         /// for word doubler mode
-uint8_t wordCounter = 0;                          // for maxSequence
 const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 //                      0....5....1....5....2....5....3....5....4....5....5...
 // we use substrings as char pool for trainer mode

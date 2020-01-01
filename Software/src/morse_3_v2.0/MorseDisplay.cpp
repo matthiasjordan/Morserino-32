@@ -25,7 +25,6 @@ using namespace MorseDisplay;
 ////////////////////////////// New scrolling display
 
 /// circular buffer: 14 chars by NoOfLines lines (bottom 3 are visible)
-#define NoOfLines 15
 #define NoOfCharsPerLine 14
 #define SCROLL_TOP 15
 #define LINE_HEIGHT 16
@@ -34,10 +33,7 @@ char textBuffer[NoOfLines][2 * NoOfCharsPerLine + 1]; /// we need extra room for
                                                       /// and 0 terminator
 
 uint8_t linePointer = 0;    /// defines the current bottom line
-uint8_t bottomLine = 0;
 
-const int8_t maxPos = NoOfLines - 3;
-int8_t relPos = maxPos;
 
 #define lora_width 6        /// a simple logo that shows when we operate with loRa, stored in XBM format
 #define lora_height 11
@@ -637,4 +633,17 @@ void MorseDisplay::displayCWspeed() {
   MorseDisplay::printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
   MorseDisplay::printOnStatusLine(false, 10,  "WpM");
   MorseDisplay::display();
+}
+
+
+void MorseDisplay::showVolumeBar(uint16_t mini, uint16_t maxi) {
+    int a, b, c;
+    a = map(mini, 0, 4096, 0, 125);
+    b = map(maxi, 0, 4000, 0, 125);
+    c = b - a;
+    MorseDisplay::clearLine(2);
+    display.drawRect(5, SCROLL_TOP + 2 * LINE_HEIGHT +5, 102, LINE_HEIGHT-8);
+    display.drawRect(30, SCROLL_TOP + 2 * LINE_HEIGHT +5, 52, LINE_HEIGHT-8);
+    display.fillRect(a, SCROLL_TOP + 2 * LINE_HEIGHT + 7 , c, LINE_HEIGHT -11);
+    display.display();
 }

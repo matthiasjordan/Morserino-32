@@ -5,8 +5,15 @@
 //#include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
 #include "morsedefs.h"
 
+#define NoOfLines 15
+
 namespace MorseDisplay
 {
+
+    const int8_t maxPos = NoOfLines - 3;
+    int8_t relPos = maxPos;
+    uint8_t bottomLine = 0;
+
 
     void init();
     void displayStartUp();
@@ -40,6 +47,7 @@ namespace MorseDisplay
     void drawInputStatus( boolean on);
     void displayTopLine();
     void displayCWspeed();
+    void showVolumeBar(uint16_t mini, uint16_t maxi);
 
 }
 
