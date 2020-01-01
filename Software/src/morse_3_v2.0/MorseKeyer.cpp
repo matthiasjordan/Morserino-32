@@ -10,7 +10,7 @@
 using namespace MorseKeyer;
 
 
-namespace MorseKeyer::internal {
+namespace internal {
 
     void updatePaddleLatch(boolean dit, boolean dah);
     void setDITstate();
@@ -27,7 +27,7 @@ unsigned int rUntouched = 0;
 
 
 void setup() {
-    MorseKeyer::internal::initSensors();
+    internal::initSensors();
 }
 
 void updateTimings() {
@@ -304,7 +304,7 @@ boolean MorseKeyer::checkPaddles() {
 ///
 
 // update the paddle latches in keyerControl
-void MorseKeyer::internal::updatePaddleLatch(boolean dit, boolean dah)
+void internal::updatePaddleLatch(boolean dit, boolean dah)
 {
     if (dit)
       keyerControl |= DIT_L;
@@ -319,14 +319,14 @@ void MorseKeyer::clearPaddleLatches ()
 }
 
 // functions to set DIT and DAH keyer states
-void MorseKeyer::internal::setDITstate() {
+void internal::setDITstate() {
   keyerState = DIT;
   Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
   if (MorseMachine::isMode(MorseMachine::loraTrx))
       MorseLoRa::cwForLora(1);                         // build compressed string for LoRA
 }
 
-void MorseKeyer::internal::setDAHstate() {
+void internal::setDAHstate() {
   keyerState = DAH;
   Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
   if (MorseMachine::isMode(MorseMachine::loraTrx))
@@ -341,7 +341,7 @@ void MorseKeyer::internal::setDAHstate() {
 /// 0 = nothing touched,  1= right touched, 2 = left touched, 3 = both touched
 /// binary:   00          01                10                11
 
-uint8_t MorseKeyer::internal::readSensors(int left, int right) {
+uint8_t internal::readSensors(int left, int right) {
   //static boolean first = true;
   uint8_t v, lValue, rValue;
 
@@ -377,7 +377,7 @@ uint8_t MorseKeyer::internal::readSensors(int left, int right) {
 }
 
 
-void MorseKeyer::internal::initSensors() {
+void internal::initSensors() {
   int v;
   lUntouched = rUntouched = 60;       /// new: we seek minimum
   for (int i=0; i<8; ++i) {

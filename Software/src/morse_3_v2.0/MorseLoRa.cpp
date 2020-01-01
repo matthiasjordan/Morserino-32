@@ -6,9 +6,9 @@
 #include "morsedefs.h"
 #include "MorseDisplay.h"
 #include "MorsePreferences.h"
+#include "MorsePreferencesMenu.h"
 #include "MorseMachine.h"
 #include "MorseLoRa.h"
-#include "menu.h"
 
 using namespace MorseLoRa;
 
@@ -74,10 +74,10 @@ void MorseLoRa::idle() {
 //////// System Setup / LoRa Setup ///// Called when BALCK knob is pressed @ startup
 
 void MorseLoRa::internal::loraSystemSetup() {
-    Menu::displayKeyerPreferencesMenu(MorsePreferences::posLoraBand);
-    Menu::adjustKeyerPreference(MorsePreferences::posLoraBand);
-    Menu::displayKeyerPreferencesMenu(MorsePreferences::posLoraQRG);
-    Menu::adjustKeyerPreference(MorsePreferences::posLoraQRG);
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posLoraBand);
+    MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posLoraBand);
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posLoraQRG);
+    MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posLoraQRG);
     /// now store chosen values in Preferences
 
     MorsePreferences::writeLoRaPrefs(MorsePreferences::prefs.loraBand, MorsePreferences::prefs.loraQRG);
@@ -148,7 +148,7 @@ void sendWithLora() {           // hand this string over as payload to the LoRA 
   LoRa.beginPacket();
   LoRa.print(loraTxBuffer);
   LoRa.endPacket();
-  if (MorseMachine::isMode(loraTrx))
+  if (MorseMachine::isMode(MorseMachine::loraTrx))
       LoRa.receive();
 }
 

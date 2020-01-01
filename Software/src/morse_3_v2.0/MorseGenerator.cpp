@@ -105,19 +105,19 @@ const byte pool[][2]  = {
 
 
 
-namespace MorseGenerator::internal {
+namespace internal {
     void fetchNewWord();
     void dispGeneratedChar();
     String CWwordToClearText(String cwword);
-    String encodeProSigns( String &input );
+//    String encodeProSigns( String &input );
 
     String getRandomChars( int maxLength, int option);
     String getRandomCall( int maxLength);
     String getRandomWord( int maxLength);
     String getRandomAbbrev( int maxLength);
 
-    String cleanUpText(String w);
-    String utf8umlaut(String s);
+//    String cleanUpText(String w);
+//    String utf8umlaut(String s);
     String generateCWword(String symbols);
 }
 
@@ -447,7 +447,7 @@ void MorseGenerator::keyOut(boolean on,  boolean fromHere, int f, int volume) {
 /////// generate CW representations from its input string
 /////// CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
-String MorseGenerator::internal::generateCWword(String symbols) {
+String internal::generateCWword(String symbols) {
   int pointer;
   byte bitMask, NoE;
   //byte nextElement[8];      // the list of elements; 0 = dit, 1 = dah
@@ -480,7 +480,7 @@ String MorseGenerator::internal::generateCWword(String symbols) {
 /// add code to display in echo mode when parameter is so set
 /// MorsePreferences::prefs.echoDisplay 1 = CODE_ONLY 2 = DISP_ONLY 3 = CODE_AND_DISP
 
-void MorseGenerator::internal::dispGeneratedChar() {
+void internal::dispGeneratedChar() {
   static String charString;
   charString.reserve(10);
 
@@ -522,7 +522,7 @@ void MorseGenerator::internal::dispGeneratedChar() {
 
   //  {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO}
 
-String MorseGenerator::internal::getRandomChars( int maxLength, int option) {             /// random char string, eg. group of 5, 9 differing character pools; maxLength = 1-6
+String internal::getRandomChars( int maxLength, int option) {             /// random char string, eg. group of 5, 9 differing character pools; maxLength = 1-6
   String result = ""; String pool;
   int s = 0, e = 50;
   int i;
@@ -564,7 +564,7 @@ String MorseGenerator::internal::getRandomChars( int maxLength, int option) {   
 }
 
 
-String MorseGenerator::internal::getRandomCall( int maxLength) {            // random call-sign like pattern, maxLength = 3 - 6, 0 returns any length
+String internal::getRandomCall( int maxLength) {            // random call-sign like pattern, maxLength = 3 - 6, 0 returns any length
   const byte prefixType[] = {1,0,1,2,3,1};         // 0 = a, 1 = aa, 2 = a9, 3 = 9a
   byte prefix;
   String call = "";
@@ -624,7 +624,7 @@ String MorseGenerator::internal::getRandomCall( int maxLength) {            // r
 }
 
 
-String MorseGenerator::internal::getRandomWord( int maxLength) {        //// give me a random English word, max maxLength chars long (1-5) - 0 returns any length
+String internal::getRandomWord( int maxLength) {        //// give me a random English word, max maxLength chars long (1-5) - 0 returns any length
   if (maxLength > 5)
     maxLength = 0;
     if (Koch::isKochActive())
@@ -633,7 +633,7 @@ String MorseGenerator::internal::getRandomWord( int maxLength) {        //// giv
         return EnglishWords::getRandomWord(maxLength);
 }
 
-String MorseGenerator::internal::getRandomAbbrev( int maxLength) {        //// give me a random CW abbreviation , max maxLength chars long (1-5) - 0 returns any length
+String internal::getRandomAbbrev( int maxLength) {        //// give me a random CW abbreviation , max maxLength chars long (1-5) - 0 returns any length
   if (maxLength > 5)
     maxLength = 0;
     if (Koch::isKochActive())
