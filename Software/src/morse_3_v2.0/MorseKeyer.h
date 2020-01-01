@@ -6,12 +6,17 @@
 // defines for keyer modi
 //
 
-#define    IAMBICA      1          // Curtis Mode A
-#define    IAMBICB      2          // Curtis Mode B (with enhanced Curtis timing, set as parameter
-#define    ULTIMATIC    3          // Ultimatic mode
-#define    NONSQUEEZE   4          // Non-squeeze mode of dual-lever paddles - simulate a single-lever paddle
 
 namespace MorseKeyer {
+
+#define    IAMBICA      1
+// Curtis Mode A
+#define    IAMBICB      2
+// Curtis Mode B (with enhanced Curtis timing, set as parameter
+#define    ULTIMATIC    3
+// Ultimatic mode
+#define    NONSQUEEZE   4
+// Non-squeeze mode of dual-lever paddles - simulate a single-lever paddle
 
     ///////////////////////////////////////////////////////////////////////////////
     //

@@ -220,7 +220,7 @@ const String words[WORDS_NUMBER_OF_ELEMENTS]  = {
 };
 
 
-String EnglishWords::getRandomWord(int maxLength);
+String getRandomWord(int maxLength);
 
 }
 

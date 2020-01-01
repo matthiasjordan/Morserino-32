@@ -20,6 +20,7 @@
 #include "MorseSystem.h"
 #include "MorseMachine.h"
 #include "MorseGenerator.h"
+#include "MorseKeyer.h"
 
 using namespace MorseDisplay;
 
@@ -605,10 +606,10 @@ void MorseDisplay::displayTopLine() {
       MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
   else {
     switch (MorsePreferences::prefs.keyermode) {
-      case MorseKeyer::IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
-      case MorseKeyer::IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
-      case MorseKeyer::ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
-      case MorseKeyer::NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
+      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
+      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
+      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
+      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
     }
   }
 
@@ -631,7 +632,7 @@ void MorseDisplay::displayCWspeed() {
   MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
 
   sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
-  MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(speedSettingMode) ? true : false, 7,  numBuffer);
+  MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? true : false, 7,  numBuffer);
   MorseDisplay::printOnStatusLine(false, 10,  "WpM");
   MorseDisplay::displayDisplay();
 }

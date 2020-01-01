@@ -65,7 +65,7 @@ void checkShutDown(boolean enforce)
 
     if ((millis() - TOTcounter) > timeOut || enforce == true)
     {
-        MorseDisplay::clearAll();
+        MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, INVERSE_BOLD, 0, "Power OFF...");
         MorseDisplay::printOnScroll(2, REGULAR, 0, "RED to turn ON");
         MorseDisplay::displayDisplay();

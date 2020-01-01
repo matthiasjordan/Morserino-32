@@ -257,7 +257,7 @@ const String abbreviations[ABBREV_NUMBER_OF_ELEMENTS]  = {
 };
 
 
-String Abbrev::getRandomAbbrev(int maxLength);
+String getRandomAbbrev(int maxLength);
 }
 
 #endif

@@ -13,8 +13,6 @@ using namespace MorseEchoTrainer;
 echoStates echoTrainerState = START_ECHO;
 
 
-namespace MorseEchoTrainer::internal {
-}
 
 boolean MorseEchoTrainer::isState(echoStates state) {
     return echoTrainerState == state;

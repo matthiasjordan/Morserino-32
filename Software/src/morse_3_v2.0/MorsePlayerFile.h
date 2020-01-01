@@ -11,7 +11,7 @@
 namespace MorsePlayerFile {
 
     void setup();
-    String MorsePlayerFile::getWord();
+    String getWord();
     void skipWords(uint32_t count);
 
 
