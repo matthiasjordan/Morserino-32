@@ -2,6 +2,8 @@
 #include "MorsePreferences.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
+#include "MorseDisplay.h"
+#include "MorseGenerator.h"
 
 
 
@@ -10,6 +12,11 @@ using namespace MorseEchoTrainer;
 
 echoStates echoTrainerState = START_ECHO;
 
+
+namespace MorseEchoTrainer::internal {
+    void changeSpeed( int t)
+    ;
+}
 
 boolean MorseEchoTrainer::isState(echoStates state) {
     return echoTrainerState == state;
@@ -44,29 +51,37 @@ void echoTrainerEval() {
       if (MorsePreferences::prefs.echoConf) {
           MorseSound::pwmTone(440,  MorsePreferences::prefs.sidetoneVolume, false);
           delay(97);
-          pwmNoTone();
-          pwmTone(587,  MorsePreferences::prefs.sidetoneVolume, false);
+          MorseSound::pwmNoTone();
+          MorseSound::pwmTone(587,  MorsePreferences::prefs.sidetoneVolume, false);
           delay(193);
-          pwmNoTone();
+          MorseSound::pwmNoTone();
       }
-      delay(interWordSpace);
+      delay(MorseKeyer::interWordSpace);
       if (MorsePreferences::prefs.speedAdapt)
-          changeSpeed(1);
+          internal::changeSpeed(1);
     } else {
       echoTrainerState = REPEAT_WORD;
-      if (generatorMode != KOCH_LEARN || echoResponse != "") {
+      if (MorseGenerator::generatorMode != MorseGenerator::KOCH_LEARN || echoResponse != "") {
           MorseDisplay::printToScroll(BOLD, "ERR");
           if (MorsePreferences::prefs.echoConf) {
-              pwmTone(311,  MorsePreferences::prefs.sidetoneVolume, false);
+              MorseSound::pwmTone(311,  MorsePreferences::prefs.sidetoneVolume, false);
               delay(193);
-              pwmNoTone();
+              MorseSound::pwmNoTone();
           }
       }
-      delay(interWordSpace);
+      delay(MorseKeyer::interWordSpace);
       if (MorsePreferences::prefs.speedAdapt)
-          changeSpeed(-1);
+          internal::changeSpeed(-1);
     }
     echoResponse = "";
-    clearPaddleLatches();
+    MorseKeyer::clearPaddleLatches();
 }   // end of function
 
+
+void MorseEchoTrainer::internal::changeSpeed( int t) {
+  MorsePreferences::prefs.wpm += t;
+  MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
+  MorseKeyer::updateTimings();
+  MorseDisplay::displayCWspeed();                     // update display of CW speed
+  MorsePreferences::charCounter = 0;                                    // reset character counter
+}

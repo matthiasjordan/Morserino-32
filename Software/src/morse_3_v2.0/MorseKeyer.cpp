@@ -13,7 +13,6 @@ using namespace MorseKeyer;
 namespace MorseKeyer::internal {
 
     void updatePaddleLatch(boolean dit, boolean dah);
-    void clearPaddleLatches ();
     void setDITstate();
     void setDAHstate();
 
@@ -110,7 +109,7 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
     /// first we check that we have waited as defined by ACS settings
             if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))  // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
               break;
-            internal::clearPaddleLatches();                           // always clear the paddle latches at beginning of new element
+            clearPaddleLatches();                           // always clear the paddle latches at beginning of new element
             keyerControl |= DIT_LAST;                        // remember that we process a DIT
 
             ktimer = ditLength;                              // prime timer for dit
@@ -130,7 +129,7 @@ boolean MorseKeyer::doPaddleIambic (boolean dit, boolean dah) {
     case DAH:
             if ( MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))  // if we do automatic character spacing, and haven't waited for 3 dits...
               break;
-            internal::clearPaddleLatches();                          // clear the paddle latches
+            clearPaddleLatches();                          // clear the paddle latches
             keyerControl &= ~(DIT_LAST);                    // clear dit latch  - we are not processing a DIT
 
             ktimer = dahLength;
@@ -310,7 +309,7 @@ void MorseKeyer::internal::updatePaddleLatch(boolean dit, boolean dah)
 }
 
 // clear the paddle latches in keyer control
-void MorseKeyer::internal::clearPaddleLatches ()
+void MorseKeyer::clearPaddleLatches ()
 {
     keyerControl &= ~(DIT_L + DAH_L);   // clear both paddle latch bits
 }

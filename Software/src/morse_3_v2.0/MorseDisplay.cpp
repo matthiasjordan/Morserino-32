@@ -592,3 +592,17 @@ void MorseDisplay::drawInputStatus( boolean on) {
   display.fillRect(1, 1, 20, 13);
   display.display();
 }
+
+
+void MorseDisplay::displayCWspeed () {
+  if (( morseState == morseGenerator || morseState ==  echoTrainer ))
+      sprintf(numBuffer, "(%2i)", effWpm);
+  else sprintf(numBuffer, "    ");
+
+  MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
+
+  sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
+  MorseDisplay::printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
+  MorseDisplay::printOnStatusLine(false, 10,  "WpM");
+  MorseDisplay::display();
+}

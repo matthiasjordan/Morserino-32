@@ -47,6 +47,7 @@ void updateTimings();
 void keyTransmitter();
 boolean doPaddleIambic(boolean dit, boolean dah);
 boolean checkPaddles();
+void clearPaddleLatches ();
 
 
 }

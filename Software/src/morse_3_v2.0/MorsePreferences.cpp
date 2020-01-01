@@ -14,7 +14,6 @@ Preferences pref;               // use the Preferences library for storing and r
 
 using namespace MorsePreferences;
 
-unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
 //MorsePrefs prefs;
 

@@ -514,18 +514,6 @@ void displayTopLine() {
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
 
-void displayCWspeed () {
-  if (( morseState == morseGenerator || morseState ==  echoTrainer )) 
-      sprintf(numBuffer, "(%2i)", effWpm);   
-  else sprintf(numBuffer, "    ");
-  
-  MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
-  
-  sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
-  MorseDisplay::printOnStatusLine(encoderState == speedSettingMode ? true : false, 7,  numBuffer);
-  MorseDisplay::printOnStatusLine(false, 10,  "WpM");
-  MorseDisplay::display();
-}
 
 
 
@@ -540,13 +528,6 @@ void displayCWspeed () {
 
 
 
-void changeSpeed( int t) {
-  MorsePreferences::prefs.wpm += t;
-  MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
-  updateTimings();
-  displayCWspeed();                     // update display of CW speed
-  charCounter = 0;                                    // reset character counter
-}
 
 
 

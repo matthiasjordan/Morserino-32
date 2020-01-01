@@ -38,7 +38,7 @@ namespace MorseDisplay
     void dispLoraLogo();
     void updateSMeter(int rssi);
     void drawInputStatus( boolean on);
-
+    void MorseDisplay::displayCWspeed ();
 
 }
 

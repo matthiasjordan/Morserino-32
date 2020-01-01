@@ -182,6 +182,7 @@ namespace MorsePreferences
     prefPos *currentOptions = allOptions;
 
     int currentOptionSize;
+    unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
 
     MorsePrefs readPreferences(String repository);
