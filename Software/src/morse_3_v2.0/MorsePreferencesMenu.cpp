@@ -846,7 +846,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
 ////// setup preferences ///////
 
 
-boolean setupPreferences(uint8_t atMenu) {
+boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
   // enum morserinoMode {morseKeyer, loraTrx, morseGenerator, echoTrainer, shutDown, morseDecoder, invalid };
   static int oldPos = 1;
   int t;

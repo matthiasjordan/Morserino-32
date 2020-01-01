@@ -26,6 +26,10 @@ unsigned int lUntouched = 0;                        // sensor values (in untouch
 unsigned int rUntouched = 0;
 
 
+void setup() {
+    MorseKeyer::internal::initSensors();
+}
+
 void updateTimings() {
   ditLength = 1200 / MorsePreferences::prefs.wpm;                    // set new value for length of dits and dahs and other timings
   dahLength = 3 * ditLength;

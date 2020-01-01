@@ -61,6 +61,7 @@
 #include "MorsePlayerFile.h"
 #include "MorseKeyer.h"
 #include "decoder.h"
+#include "MorseMenu.h"
 
 
 
@@ -200,7 +201,7 @@ MorseRotaryEncoder::setup();
 
 
   // to calibrate sensors, we record the values in untouched state
-  initSensors();
+  MorseKeyer::setup();
   
   // read preferences from non-volatile storage
   // if version cannot be read, we have a new ESP32 and need to write the preferences first
@@ -223,7 +224,7 @@ MorsePlayerFile::setup();
 
   ////
 
-  menu_();
+  MorseMenu::menu_();
 } /////////// END setup()
 
 
@@ -243,29 +244,29 @@ void loop() {
    int t;
 
    boolean activeOld = active;
-   checkPaddles();
+   MorseKeyer::checkPaddles();
    switch (MorseMachine::getMode()) {
-      case MorseMachine::morseKeyer:    if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
+      case MorseMachine::morseKeyer:    if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }
                           break;
-      case MorseMachine::loraTrx:      if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
+      case MorseMachine::loraTrx:      if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }
                           MorseGenerator::generateCW();
                           break;
-      case MorseMachine::morseTrx:      if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
+      case MorseMachine::morseTrx:      if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
                                return;                                                        // we are busy keying and so need a very tight loop !
                           }  
                           Decoder::doDecode();
                           if (Decoder::speedChanged) {
                             Decoder::speedChanged = false;
-                            displayCWspeed();
+                            MorseDisplay::displayCWspeed();
                           }
                           break;    
       case MorseMachine::morseGenerator:  if ((autoStop == stop1) || MorseKeyer::leftKey  || MorseKeyer::rightKey)   {                                    // touching a paddle starts and stops the generation of code
                           // for debouncing:
-                          while (checkPaddles() )
+                          while (MorseKeyer::checkPaddles() )
                               ;                                                           // wait until paddles are released
 
                           if (effectiveAutoStop) {
@@ -320,7 +321,7 @@ void loop() {
                           }
                           if (!active && (MorseKeyer::leftKey  || MorseKeyer::rightKey))   {                       // touching a paddle starts  the generation of code
                               // for debouncing:
-                              while (checkPaddles() )
+                              while (MorseKeyer::checkPaddles() )
                                   ;                                                           // wait until paddles are released
                               active = !active;
              
@@ -332,19 +333,20 @@ void loop() {
                             case  SEND_WORD:
                             case  REPEAT_WORD:  echoResponse = ""; MorseGenerator::generateCW();
                                                 break;
-                            case  EVAL_ANSWER:  echoTrainerEval();
+                            case  EVAL_ANSWER:  MorseEchoTrainer::echoTrainerEval();
                                                 break;
                             case  COMPLETE_ANSWER:                    
-                            case  GET_ANSWER:   if (doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+                            case  GET_ANSWER:   if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
                                                     return;                             // we are busy keying and so need a very tight loop !
                                                 break;
                             }                              
                             break;
-      case MorseMachine::morseDecoder: doDecode();
+      case MorseMachine::morseDecoder: Decoder::doDecode();
                          if (speedChanged) {
                             speedChanged = false;
-                            displayCWspeed();
+                            MorseDisplay::displayCWspeed();
                           }
+                         break;
       default:            break;
             
                         
@@ -369,7 +371,7 @@ void loop() {
                 } else if (encoderState == volumeSettingMode && morseState != morseDecoder) {          //  single click toggles encoder between speed and volume
                   encoderState = speedSettingMode;
                   MorsePreferences::writeVolume();
-                  displayCWspeed();
+                  MorseDisplay::displayCWspeed();
                   MorseDisplay::displayVolume();
                 }
                 else {
@@ -392,9 +394,9 @@ void loop() {
     }
    
     switch (modeButton.clicks) {                                // actions based on enocder button
-       case -1:   menu_();                                       // long click exits current mode and goes to top menu
+       case -1:   MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
                   return;
-       case 1:    if (morseState == morseGenerator || morseState == echoTrainer) {//  start/stop in trainer modi, in others does nothing currently
+       case 1:    if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)) {//  start/stop in trainer modi, in others does nothing currently
                   active = !active;
                   if (!active) {
                         //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
@@ -408,10 +410,10 @@ void loop() {
                         
               }
               break;
-       case 2:  setupPreferences(MorsePreferences::prefs.menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
+       case 2:  MorsePreferencesMenu::setupPreferences(MorsePreferences::prefs.menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
                 MorseDisplay::clear();                                  // restore display
-                displayTopLine();
-                if (morseState == morseGenerator || morseState == echoTrainer) 
+                MorseDisplay::displayTopLine();
+                if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
                     stopFlag = true;                                  // we stop what we had been doing
                 else
                     stopFlag = false;
@@ -426,13 +428,13 @@ void loop() {
         MorseUI::click();
         switch (encoderState) {
           case speedSettingMode:  
-                                  changeSpeed(t);
+                                  MorseEchoTrainer::changeSpeed(t);
                                   break;
           case volumeSettingMode: 
                                   MorsePreferences::prefs.sidetoneVolume += (t*10)+11;
                                   MorsePreferences::prefs.sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) -11;
                                   //Serial.println(MorsePreferences::prefs.sidetoneVolume);
-                                  displayVolume();
+                                  MorseDisplay::displayVolume();
                                   break;
           case scrollMode:
                                   if (t == 1 && relPos < maxPos ) {        // up = scroll towards bottom
@@ -464,7 +466,7 @@ void cleanStartSettings() {
     genTimer = millis()-1;                       // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc... 
     wordCounter = 0;                             // reset word counter for maxSequence
     startFirst = true;
-    displayTopLine();
+    MorseDisplay::displayTopLine();
 }
 
 
@@ -472,47 +474,15 @@ void cleanStartSettings() {
 
 
 // toggle polarity of paddles
-void togglePolarity () {
-      MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;
-     //displayPolarity();
-}
+//void togglePolarity () {
+//      MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;
+//     //displayPolarity();
+//}
   
 
 
 
 
-
-//////// Display the status line in CW Keyer Mode
-//////// Layout of top line:
-//////// Tch ul 15 WpM
-//////// 0    5    0
-
-void displayTopLine() {
-    MorseDisplay::clearStatusLine();
-
-  // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
-  if (morseState == morseGenerator) 
-      MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
-  else {
-    switch (MorsePreferences::prefs.keyermode) {
-      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
-      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
-      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
-      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
-    }
-  }
-
-  displayCWspeed();                                     // update display of CW speed
-  if ((morseState == loraTrx ) || (morseState == morseGenerator  && MorsePreferences::prefs.loraTrainerMode == true))
-      dispLoraLogo();
-
-  MorseDisplay::displayVolume();                                     // sidetone volume
-  MorseDisplay::display();
-}
-
-
-//////// Display the current CW speed
-/////// pos 7-8, "Wpm" on 10-12
 
 
 

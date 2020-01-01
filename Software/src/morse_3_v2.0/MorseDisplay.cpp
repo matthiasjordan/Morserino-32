@@ -594,8 +594,40 @@ void MorseDisplay::drawInputStatus( boolean on) {
 }
 
 
-void MorseDisplay::displayCWspeed () {
-  if (( morseState == morseGenerator || morseState ==  echoTrainer ))
+
+//////// Display the status line in CW Keyer Mode
+//////// Layout of top line:
+//////// Tch ul 15 WpM
+//////// 0    5    0
+
+void MorseDisplay::displayTopLine() {
+    MorseDisplay::clearStatusLine();
+
+  // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
+  if (morseState == morseGenerator)
+      MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
+  else {
+    switch (MorsePreferences::prefs.keyermode) {
+      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
+      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
+      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
+      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
+    }
+  }
+
+  displayCWspeed();                                     // update display of CW speed
+  if ((morseState == loraTrx ) || (morseState == morseGenerator  && MorsePreferences::prefs.loraTrainerMode == true))
+      dispLoraLogo();
+
+  MorseDisplay::displayVolume();                                     // sidetone volume
+  MorseDisplay::display();
+}
+
+
+//////// Display the current CW speed
+/////// pos 7-8, "Wpm" on 10-12
+void MorseDisplay::displayCWspeed() {
+  if ((MorseMachine::isMode(morseGenerator) || MorseMachine::isMode(echoTrainer) ))
       sprintf(numBuffer, "(%2i)", effWpm);
   else sprintf(numBuffer, "    ");
 

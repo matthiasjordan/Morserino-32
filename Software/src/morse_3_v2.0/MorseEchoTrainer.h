@@ -22,6 +22,8 @@ namespace MorseEchoTrainer {
     boolean isState(echoStates state);
     void setState(echoStates newState);
     echoStates getState();
+    void changeSpeed( int t);
+
 }
 
 

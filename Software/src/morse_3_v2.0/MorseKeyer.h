@@ -42,7 +42,7 @@ unsigned int effWpm;                                // calculated effective spee
 
 boolean keyTx = false;             // when state is set by manual key or touch paddle, then true!
                                    // we use this to decide if Tx should be keyed or not
-
+void setup();
 void updateTimings();
 void keyTransmitter();
 boolean doPaddleIambic(boolean dit, boolean dah);

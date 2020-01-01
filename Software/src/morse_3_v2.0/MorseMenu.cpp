@@ -273,7 +273,7 @@ boolean MorseMenu::internal::menuExec() {                                       
                 MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer" );
                 delay(500);
                 MorseDisplay::clear();
-                displayTopLine();
+                MorseDisplay::displayTopLine();
                 MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 clearPaddleLatches();
                 keyTx = true;
@@ -323,7 +323,7 @@ boolean MorseMenu::internal::menuExec() {                                       
                 MorseDisplay::printOnScroll(2, REGULAR, 0, "Paddle | BLACK");
                 delay(1250);
                 MorseDisplay::clear();
-                displayTopLine();
+                MorseDisplay::displayTopLine();
                 MorseDisplay::clearScroll();      // clear the buffer
                 keyTx = true;
                 return true;
@@ -356,7 +356,7 @@ boolean MorseMenu::internal::menuExec() {                                       
                 MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
                 delay(1250);
                 MorseDisplay::clear();
-                displayTopLine();
+                MorseDisplay::displayTopLine();
                 MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 keyTx = false;
                 return true;
@@ -430,7 +430,7 @@ boolean MorseMenu::internal::menuExec() {                                       
                 MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx" );
                 delay(600);
                 MorseDisplay::clear();
-                displayTopLine();
+                MorseDisplay::displayTopLine();
                 MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
                 clearPaddleLatches();
                 keyTx = false;
@@ -462,7 +462,7 @@ boolean MorseMenu::internal::menuExec() {                                       
                 speedChanged = true;
                 delay(650);
                 MorseDisplay::clear();
-                displayTopLine();
+                MorseDisplay::displayTopLine();
                 drawInputStatus(false);
                 MorseDisplay::printToScroll(REGULAR,"");      // clear the buffer
 

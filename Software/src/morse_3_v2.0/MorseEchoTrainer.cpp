@@ -14,8 +14,6 @@ echoStates echoTrainerState = START_ECHO;
 
 
 namespace MorseEchoTrainer::internal {
-    void changeSpeed( int t)
-    ;
 }
 
 boolean MorseEchoTrainer::isState(echoStates state) {
@@ -58,7 +56,7 @@ void echoTrainerEval() {
       }
       delay(MorseKeyer::interWordSpace);
       if (MorsePreferences::prefs.speedAdapt)
-          internal::changeSpeed(1);
+          changeSpeed(1);
     } else {
       echoTrainerState = REPEAT_WORD;
       if (MorseGenerator::generatorMode != MorseGenerator::KOCH_LEARN || echoResponse != "") {
@@ -71,14 +69,14 @@ void echoTrainerEval() {
       }
       delay(MorseKeyer::interWordSpace);
       if (MorsePreferences::prefs.speedAdapt)
-          internal::changeSpeed(-1);
+          changeSpeed(-1);
     }
     echoResponse = "";
     MorseKeyer::clearPaddleLatches();
 }   // end of function
 
 
-void MorseEchoTrainer::internal::changeSpeed( int t) {
+void MorseEchoTrainer::changeSpeed( int t) {
   MorsePreferences::prefs.wpm += t;
   MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
   MorseKeyer::updateTimings();
