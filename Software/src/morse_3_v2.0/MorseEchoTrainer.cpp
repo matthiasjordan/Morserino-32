@@ -10,10 +10,11 @@
 
 using namespace MorseEchoTrainer;
 
-String echoResponse = "";
+String MorseEchoTrainer::echoResponse = "";
 echoStates echoTrainerState = START_ECHO;
-boolean echoStop = false;                         // for maxSequence
-boolean active = false;                           // flag for trainer mode
+boolean MorseEchoTrainer::echoStop = false;                         // for maxSequence
+boolean MorseEchoTrainer::active = false;                           // flag for trainer mode
+String MorseEchoTrainer::echoTrainerWord;
 
 
 

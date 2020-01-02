@@ -10,8 +10,8 @@ using namespace MorseUI;
 
 
 // define the buttons for the clickbutton library
-ClickButton modeButton(modeButtonPin);  // initialize mode button
-ClickButton volButton(volButtonPin);    // external pullup for this one
+ClickButton MorseUI::modeButton(modeButtonPin);  // initialize mode button
+ClickButton MorseUI::volButton(volButtonPin);    // external pullup for this one
 
 
 void MorseUI::setup() {

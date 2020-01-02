@@ -6,14 +6,14 @@
 using namespace MorseRotaryEncoder;
 
 
-portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE MorseRotaryEncoder::mux = portMUX_INITIALIZER_UNLOCKED;
 
 
-volatile int8_t _oldState;
-volatile int8_t encoderPos = 0;
+volatile int8_t MorseRotaryEncoder::_oldState;
+volatile int8_t MorseRotaryEncoder::encoderPos = 0;
 volatile uint64_t IRTime = 0;   // interrupt time
 const int encoderWaitTime = 100 ;         // how long to wait for next reading from encoder in microseconds
-volatile uint8_t stateRegister = 0;
+volatile uint8_t MorseRotaryEncoder::stateRegister = 0;
 
 
 void MorseRotaryEncoder::setup() {

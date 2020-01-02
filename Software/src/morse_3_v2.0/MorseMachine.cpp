@@ -3,9 +3,9 @@
 
 using namespace MorseMachine;
 
-encoderMode encoderState = speedSettingMode;    // we start with adjusting the speed
+encoderMode MorseMachine::encoderState = speedSettingMode;    // we start with adjusting the speed
 
-morserinoMode morseState = morseKeyer;
+morserinoMode MorseMachine::morseState = morseKeyer;
 
 
 

@@ -33,7 +33,7 @@ namespace MorseKeyer {
 
 //  Global Keyer Variables
 //
-unsigned char keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
+extern unsigned char keyerControl; // this holds the latches for the paddles and the DIT_LAST latch, see above
 
 
 extern boolean DIT_FIRST; // first latched was dit?

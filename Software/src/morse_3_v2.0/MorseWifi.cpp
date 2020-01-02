@@ -15,9 +15,158 @@
 /// stuff using WiFi - ask for access point credentials, upload player file, do OTA software update
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
+WebServer MorseWifi::server(80);    // Create a webserver object that listens for HTTP request on port 80
 
-File fsUploadFile;              // a File object to temporarily store the received file
+File MorseWifi::fsUploadFile;              // a File object to temporarily store the received file
+
+
+const char* MorseWifi::host = "m32";               // hostname of the webserver
+
+
+/// WiFi constants
+const char* MorseWifi::ssid = "morserino";
+const char* MorseWifi::password = "";
+
+
+                          // HTML for the AP server - ued to get SSID and Password for local WiFi network - needed for file upload and OTA SW updates
+const char* MorseWifi::myForm = "<html><head><meta charset='utf-8'><title>Get AP Info</title><style> form {width: 420px;}div { margin-bottom: 20px;}"
+                "label {display: inline-block; width: 240px; text-align: right; padding-right: 10px;} button, input {float: right;}</style>"
+                "</head><body>"
+                "<form action='/set' method='get'><div>"
+                "<label for='ssid'>SSID of WiFi network?</label>"
+                "<input name='ssid' id='ssid' ></div> <div>"
+                "<label for='pw'>WiFi Password?</label> <input name='pw' id='pw'>"
+                "</div><div><button>Submit</button></div></form></body></html>";
+
+
+
+/*
+ * HTML for Upload Login page
+ */
+
+const char* MorseWifi::uploadLoginIndex =
+ "<form name='loginForm'>"
+    "<table width='20%' bgcolor='A09F9F' align='center'>"
+        "<tr>"
+            "<td colspan=2>"
+                "<center><font size=4><b>M32 File Upload - Login Page</b></font></center>"
+                "<br>"
+            "</td>"
+            "<br>"
+            "<br>"
+        "</tr>"
+        "<td>Username:</td>"
+        "<td><input type='text' size=25 name='userid'><br></td>"
+        "</tr>"
+        "<br>"
+        "<br>"
+        "<tr>"
+            "<td>Password:</td>"
+            "<td><input type='Password' size=25 name='pwd'><br></td>"
+            "<br>"
+            "<br>"
+        "</tr>"
+        "<tr>"
+            "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
+        "</tr>"
+    "</table>"
+"</form>"
+"<script>"
+    "function check(form)"
+    "{"
+    "if(form.userid.value=='m32' && form.pwd.value=='upload')"
+    "{"
+    "window.open('/serverIndex')"
+    "}"
+    "else"
+    "{"
+    " alert('Error Password or Username')/*displays error message*/"
+    "}"
+    "}"
+"</script>";
+
+
+const char* MorseWifi::updateLoginIndex =
+ "<form name='loginForm'>"
+    "<table width='20%' bgcolor='A09F9F' align='center'>"
+        "<tr>"
+            "<td colspan=2>"
+                "<center><font size=4><b>M32 Firmware Update Login Page</b></font></center>"
+                "<br>"
+            "</td>"
+            "<br>"
+            "<br>"
+        "</tr>"
+        "<td>Username:</td>"
+        "<td><input type='text' size=25 name='userid'><br></td>"
+        "</tr>"
+        "<br>"
+        "<br>"
+        "<tr>"
+            "<td>Password:</td>"
+            "<td><input type='Password' size=25 name='pwd'><br></td>"
+            "<br>"
+            "<br>"
+        "</tr>"
+        "<tr>"
+            "<td><input type='submit' onclick='check(this.form)' value='Login'></td>"
+        "</tr>"
+    "</table>"
+"</form>"
+"<script>"
+    "function check(form)"
+    "{"
+    "if(form.userid.value=='m32' && form.pwd.value=='update')"
+    "{"
+    "window.open('/serverIndex')"
+    "}"
+    "else"
+    "{"
+    " alert('Error Password or Username')/*displays error message*/"
+    "}"
+    "}"
+"</script>";
+
+
+const char* MorseWifi::serverIndex =
+"<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>"
+"<form method='POST' action='#' enctype='multipart/form-data' id='upload_form'>"
+   "<input type='file' name='update'>"
+        "<input type='submit' value='Begin'>"
+    "</form>"
+ "<div id='prg'>Progress: 0%</div>"
+ "<script>"
+  "$('form').submit(function(e){"
+  "e.preventDefault();"
+  "var form = $('#upload_form')[0];"
+  "var data = new FormData(form);"
+  " $.ajax({"
+  "url: '/update',"
+  "type: 'POST',"
+  "data: data,"
+  "contentType: false,"
+  "processData:false,"
+  "xhr: function() {"
+  "var xhr = new window.XMLHttpRequest();"
+  "xhr.upload.addEventListener('progress', function(evt) {"
+  "if (evt.lengthComputable) {"
+  "var per = evt.loaded / evt.total;"
+  "$('#prg').html('progress: ' + Math.round(per*100) + '%');"
+  "}"
+  "}, false);"
+  "return xhr;"
+  "},"
+  "success:function(d, s) {"
+  "console.log('success!')"
+ "},"
+ "error: function (a, b, c) {"
+ "}"
+ "});"
+ "});"
+ "</script>";
+
+
+
 
 
 namespace internal {
@@ -34,16 +183,16 @@ namespace internal {
 void internal::handleNotFound() {
   String message = "File Not Found\n\n";
   message += "URI: ";
-  message += server.uri();
+  message += MorseWifi::server.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += (MorseWifi::server.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
-  message += server.args();
+  message += MorseWifi::server.args();
   message += "\n";
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  for (uint8_t i = 0; i < MorseWifi::server.args(); i++) {
+    message += " " + MorseWifi::server.argName(i) + ": " + MorseWifi::server.arg(i) + "\n";
   }
-  server.send(404, "text/plain", message);
+  MorseWifi::server.send(404, "text/plain", message);
 }
 
 void MorseWifi::startAP() {
@@ -247,7 +396,7 @@ bool internal::handleFileRead(String path) { // send the right file to the clien
     if (SPIFFS.exists(pathWithGz))                            // If there's a compressed version available
       path += ".gz";                                          // Use the compressed verion
     File file = SPIFFS.open(path, "r");                       // Open the file
-    server.streamFile(file, contentType);                     // Send it to the client
+    MorseWifi::server.streamFile(file, contentType);                     // Send it to the client
     file.close();                                             // Close the file again
     Serial.println(String("\tSent file: ") + path);
     return true;
@@ -257,19 +406,19 @@ bool internal::handleFileRead(String path) { // send the right file to the clien
 }
 
 void internal::handleFileUpload(){ // upload a new file to the SPIFFS
-  HTTPUpload& upload = server.upload();
+  HTTPUpload& upload = MorseWifi::server.upload();
   if(upload.status == UPLOAD_FILE_START){
     String filename = upload.filename;
     if(!filename.startsWith("/")) filename = "/"+filename;
     //Serial.print("handleFileUpload Name: "); Serial.println(filename);
-    fsUploadFile = SPIFFS.open("/player.txt", "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
+    MorseWifi::fsUploadFile = SPIFFS.open("/player.txt", "w");            // Open the file for writing in SPIFFS (create if it doesn't exist)
     filename = String();
   } else if(upload.status == UPLOAD_FILE_WRITE){
-    if(fsUploadFile)
-      fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
+    if(MorseWifi::fsUploadFile)
+        MorseWifi::fsUploadFile.write(upload.buf, upload.currentSize); // Write the received bytes to the file
   } else if(upload.status == UPLOAD_FILE_END){
-    if(fsUploadFile) {                                    // If the file was successfully created
-      fsUploadFile.close();                               // Close the file again
+    if(MorseWifi::fsUploadFile) {                                    // If the file was successfully created
+        MorseWifi::fsUploadFile.close();                               // Close the file again
       MorsePreferences::prefs.fileWordPointer = 0;                              // reset word counter for file player
       MorsePreferences::writeWordPointer();
 
@@ -277,7 +426,7 @@ void internal::handleFileUpload(){ // upload a new file to the SPIFFS
       //server.sendHeader("Location","/success.html");      // Redirect the client to the success page
       //server.send(303);
     } else {
-      server.send(500, "text/plain", "500: couldn't create file");
+        MorseWifi::server.send(500, "text/plain", "500: couldn't create file");
     }
   }
 }

@@ -22,8 +22,19 @@ namespace internal {
 
 }
 
-boolean DIT_FIRST = false; // first latched was dit?
-boolean keyTx = false;
+unsigned char MorseKeyer::keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
+KSTYPE MorseKeyer::keyerState;
+
+uint8_t MorseKeyer::sensor;                 // what we read from checking the touch sensors
+boolean MorseKeyer::leftKey, MorseKeyer::rightKey;
+
+boolean MorseKeyer::DIT_FIRST = false; // first latched was dit?
+unsigned int MorseKeyer::ditLength ;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
+unsigned int MorseKeyer::dahLength ;        // dahs are 3 dits long
+boolean MorseKeyer::keyTx = false;
+unsigned int MorseKeyer::interCharacterSpace;
+unsigned int MorseKeyer::interWordSpace;   // need to be properly initialised!
+unsigned int MorseKeyer::effWpm;                                // calculated effective speed in WpM
 
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;
@@ -40,7 +51,7 @@ void MorseKeyer::updateTimings() {
   //interWordSpace = _max(p_interWordSpace * ditLength, (p_interCharSpace+6)*ditLength);
   interWordSpace = _max(MorsePreferences::prefs.interWordSpace, MorsePreferences::prefs.interCharSpace+4) * ditLength;
 
-  effWpm = 60000 / (31 * ditLength + 4 * interCharacterSpace + interWordSpace );  ///  effective wpm with lengthened spaces = Farnsworth speed
+  MorseKeyer::effWpm = 60000 / (31 * ditLength + 4 * interCharacterSpace + interWordSpace );  ///  effective wpm with lengthened spaces = Farnsworth speed
 }
 
 
@@ -310,9 +321,9 @@ boolean MorseKeyer::checkPaddles() {
 void internal::updatePaddleLatch(boolean dit, boolean dah)
 {
     if (dit)
-      keyerControl |= DIT_L;
+      MorseKeyer::keyerControl |= DIT_L;
     if (dah)
-      keyerControl |= DAH_L;
+      MorseKeyer::keyerControl |= DAH_L;
 }
 
 // clear the paddle latches in keyer control

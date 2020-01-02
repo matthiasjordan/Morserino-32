@@ -20,7 +20,7 @@ using namespace MorsePreferences;
 
 
 
-const String prefOption[] =
+const String MorsePreferences::prefOption[] =
 {
         "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
         "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
@@ -31,49 +31,49 @@ const String prefOption[] =
         //
         "Sentinel"};
 
-prefPos keyerOptions[] =
+prefPos MorsePreferences::keyerOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posKeyTrainerMode, posTimeOut, posQuickStart, sentinel};
-prefPos generatorOptions[] =
+prefPos MorsePreferences::generatorOptions[] =
 {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
         posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
         posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos headOptions[] =
+prefPos MorsePreferences::headOptions[] =
 {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
         posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos playerOptions[] =
+prefPos MorsePreferences::playerOptions[] =
 {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
         posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos echoPlayerOptions[] =
+prefPos MorsePreferences::echoPlayerOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
         posEchoConf, posTimeOut, posQuickStart, sentinel};
-prefPos echoTrainerOptions[] =
+prefPos MorsePreferences::echoTrainerOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
         posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
-prefPos kochGenOptions[] =
+prefPos MorsePreferences::kochGenOptions[] =
 {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
         posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
         posQuickStart, sentinel};
-prefPos kochEchoOptions[] =
+prefPos MorsePreferences::kochEchoOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
         posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
-prefPos loraTrxOptions[] =
+prefPos MorsePreferences::loraTrxOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
-prefPos extTrxOptions[] =
+prefPos MorsePreferences::extTrxOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
         posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
-prefPos decoderOptions[] =
+prefPos MorsePreferences::decoderOptions[] =
 {posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
 
-//prefPos allOptions[] =
-//{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-//        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-//        posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
-//        posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
+prefPos MorsePreferences::allOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+        posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
+        posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
 
 
 
@@ -81,15 +81,15 @@ Preferences pref;               // use the Preferences library for storing and r
 
 
 /// variables for managing snapshots
-uint8_t memories[8];
-uint8_t memCounter;
-uint8_t memPtr = 0;
+uint8_t MorsePreferences::memories[8];
+uint8_t MorsePreferences::memCounter;
+uint8_t MorsePreferences::memPtr = 0;
 
-MorsePrefs prefs;
+MorsePrefs MorsePreferences::prefs;
 
-prefPos *currentOptions = allOptions;
+prefPos *MorsePreferences::currentOptions = MorsePreferences::allOptions;
 
-unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
+unsigned long MorsePreferences::charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
 
 

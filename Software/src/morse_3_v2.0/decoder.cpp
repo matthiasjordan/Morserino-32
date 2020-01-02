@@ -12,7 +12,7 @@ using namespace Decoder;
 
 
 
-const struct linklist CWtree[67]  = {
+const struct linklist Decoder::CWtree[67]  = {
   {"",1,2},            // 0
   {"e", 3,4},         // 1
   {"t",5,6},          // 2
@@ -88,20 +88,20 @@ const struct linklist CWtree[67]  = {
   {"<err>", 66, 63}      // 66 !! Error - backspace
 };
 
-boolean filteredState = false;
-boolean filteredStateBefore = false;
+boolean Decoder::filteredState = false;
+boolean Decoder::filteredStateBefore = false;
 
-DECODER_STATES decoderState = LOW_;
+DECODER_STATES Decoder::decoderState = LOW_;
 
-unsigned long ditAvg, dahAvg;     /// average values of dit and dah lengths to decode as dit or dah and to adapt to speed change
+unsigned long Decoder::ditAvg, Decoder::dahAvg;     /// average values of dit and dah lengths to decode as dit or dah and to adapt to speed change
 
-byte treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
+byte Decoder::treeptr = 0;                          // pointer used to navigate within the linked list representing the dichotomic tree
 
-unsigned long acsTimer = 0;            // timer to use for automatic character spacing (ACS)
-boolean speedChanged = true;
+unsigned long Decoder::acsTimer = 0;            // timer to use for automatic character spacing (ACS)
+boolean Decoder::speedChanged = true;
 
-unsigned long interWordTimer = 0;      // timer to detect interword spaces
-int goertzel_n = 152;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
+unsigned long Decoder::interWordTimer = 0;      // timer to detect interword spaces
+int Decoder::goertzel_n = 152;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
 
 
 

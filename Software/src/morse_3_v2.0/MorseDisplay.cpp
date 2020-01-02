@@ -22,9 +22,9 @@ using namespace MorseDisplay;
 #define SCROLL_TOP 15
 #define LINE_HEIGHT 16
 
-const int8_t maxPos = NoOfLines - 3;
-int8_t relPos = MorseDisplay::maxPos;
-uint8_t bottomLine = 0;
+const int8_t MorseDisplay::maxPos = NoOfLines - 3;
+int8_t MorseDisplay::relPos = MorseDisplay::maxPos;
+uint8_t MorseDisplay::bottomLine = 0;
 
 
 char textBuffer[NoOfLines][2 * NoOfCharsPerLine + 1]; /// we need extra room for style markers (FONT_ATTRIB stored as characters to toggle on/off the style within a line)

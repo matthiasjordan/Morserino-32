@@ -10,7 +10,7 @@ const String lcwoKochChars = "kmuresnaptlwi.jz=foy,vg5/q92h38b?47c1d60x-K+ASNV@:
 
 boolean kochActive = false;                 // set to true when in Koch trainer mode
 
-String kochChars;
+String Koch::kochChars;
 
 void Koch::setup() {
     if (MorsePreferences::prefs.lcwoKochSeq) kochChars = lcwoKochChars;
