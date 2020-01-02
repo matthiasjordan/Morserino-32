@@ -10,10 +10,14 @@
 #include "MorseUI.h"
 
 
-using namespace MorseWifi;
+//using namespace MorseWifi;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// stuff using WiFi - ask for access point credentials, upload player file, do OTA software update
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
+
+File fsUploadFile;              // a File object to temporarily store the received file
 
 
 namespace internal {
@@ -176,11 +180,11 @@ boolean internal::errorConnect(String msg) {
 
 void internal::startMDNS() {
   /*use mdns for host name resolution*/
-  if (!MDNS.begin(host)) { //http://m32.local
+  if (!MDNS.begin(MorseWifi::host)) { //http://m32.local
     Serial.println("Error setting up MDNS responder!");
     while (1) {
       delay(1000);
-      if (MDNS.begin(host))
+      if (MDNS.begin(MorseWifi::host))
         break;
     }
   }

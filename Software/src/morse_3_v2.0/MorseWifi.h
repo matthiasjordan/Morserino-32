@@ -17,13 +17,10 @@ namespace MorseWifi {
 
 //    File file;
 
-    WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
+    extern WebServer server;    // Create a webserver object that listens for HTTP request on port 80
 
-    File fsUploadFile;              // a File object to temporarily store the received file
+    extern File fsUploadFile;              // a File object to temporarily store the received file
 
-    String getContentType(String filename); // convert the file extension to the MIME type
-    bool handleFileRead(String path);       // send the right file to the client (if it exists)
-    void handleFileUpload();                // upload a new file to the SPIFFS
     const char* host = "m32";               // hostname of the webserver
 
 
@@ -174,6 +171,9 @@ namespace MorseWifi {
     boolean wifiConnect();
     void uploadFile();
     void updateFirmware();
+    String getContentType(String filename); // convert the file extension to the MIME type
+    bool handleFileRead(String path);       // send the right file to the client (if it exists)
+    void handleFileUpload();                // upload a new file to the SPIFFS
 }
 
 
