@@ -11,11 +11,10 @@
 #include "MorseGenerator.h"
 #include "MorseSound.h"
 
-
 using namespace MorsePreferencesMenu;
 
-
-namespace internal {
+namespace internal
+{
     void displayCurtisMode();
     void displayCurtisBTiming();
     void displayCurtisBDotTiming();
@@ -57,22 +56,21 @@ namespace internal {
     int calcNewIndexWraparound(int ptrIndex, int encoderDelta);
 }
 
-
-
-
-
 //////// Display the preferences menu - we display the following preferences
 
 void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
 {
     MorseDisplay::clear();
-    if (pos < MorsePreferences::posLoraBand) {
+    if (pos < MorsePreferences::posLoraBand)
+    {
         MorseDisplay::printOnStatusLine(true, 0, "Set Preferences: ");
     }
-    else if (pos < MorsePreferences::posSnapRecall) {
+    else if (pos < MorsePreferences::posSnapRecall)
+    {
         MorseDisplay::printOnStatusLine(true, 0, "Config LoRa:     ");
     }
-    else {
+    else
+    {
         MorseDisplay::printOnStatusLine(true, 0, "Manage Snapshots:");
     }
     MorseDisplay::printOnScroll(1, BOLD, 0, MorsePreferences::prefOption[pos]);
@@ -199,7 +197,7 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
 void internal::displayCurtisMode()
 {
     String keyerModus[] =
-    {"Curtis A    ", "Curtis B    ", "Ultimatic   ", "Non-Squeeze "};
+        {"Curtis A    ", "Curtis B    ", "Ultimatic   ", "Non-Squeeze "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, keyerModus[MorsePreferences::prefs.keyermode - 1]);
 }
 
@@ -218,7 +216,7 @@ void internal::displayCurtisBDotTiming()
 void internal::displayACS()
 {
     String ACSmode[] =
-    {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
+        {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, ACSmode[MorsePreferences::prefs.ACSlength]);
 }
 
@@ -261,18 +259,20 @@ void internal::displayInterCharSpace()
 void internal::displayRandomOption()
 {
     String texts[] =
-    {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ", "Interp+ProSn",
-            "Alph+Num+Int", "Num+Int+ProS"};
+        {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ", "Interp+ProSn",
+                "Alph+Num+Int", "Num+Int+ProS"};
     MorseDisplay::printOnScroll(2, REGULAR, 1, texts[MorsePreferences::prefs.randomOption]);
 }
 
 void internal::displayRandomLength()
 {
     // display length of random character groups - 2 - 6
-    if (MorsePreferences::prefs.randomLength <= 6) {
+    if (MorsePreferences::prefs.randomLength <= 6)
+    {
         MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%1i     ", MorsePreferences::prefs.randomLength);
     }
-    else {
+    else
+    {
         MorseDisplay::vprintOnScroll(2, REGULAR, 1, "2 to %1i", MorsePreferences::prefs.randomLength - 4);
     }
 }
@@ -565,7 +565,8 @@ void internal::displaySnapStore()
         MorseDisplay::printOnScroll(2, REGULAR, 1, "Cancel Store");
     else
     {
-        MorseDisplay::vprintOnScroll(2, MorsePreferences::prefs.snapShots & mask ? BOLD : REGULAR, 1, "Snapshot %d  ", MorsePreferences::memPtr + 1);
+        MorseDisplay::vprintOnScroll(2, MorsePreferences::prefs.snapShots & mask ? BOLD : REGULAR, 1, "Snapshot %d  ",
+                MorsePreferences::memPtr + 1);
     }
 }
 
@@ -595,7 +596,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
             if (MorseUI::volButton.clicks)
             {
                 if (MorsePreferences::memCounter)
-                    MorsePreferences::clearMemory (MorsePreferences::memPtr);
+                    MorsePreferences::clearMemory(MorsePreferences::memPtr);
                 return true;
             }
         }
@@ -605,7 +606,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
             switch (pos)
             {
                 case MorsePreferences::posCurtisMode:
-                    MorsePreferences::prefs.keyermode = (MorsePreferences::prefs.keyermode + t);                        // set the curtis mode
+                    MorsePreferences::prefs.keyermode = (MorsePreferences::prefs.keyermode + t);                      // set the curtis mode
                     MorsePreferences::prefs.keyermode = constrain(MorsePreferences::prefs.keyermode, 1, 4);
                     internal::displayCurtisMode();                                    // display curtis mode
                     break;
@@ -636,7 +637,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayClicks();
                     break;
                 case MorsePreferences::posExtPaddles:
-                    MorsePreferences::prefs.useExtPaddle = !MorsePreferences::prefs.useExtPaddle;                           // ext paddle on/off
+                    MorsePreferences::prefs.useExtPaddle = !MorsePreferences::prefs.useExtPaddle;                       // ext paddle on/off
                     internal::displayExtPaddles();
                     break;
                 case MorsePreferences::posPolarity:
@@ -649,18 +650,18 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayLatency();
                     break;
                 case MorsePreferences::posKeyTrainerMode:
-                    MorsePreferences::prefs.keyTrainerMode += (t + 1);                     // Key TRX: 0=never, 1= keyer only, 2 = keyer & trainer
+                    MorsePreferences::prefs.keyTrainerMode += (t + 1);               // Key TRX: 0=never, 1= keyer only, 2 = keyer & trainer
                     MorsePreferences::prefs.keyTrainerMode = constrain(MorsePreferences::prefs.keyTrainerMode - 1, 0, 2);
                     internal::displayKeyTrainerMode();
                     break;
                 case MorsePreferences::posInterWordSpace:
                     MorsePreferences::prefs.interWordSpace += t;                         // interword space in lengths of dit
-                    MorsePreferences::prefs.interWordSpace = constrain(MorsePreferences::prefs.interWordSpace, 6, 45);            // has to be between 6 and 45 dits
+                    MorsePreferences::prefs.interWordSpace = constrain(MorsePreferences::prefs.interWordSpace, 6, 45); // has to be between 6 and 45 dits
                     internal::displayInterWordSpace();
                     MorseKeyer::updateTimings();
                     break;
                 case MorsePreferences::posInterCharSpace:
-                    MorsePreferences::prefs.interCharSpace = constrain(MorsePreferences::prefs.interCharSpace + t, 3, 24);  // set Interchar space - 3 - 24 dits
+                    MorsePreferences::prefs.interCharSpace = constrain(MorsePreferences::prefs.interCharSpace + t, 3, 24); // set Interchar space - 3 - 24 dits
                     internal::displayInterCharSpace();
                     MorseKeyer::updateTimings();
                     break;
@@ -672,12 +673,12 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     //               displayGenerate();
                     //               break;
                 case MorsePreferences::posRandomOption:
-                    MorsePreferences::prefs.randomOption = (MorsePreferences::prefs.randomOption + t + 10) % 10;     // which char set for random chars?
+                    MorsePreferences::prefs.randomOption = (MorsePreferences::prefs.randomOption + t + 10) % 10; // which char set for random chars?
                     internal::displayRandomOption();
                     break;
                 case MorsePreferences::posRandomLength:
                     MorsePreferences::prefs.randomLength += t;                                 // length of random char group: 2-6
-                    MorsePreferences::prefs.randomLength = constrain(MorsePreferences::prefs.randomLength, 1, 10);                   // 7-10 for rnd length 2 to 3-6
+                    MorsePreferences::prefs.randomLength = constrain(MorsePreferences::prefs.randomLength, 1, 10); // 7-10 for rnd length 2 to 3-6
                     internal::displayRandomLength();
                     break;
                 case MorsePreferences::posCallLength:
@@ -725,12 +726,12 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayMaxSequence();
                     break;
                 case MorsePreferences::posTrainerDisplay:
-                    MorsePreferences::prefs.trainerDisplay = (MorsePreferences::prefs.trainerDisplay + t + 3) % 3;   // display options for trainer: 0-2
+                    MorsePreferences::prefs.trainerDisplay = (MorsePreferences::prefs.trainerDisplay + t + 3) % 3; // display options for trainer: 0-2
                     internal::displayTrainerDisplay();
                     break;
                 case MorsePreferences::posEchoDisplay:
                     MorsePreferences::prefs.echoDisplay += t;
-                    MorsePreferences::prefs.echoDisplay = constrain(MorsePreferences::prefs.echoDisplay, 1, 3);             // what prompt for echo trainer mode
+                    MorsePreferences::prefs.echoDisplay = constrain(MorsePreferences::prefs.echoDisplay, 1, 3); // what prompt for echo trainer mode
                     internal::displayEchoDisplay();
                     break;
                 case MorsePreferences::posEchoRepeats:
@@ -739,7 +740,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayEchoRepeats();
                     break;
                 case MorsePreferences::posEchoToneShift:
-                    MorsePreferences::prefs.echoToneShift += (t + 1);                             // echo tone shift can be 0, 1 (up) or 2 (down)
+                    MorsePreferences::prefs.echoToneShift += (t + 1);                        // echo tone shift can be 0, 1 (up) or 2 (down)
                     MorsePreferences::prefs.echoToneShift = constrain(MorsePreferences::prefs.echoToneShift - 1, 0, 2);
                     internal::displayEchoToneShift();
                     break;
@@ -759,7 +760,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayEchoConf();
                     break;
                 case MorsePreferences::posLoraTrainerMode:
-                    MorsePreferences::prefs.loraTrainerMode += (t + 2);                    // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
+                    MorsePreferences::prefs.loraTrainerMode += (t + 2); // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
                     MorsePreferences::prefs.loraTrainerMode = (MorsePreferences::prefs.loraTrainerMode % 2);
                     internal::displayLoraTrainerMode();
                     break;
@@ -768,7 +769,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     internal::displayLoraSyncW();
                     break;
                 case MorsePreferences::posGoertzelBandwidth:
-                    MorsePreferences::prefs.goertzelBandwidth += (t + 2);                  // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
+                    MorsePreferences::prefs.goertzelBandwidth += (t + 2); // transmit lora in generator and player mode; can be 0 (no) or 1 (yes)
                     MorsePreferences::prefs.goertzelBandwidth = (MorsePreferences::prefs.goertzelBandwidth % 2);
                     internal::displayGoertzelBandwidth();
                     break;
@@ -825,7 +826,8 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                 case MorsePreferences::posSnapRecall:
                     if (MorsePreferences::memCounter)
                     {
-                        MorsePreferences::memPtr = (MorsePreferences::memPtr + t + MorsePreferences::memCounter + 1) % (MorsePreferences::memCounter + 1);
+                        MorsePreferences::memPtr = (MorsePreferences::memPtr + t + MorsePreferences::memCounter + 1)
+                                % (MorsePreferences::memCounter + 1);
                         //memPtr += (t+1);
                         //memPtr = constrain(memPtr-1, 0, memCounter);
                     }
@@ -835,7 +837,8 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     MorsePreferences::memPtr = (MorsePreferences::memPtr + t + 9) % 9;
                     internal::displaySnapStore();
                     break;
-                default: ;
+                default:
+                    ;
             }   // end switch(pos)
             MorseDisplay::displayDisplay();                                                      // update the display
 
@@ -844,71 +847,73 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
     }    // end while(true)
 }   // end of function
 
-
-
 ////// setup preferences ///////
 
+boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu)
+{
+    // enum morserinoMode {morseKeyer, loraTrx, morseGenerator, echoTrainer, shutDown, morseDecoder, invalid };
+    static int oldPos = 1;
+    int t;
 
-boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
-  // enum morserinoMode {morseKeyer, loraTrx, morseGenerator, echoTrainer, shutDown, morseDecoder, invalid };
-  static int oldPos = 1;
-  int t;
+    int ptrIndex;
+    MorsePreferences::prefPos posPtr;
 
-  int ptrIndex;
-  MorsePreferences::prefPos posPtr;
+    ///// we should check here if the old ptr (oldIndex) is contained in the current preferences collection (currentOptions)
+    ptrIndex = 1;
 
+    for (int i = 0; (MorsePreferences::currentOptions[i] != MorsePreferences::sentinel); ++i)
+    {
+        if (MorsePreferences::currentOptions[i] == oldPos)
+        {
+            ptrIndex = i;
+            break;
+        }
+    }
+    posPtr = MorsePreferences::currentOptions[ptrIndex];
+    MorseGenerator::keyOut(false, true, 0, 0);                // turn the LED off, unkey transmitter, or whatever; just in case....
+    MorseGenerator::keyOut(false, false, 0, 0);
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(posPtr);
+    MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
 
-  ///// we should check here if the old ptr (oldIndex) is contained in the current preferences collection (currentOptions)
-  ptrIndex = 1;
-
-  for (int i = 0; (MorsePreferences::currentOptions[i] != MorsePreferences::sentinel); ++i) {
-      if (MorsePreferences::currentOptions[i] == oldPos) {
-          ptrIndex = i;
-          break;
-      }
-  }
-  posPtr = MorsePreferences::currentOptions[ptrIndex];
-  MorseGenerator::keyOut(false, true, 0, 0);                // turn the LED off, unkey transmitter, or whatever; just in case....
-  MorseGenerator::keyOut(false,false, 0, 0);
-  MorsePreferencesMenu::displayKeyerPreferencesMenu(posPtr);
-  MorseDisplay::printOnScroll(2, REGULAR, 0,  " ");
-
-  while (true) {                            // we wait for single click = selection or long click = exit - or single or long click or RED button
+    while (true)
+    {                            // we wait for single click = selection or long click = exit - or single or long click or RED button
         MorseUI::modeButton.Update();
-        switch (MorseUI::modeButton.clicks) {            // button was clicked
-          case 1:     // change the option corresponding to pos
-                      if (adjustKeyerPreference(posPtr))
-                         goto exitFromHere;
-                      break;
-          case -1:    //////// long press indicates we are done with setting preferences - check if we need to store some of the preferences
-          exitFromHere: MorsePreferences::writePreferences("morserino");
-                        //delay(200);
-                        return false;
-                        break;
-          }
+        switch (MorseUI::modeButton.clicks)
+        {            // button was clicked
+            case 1:     // change the option corresponding to pos
+                if (adjustKeyerPreference(posPtr))
+                    goto exitFromHere;
+                break;
+            case -1:  //////// long press indicates we are done with setting preferences - check if we need to store some of the preferences
+                exitFromHere: MorsePreferences::writePreferences("morserino");
+                //delay(200);
+                return false;
+                break;
+        }
 
         MorseUI::volButton.Update();                 // RED button
-          switch (MorseUI::volButton.clicks) {         // was clicked
+        switch (MorseUI::volButton.clicks)
+        {         // was clicked
             case 1:     // recall snapshot
-                        if (MorsePreferences::recallSnapshot())
-                            MorsePreferences::writePreferences("morserino");
-                        //delay(100);
-                        return true;
-                        break;
+                if (MorsePreferences::recallSnapshot())
+                    MorsePreferences::writePreferences("morserino");
+                //delay(100);
+                return true;
+                break;
             case -1:    //store snapshot
 
-                        if (MorsePreferences::storeSnapshot(atMenu))
-                            MorsePreferences::writePreferences("morserino");
-                        while(MorseUI::volButton.clicks)
-                            MorseUI::volButton.Update();
-                        return false;
-                        break;
-          }
+                if (MorsePreferences::storeSnapshot(atMenu))
+                    MorsePreferences::writePreferences("morserino");
+                while (MorseUI::volButton.clicks)
+                    MorseUI::volButton.Update();
+                return false;
+                break;
+        }
 
+        //// display the value of the preference in question
 
-          //// display the value of the preference in question
-
-         if ((t = MorseRotaryEncoder::checkEncoder())) {
+        if ((t = MorseRotaryEncoder::checkEncoder()))
+        {
             MorseUI::click();
 
             ptrIndex = internal::calcNewIndexWraparound(ptrIndex, t);
@@ -922,23 +927,27 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
             MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
 
             MorseDisplay::displayDisplay();                                                        // update the display
-         }    // end if (encoderPos)
-         MorseSystem::checkShutDown(false);         // check for time out
-  } // end while - we leave as soon as the button has been pressed long
+        }    // end if (encoderPos)
+        MorseSystem::checkShutDown(false);         // check for time out
+    } // end while - we leave as soon as the button has been pressed long
 }   // end function setupKeyerPreferences()
 
-
-int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta) {
+int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta)
+{
     int dir = (encoderDelta < 0) ? -1 : 1;
-    while (encoderDelta != 0) {
+    while (encoderDelta != 0)
+    {
         ptrIndex += dir;
-        if (MorsePreferences::currentOptions[ptrIndex] == MorsePreferences::sentinel) {
+        if (MorsePreferences::currentOptions[ptrIndex] == MorsePreferences::sentinel)
+        {
             // sentinel element found - wrap around to 0
             ptrIndex = 0;
         }
-        else if (ptrIndex < 0) {
+        else if (ptrIndex < 0)
+        {
             // too far left - set pointer to leftmost element
-            while (MorsePreferences::currentOptions[ptrIndex] != MorsePreferences::sentinel) {
+            while (MorsePreferences::currentOptions[ptrIndex] != MorsePreferences::sentinel)
+            {
                 ptrIndex += 1;
             }
             // now we are at the sentinel - or very deep in trouble. Let's assume we're fine and step to the left.

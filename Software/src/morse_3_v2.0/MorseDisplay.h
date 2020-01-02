@@ -14,7 +14,6 @@ namespace MorseDisplay
     extern int8_t relPos;
     extern uint8_t bottomLine;
 
-
     void init();
     void displayStartUp();
     void displayDisplay();
@@ -44,7 +43,7 @@ namespace MorseDisplay
     void displayEmptyBattery();
     void dispLoraLogo();
     void updateSMeter(int rssi);
-    void drawInputStatus( boolean on);
+    void drawInputStatus(boolean on);
     void displayTopLine();
     void displayCWspeed();
     void showVolumeBar(uint16_t mini, uint16_t maxi);

@@ -10,20 +10,17 @@
 
 #include "ClickButton.h"   // button control library
 
-
-namespace MorseUI {
+namespace MorseUI
+{
 
     // define the buttons for the clickbutton library
     extern ClickButton modeButton;
     extern ClickButton volButton;
-
 
     void setup();
     void click();
     void audioLevelAdjust();
 
 }
-
-
 
 #endif /* MORSEUI_H_ */

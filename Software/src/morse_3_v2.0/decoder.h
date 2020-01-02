@@ -16,12 +16,12 @@ namespace Decoder
 
     // morse code decoder
 
-    struct linklist {
-         const char* symb;
-         const uint8_t dit;
-         const uint8_t dah;
+    struct linklist
+    {
+            const char* symb;
+            const uint8_t dit;
+            const uint8_t dah;
     };
-
 
     extern const struct linklist CWtree[67];
 
@@ -46,11 +46,9 @@ namespace Decoder
     extern unsigned long interWordTimer;      // timer to detect interword spaces
     extern int goertzel_n;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
 
-
-
     void doDecode();
     void setupGoertzel();
-    void drawInputStatus( boolean on);
+    void drawInputStatus(boolean on);
     void interWordTimerOff();
     String CWwordToClearText(String cwword);
     void displayMorse();

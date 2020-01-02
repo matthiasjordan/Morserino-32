@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #include <Wire.h>          // Only needed for Arduino 1.6.5 and earlier
 
@@ -26,17 +25,15 @@ const int8_t MorseDisplay::maxPos = NoOfLines - 3;
 int8_t MorseDisplay::relPos = MorseDisplay::maxPos;
 uint8_t MorseDisplay::bottomLine = 0;
 
-
 char textBuffer[NoOfLines][2 * NoOfCharsPerLine + 1]; /// we need extra room for style markers (FONT_ATTRIB stored as characters to toggle on/off the style within a line)
                                                       /// and 0 terminator
 
 uint8_t linePointer = 0;    /// defines the current bottom line
 
-
 #define lora_width 6        /// a simple logo that shows when we operate with loRa, stored in XBM format
 #define lora_height 11
 static unsigned char lora_bits[] =
-{0x0f, 0x18, 0x33, 0x24, 0x29, 0x2b, 0x29, 0x24, 0x33, 0x18, 0x0f};
+    {0x0f, 0x18, 0x33, 0x24, 0x29, 0x2b, 0x29, 0x24, 0x33, 0x18, 0x0f};
 
 // define OLED display and its address - the Heltec ESP32 LoRA uses its display on 0x3c
 SSD1306 display(0x3c, OLED_SDA, OLED_SCL, OLED_RST);
@@ -100,27 +97,26 @@ void MorseDisplay::displayStartUp()
     delay(3000);
 }
 
-
-void MorseDisplay::clear() {
+void MorseDisplay::clear()
+{
     display.clear();
 }
 
-void MorseDisplay::displayDisplay() {
+void MorseDisplay::displayDisplay()
+{
     display.display();
 }
 
-
-void MorseDisplay::clearDisplay() {
+void MorseDisplay::clearDisplay()
+{
     MorseDisplay::clear();
     MorseDisplay::displayDisplay();
 }
 
-
-
-void MorseDisplay::sleep() {
+void MorseDisplay::sleep()
+{
     display.sleep();
 }
-
 
 ///// functions to use the graphics display more or less like a character display
 ///// basically we use two different fixed-width fonts, Dialoginput 12 (for the status line) and Dialoginput 15 for almost everything else
@@ -180,17 +176,17 @@ void MorseDisplay::printOnStatusLine(boolean strong, uint8_t xpos, String string
     MorseSystem::resetTOT();
 }
 
-void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, const char* format, ...) {
+void MorseDisplay::vprintOnStatusLine(boolean strong, uint8_t xpos, const char* format, ...)
+{
     va_list arglist;
-    va_start( arglist, format );
+    va_start(arglist, format);
     vsprintf(numBuffer, format, arglist);
-    va_end( arglist );
+    va_end(arglist);
     MorseDisplay::printOnStatusLine(strong, xpos, numBuffer);
 }
 
 String printToScroll_buffer = "";
 FONT_ATTRIB printToScroll_lastStyle = REGULAR;
-
 
 void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
 {
@@ -402,12 +398,12 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
         printOnScroll(displayLine, style, pos, temp);
 }
 
-
-uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, const char* format, ...) {
+uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, const char* format, ...)
+{
     va_list arglist;
-    va_start( arglist, format );
+    va_start(arglist, format);
     vsprintf(numBuffer, format, arglist);
-    va_end( arglist );
+    va_end(arglist);
     return MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
 }
 
@@ -446,8 +442,8 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
     return w;         // we return the actual width of the output, in case of converted UTF8 characters
 }
 
-
-void MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring) {
+void MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring)
+{
     MorseDisplay::printOnScroll(line, how, xpos, mystring);
     displayDisplay();
     delay(500);
@@ -515,7 +511,8 @@ void MorseDisplay::displayScrollBar(boolean visible)
 /// display volume as a progress bar: vol = 1-100
 void MorseDisplay::displayVolume()
 {
-    MorseDisplay::drawVolumeCtrl(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? false : true, 93, 0, 28, 15, MorsePreferences::prefs.sidetoneVolume);
+    MorseDisplay::drawVolumeCtrl(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? false : true, 93, 0, 28, 15,
+            MorsePreferences::prefs.sidetoneVolume);
     display.display();
 }
 
@@ -550,98 +547,113 @@ void MorseDisplay::displayEmptyBattery()
     MorseSystem::shutMeDown();
 }
 
-void MorseDisplay::dispLoraLogo() {     // display a small logo in the top right corner to indicate we operate with LoRa
-  display.setColor(BLACK);
-  display.drawXbm(121, 2, lora_width, lora_height, lora_bits);
-  display.setColor(WHITE);
-  display.display();
+void MorseDisplay::dispLoraLogo()
+{     // display a small logo in the top right corner to indicate we operate with LoRa
+    display.setColor(BLACK);
+    display.drawXbm(121, 2, lora_width, lora_height, lora_bits);
+    display.setColor(WHITE);
+    display.display();
 }
-
 
 ////// S Meter for Trx modus
 
-void MorseDisplay::updateSMeter(int rssi) {
+void MorseDisplay::updateSMeter(int rssi)
+{
 
-  static boolean wasZero = false;
+    static boolean wasZero = false;
 
-  if (rssi == 0)
-      if (wasZero)
-          return;
-       else {
-           MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, 0);
-          wasZero = true;
-       }
-   else {
-       MorseDisplay::drawVolumeCtrl( false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
-      wasZero = false;
-   }
-  MorseDisplay::displayDisplay();
+    if (rssi == 0)
+        if (wasZero)
+            return;
+        else
+        {
+            MorseDisplay::drawVolumeCtrl(false, 93, 0, 28, 15, 0);
+            wasZero = true;
+        }
+    else
+    {
+        MorseDisplay::drawVolumeCtrl(false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
+        wasZero = false;
+    }
+    MorseDisplay::displayDisplay();
 }
 
-void MorseDisplay::drawInputStatus( boolean on) {
-  if (on)
-    display.setColor(BLACK);
-  else
-      display.setColor(WHITE);
-  display.fillRect(1, 1, 20, 13);
-  display.display();
+void MorseDisplay::drawInputStatus(boolean on)
+{
+    if (on)
+        display.setColor(BLACK);
+    else
+        display.setColor(WHITE);
+    display.fillRect(1, 1, 20, 13);
+    display.display();
 }
-
-
 
 //////// Display the status line in CW Keyer Mode
 //////// Layout of top line:
 //////// Tch ul 15 WpM
 //////// 0    5    0
 
-void MorseDisplay::displayTopLine() {
+void MorseDisplay::displayTopLine()
+{
     MorseDisplay::clearStatusLine();
 
-  // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
-  if (MorseMachine::isMode(MorseMachine::morseGenerator))
-      MorseDisplay::printOnStatusLine(true, 1,  MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
-  else {
-    switch (MorsePreferences::prefs.keyermode) {
-      case IAMBICA:   MorseDisplay::printOnStatusLine(false, 2,  "A "); break;          // Iambic A (no paddle eval during dah)
-      case IAMBICB:   MorseDisplay::printOnStatusLine(false, 2,  "B "); break;          // orig Curtis B mode: paddle eval during element
-      case ULTIMATIC: MorseDisplay::printOnStatusLine(false, 2,  "U "); break;          // Ultimatic Mode
-      case NONSQUEEZE: MorseDisplay::printOnStatusLine(false, 2,  "N "); break;         // Non-squeeze mode
+    // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
+    if (MorseMachine::isMode(MorseMachine::morseGenerator))
+        MorseDisplay::printOnStatusLine(true, 1, MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
+    else
+    {
+        switch (MorsePreferences::prefs.keyermode)
+        {
+            case IAMBICA:
+                MorseDisplay::printOnStatusLine(false, 2, "A ");
+                break;          // Iambic A (no paddle eval during dah)
+            case IAMBICB:
+                MorseDisplay::printOnStatusLine(false, 2, "B ");
+                break;          // orig Curtis B mode: paddle eval during element
+            case ULTIMATIC:
+                MorseDisplay::printOnStatusLine(false, 2, "U ");
+                break;          // Ultimatic Mode
+            case NONSQUEEZE:
+                MorseDisplay::printOnStatusLine(false, 2, "N ");
+                break;         // Non-squeeze mode
+        }
     }
-  }
 
-  displayCWspeed();                                     // update display of CW speed
-  if ((MorseMachine::isMode(MorseMachine::loraTrx) ) || (MorseMachine::isMode(MorseMachine::morseGenerator)  && MorsePreferences::prefs.loraTrainerMode == true))
-      dispLoraLogo();
+    displayCWspeed();                                     // update display of CW speed
+    if ((MorseMachine::isMode(MorseMachine::loraTrx))
+            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == true))
+        dispLoraLogo();
 
-  MorseDisplay::displayVolume();                                     // sidetone volume
-  MorseDisplay::displayDisplay();
+    MorseDisplay::displayVolume();                                     // sidetone volume
+    MorseDisplay::displayDisplay();
 }
-
 
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
-void MorseDisplay::displayCWspeed() {
-  if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer) ))
-      sprintf(numBuffer, "(%2i)", MorseKeyer::effWpm);
-  else sprintf(numBuffer, "    ");
+void MorseDisplay::displayCWspeed()
+{
+    if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)))
+        sprintf(numBuffer, "(%2i)", MorseKeyer::effWpm);
+    else
+        sprintf(numBuffer, "    ");
 
-  MorseDisplay::printOnStatusLine(false, 3,  numBuffer);                                         // effective wpm
+    MorseDisplay::printOnStatusLine(false, 3, numBuffer);                                         // effective wpm
 
-  sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
-  MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? true : false, 7,  numBuffer);
-  MorseDisplay::printOnStatusLine(false, 10,  "WpM");
-  MorseDisplay::displayDisplay();
+    sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
+    MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? true : false, 7, numBuffer);
+    MorseDisplay::printOnStatusLine(false, 10, "WpM");
+    MorseDisplay::displayDisplay();
 }
 
-
-void MorseDisplay::showVolumeBar(uint16_t mini, uint16_t maxi) {
+void MorseDisplay::showVolumeBar(uint16_t mini, uint16_t maxi)
+{
     int a, b, c;
     a = map(mini, 0, 4096, 0, 125);
     b = map(maxi, 0, 4000, 0, 125);
     c = b - a;
     MorseDisplay::clearLine(2);
-    display.drawRect(5, SCROLL_TOP + 2 * LINE_HEIGHT +5, 102, LINE_HEIGHT-8);
-    display.drawRect(30, SCROLL_TOP + 2 * LINE_HEIGHT +5, 52, LINE_HEIGHT-8);
-    display.fillRect(a, SCROLL_TOP + 2 * LINE_HEIGHT + 7 , c, LINE_HEIGHT -11);
+    display.drawRect(5, SCROLL_TOP + 2 * LINE_HEIGHT + 5, 102, LINE_HEIGHT - 8);
+    display.drawRect(30, SCROLL_TOP + 2 * LINE_HEIGHT + 5, 52, LINE_HEIGHT - 8);
+    display.fillRect(a, SCROLL_TOP + 2 * LINE_HEIGHT + 7, c, LINE_HEIGHT - 11);
     display.display();
 }

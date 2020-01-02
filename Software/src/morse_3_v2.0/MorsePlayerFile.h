@@ -1,7 +1,8 @@
 #ifndef MORSEPLAYERFILE_H_
 #define MORSEPLAYERFILE_H_
 
-namespace MorsePlayerFile {
+namespace MorsePlayerFile
+{
 
     void setup();
     String getWord();
@@ -9,7 +10,5 @@ namespace MorsePlayerFile {
     void openAndSkip();
 
 }
-
-
 
 #endif /* MORSEPLAYERFILE_H_ */

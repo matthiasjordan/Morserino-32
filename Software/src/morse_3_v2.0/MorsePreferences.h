@@ -9,8 +9,6 @@
 namespace MorsePreferences
 {
 
-
-
     enum prefPos
     {
         posClicks,
@@ -68,7 +66,6 @@ namespace MorsePreferences
     extern prefPos extTrxOptions[];
     extern prefPos decoderOptions[];
     extern prefPos allOptions[];
-
 
     class MorsePrefs
     {
@@ -139,7 +136,6 @@ namespace MorsePreferences
 
     };
 
-
     /// variables for managing snapshots
     extern uint8_t memories[8];
     extern uint8_t memCounter;
@@ -150,7 +146,6 @@ namespace MorsePreferences
     extern prefPos *currentOptions;
 
     extern unsigned long charCounter; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
-
 
     MorsePrefs readPreferences(String repository);
     void writePreferences(String repository);

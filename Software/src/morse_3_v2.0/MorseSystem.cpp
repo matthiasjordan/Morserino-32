@@ -12,20 +12,20 @@ int16_t MorseSystem::batteryVoltage()
     int32_t c, diff;
 
 #if BOARDVERSION == 3
-    WiFi.mode( WIFI_MODE_NULL );      // make sure WiFi is not running, as it uses the same ADC as battery measurement!
-    const float XS = 1.95;//The returned reading is multiplied by this XS to get the battery voltage.
+    WiFi.mode(WIFI_MODE_NULL);      // make sure WiFi is not running, as it uses the same ADC as battery measurement!
+    const float XS = 1.95;      //The returned reading is multiplied by this XS to get the battery voltage.
 
-    analogSetClockDiv(128);//  this value was found by experimenting - no clue what it really does :-(
-    analogSetPinAttenuation(batteryPin,ADC_11db);
+    analogSetClockDiv(128);      //  this value was found by experimenting - no clue what it really does :-(
+    analogSetPinAttenuation(batteryPin, ADC_11db);
     //delay(75);
     c = 0;
     for (int i = 0; i < 2048; ++i)
-    c += analogRead(batteryPin);
+        c += analogRead(batteryPin);
 
-    c = (int) c*XS;
+    c = (int) c * XS;
     c = c / 2048;
     //printOnScroll(1, REGULAR, 1, String(c));
-    analogSetClockDiv(1);// 5ms
+    analogSetClockDiv(1);      // 5ms
 
 #elif BOARDVERSION == 2     // probably buggy - but BOARDVERSION 2 is not supported anymore, was prototype only
     adcAttachPin(batteryPin);
@@ -42,7 +42,6 @@ int16_t MorseSystem::batteryVoltage()
 }
 
 volatile uint64_t TOTcounter;                       // holds millis for Time-Out Timer
-
 
 void MorseSystem::resetTOT()
 {       //// reset the Time Out Timer - we do this whenever there is a screen update
@@ -80,7 +79,7 @@ void MorseSystem::shutMeDown()
     LoRa.sleep();                   //LORA sleep
     delay(50);
 #if BOARDVERSION == 3
-    digitalWrite(Vext,HIGH);
+    digitalWrite(Vext, HIGH);
 #endif
     delay(50);
     esp_deep_sleep_start();         // go to deep sleep

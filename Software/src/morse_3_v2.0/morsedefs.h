@@ -150,9 +150,7 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 
 ///////////////////////////////////////// END OF HARDWARE DEFS ////////////////////////////////////////////////////////////////////
 
-
 #endif
-
 
 #define SizeOfArray(x)       (sizeof(x) / sizeof(x[0]))
 

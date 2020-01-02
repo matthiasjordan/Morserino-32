@@ -11,74 +11,65 @@
 #include "MorseDisplay.h"
 #include "MorseUI.h"
 
-
 using namespace MorsePreferences;
 
-
-
-
-
-
-
 const String MorsePreferences::prefOption[] =
-{
-        "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
-        "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
-        "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
-        "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-        "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-        "Max # of Words",
-        //
-        "Sentinel"};
+    {"Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
+            "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
+            "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
+            "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
+            "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
+            "Max # of Words",
+            //
+            "Sentinel"};
 
 prefPos MorsePreferences::keyerOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posKeyTrainerMode, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posKeyTrainerMode, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::generatorOptions[] =
-{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-        posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
-        posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
+            posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
+            posLoraSyncW, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::headOptions[] =
-{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-        posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
+            posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart,
+            sentinel};
 prefPos MorsePreferences::playerOptions[] =
-{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
-        posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
+            posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::echoPlayerOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
-        posEchoConf, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
+            posEchoConf, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::echoTrainerOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-        posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+            posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::kochGenOptions[] =
-{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
-        posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
-        posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
+            posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
+            posQuickStart, sentinel};
 prefPos MorsePreferences::kochEchoOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
-        posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
+            posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::loraTrxOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
 prefPos MorsePreferences::extTrxOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::decoderOptions[] =
-{posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
+    {posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
 
 prefPos MorsePreferences::allOptions[] =
-{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-        posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
-        posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
-
-
+    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+            posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
+            posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart,
+            sentinel};
 
 Preferences pref;               // use the Preferences library for storing and retrieving objects
-
 
 /// variables for managing snapshots
 uint8_t MorsePreferences::memories[8];
@@ -90,10 +81,6 @@ MorsePrefs MorsePreferences::prefs;
 prefPos *MorsePreferences::currentOptions = MorsePreferences::allOptions;
 
 unsigned long MorsePreferences::charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
-
-
-
-
 
 //MorsePrefs prefs;
 
@@ -523,55 +510,60 @@ void MorsePreferences::clearMemory(uint8_t ptr)
     delay(1000);
 }
 
-void MorsePreferences::writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG) {
+void MorsePreferences::writeLoRaPrefs(uint8_t loraBand, uint32_t loraQRG)
+{
     pref.begin("morserino", false);             // open the namespace as read/write
     pref.putUChar("loraBand", loraBand);
     pref.putUInt("loraQRG", loraQRG);
     pref.end();
 }
 
-
-void MorsePreferences::fireCharSeen(boolean wpmOnly) {
+void MorsePreferences::fireCharSeen(boolean wpmOnly)
+{
     ++charCounter;                         // count this character
 
-   // if we have seen 12 chars since changing speed, we write the config to Preferences
-   if (charCounter == 12) {
-      pref.begin("morserino", false);             // open the namespace as read/write
-      pref.putUChar("wpm", MorsePreferences::prefs.wpm);
-      if (!wpmOnly) {
-          pref.putUChar("tLeft", MorsePreferences::prefs.tLeft);
-          pref.putUChar("tRight", MorsePreferences::prefs.tRight);
-      }
-      pref.end();
-   }
+    // if we have seen 12 chars since changing speed, we write the config to Preferences
+    if (charCounter == 12)
+    {
+        pref.begin("morserino", false);             // open the namespace as read/write
+        pref.putUChar("wpm", MorsePreferences::prefs.wpm);
+        if (!wpmOnly)
+        {
+            pref.putUChar("tLeft", MorsePreferences::prefs.tLeft);
+            pref.putUChar("tRight", MorsePreferences::prefs.tRight);
+        }
+        pref.end();
+    }
 
 }
 
-
-void MorsePreferences::writeWordPointer() {
-    if ((prefs.fileWordPointer != pref.getUInt("fileWordPtr"))) {   // update word pointer if necessary (if we ran player before)
+void MorsePreferences::writeWordPointer()
+{
+    if ((prefs.fileWordPointer != pref.getUInt("fileWordPtr")))
+    {   // update word pointer if necessary (if we ran player before)
         pref.begin("morserino", false);              // open the namespace as read/write
-       pref.putUInt("fileWordPtr", prefs.fileWordPointer);
-       pref.end();
+        pref.putUInt("fileWordPtr", prefs.fileWordPointer);
+        pref.end();
     }
 }
 
-
-void MorsePreferences::writeVolume() {
+void MorsePreferences::writeVolume()
+{
     pref.begin("morserino", false);                     // open the namespace as read/write
     if (pref.getUChar("sidetoneVolume") != MorsePreferences::prefs.sidetoneVolume)
         pref.putUChar("sidetoneVolume", MorsePreferences::prefs.sidetoneVolume);  // store the last volume, if it has changed
     pref.end();
 }
 
-
-void MorsePreferences::writeLastExecuted(uint8_t menuPtr) {
+void MorsePreferences::writeLastExecuted(uint8_t menuPtr)
+{
     pref.begin("morserino", false);             // open the namespace as read/write
     pref.putUChar("lastExecuted", menuPtr);   // store last executed command
     pref.end();                                 // close namespace
 }
 
-void MorsePreferences::writeWifiInfo(String SSID, String passwd) {
+void MorsePreferences::writeWifiInfo(String SSID, String passwd)
+{
     MorsePreferences::prefs.wlanSSID = SSID;
     MorsePreferences::prefs.wlanPassword = passwd;
     //Serial.println("SSID: " + MorsePreferences::prefs.wlanSSID + " Password: " + MorsePreferences::prefs.wlanPassword);

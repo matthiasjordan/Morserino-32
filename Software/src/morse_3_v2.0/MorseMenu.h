@@ -3,13 +3,11 @@
 
 #include "MorsePreferences.h"
 
-namespace MorseMenu {
+namespace MorseMenu
+{
 
     void menu_();
     void cleanStartSettings();
 }
-
-
-
 
 #endif /* MORSEMENU_H_ */

@@ -3,15 +3,18 @@
 
 #include <Arduino.h>
 
-namespace MorseEchoTrainer {
-
+namespace MorseEchoTrainer
+{
 
     ////////////////////////////////////////////////////////////////////
     ///// Variables for Echo Trainer Mode
     /////
 
     extern String echoResponse;
-    enum echoStates { START_ECHO, SEND_WORD, REPEAT_WORD, GET_ANSWER, COMPLETE_ANSWER, EVAL_ANSWER };
+    enum echoStates
+    {
+        START_ECHO, SEND_WORD, REPEAT_WORD, GET_ANSWER, COMPLETE_ANSWER, EVAL_ANSWER
+    };
     extern String echoTrainerPrompt;
     extern String echoTrainerWord;
     extern boolean echoStop;                         // for maxSequence
@@ -23,11 +26,8 @@ namespace MorseEchoTrainer {
     boolean isState(echoStates state);
     void setState(echoStates newState);
     echoStates getState();
-    void changeSpeed( int t);
+    void changeSpeed(int t);
 
 }
-
-
-
 
 #endif /* MORSEECHOTRAINER_H_ */

@@ -11,8 +11,8 @@
 //#include "FS.h"
 #include "SPIFFS.h"
 
-
-namespace MorseWifi {
+namespace MorseWifi
+{
     ////////////////// Variables for file handling and WiFi functions
 
 //    File file;
@@ -23,16 +23,12 @@ namespace MorseWifi {
 
     extern const char* host;               // hostname of the webserver
 
-
     /// WiFi constants
     extern const char* ssid;
     extern const char* password;
 
-
     // HTML for the AP server - ued to get SSID and Password for local WiFi network - needed for file upload and OTA SW updates
     extern const char* myForm;
-
-
 
     /*
      * HTML for Upload Login page
@@ -42,7 +38,6 @@ namespace MorseWifi {
     extern const char* updateLoginIndex;
     extern const char* serverIndex;
 
-
     void startAP();
     boolean wifiConnect();
     void uploadFile();
@@ -51,8 +46,5 @@ namespace MorseWifi {
     bool handleFileRead(String path);       // send the right file to the client (if it exists)
     void handleFileUpload();                // upload a new file to the SPIFFS
 }
-
-
-
 
 #endif /* MORSEWIFI_H_ */

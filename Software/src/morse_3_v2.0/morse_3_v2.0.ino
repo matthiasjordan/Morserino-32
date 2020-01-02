@@ -1,4 +1,3 @@
-
 /******************************************************************************************************************************
  *  morse_3 Software for the Morserino-32 multi-functional Morse code machine, based on the Heltec WiFi LORA (ESP32) module ***
  *  Copyright (C) 2018  Willi Kraml, OE1WKL                                                                                 ***
@@ -13,7 +12,7 @@
  *  If not, see <https://www.gnu.org/licenses/>.
  *****************************************************************************************************************************/
 
- /*****************************************************************************************************************************
+/*****************************************************************************************************************************
  *  code by others used in this sketch, apart from the ESP32 libraries distributed by Heltec
  *  (see: https://github.com/Heltec-Aaron-Lee/WiFi_Kit_series)
  *
@@ -28,7 +27,6 @@
  ****************************************************************************************************************************/
 
 ///// include of the various libraries and include files being used
-
 #include <Wire.h>          // Only needed for Arduino 1.6.5 and earlier
 #include "ClickButton.h"   // button control library
 #include <SPI.h>           // library for SPI interface
@@ -44,8 +42,8 @@
 #include "morsedefs.h"
 #include "MorseDisplay.h"
 #include "wklfonts.h"      // monospaced fonts in size 12 (regular and bold) for smaller text and 15 for larger text (regular and bold), called :
-                           // DialogInput_plain_12, DialogInput_bold_12 & DialogInput_plain_15, DialogInput_bold_15
-                           // these fonts were created with this tool: http://oleddisplay.squix.ch/#/home
+// DialogInput_plain_12, DialogInput_bold_12 & DialogInput_plain_15, DialogInput_bold_15
+// these fonts were created with this tool: http://oleddisplay.squix.ch/#/home
 #include "abbrev.h"        // common CW abbreviations
 #include "english_words.h" // common English words
 #include "MorsePreferences.h"
@@ -64,429 +62,389 @@
 #include "MorseMenu.h"
 #include "MorseEchoTrainer.h"
 
-
-
-
-
-
-
-
 // positions: [3] 1 0 2 [3] 1 0 2 [3]
 // [3] is the positions where my rotary switch detends
 // ==> right, count up
 // <== left,  count down
 
-
-
-
-
-
-
-
 //// for adjusting preferences
-
-
-
-
-
-
-
 
 ///////////////////////////////////
 //// Other Global VARIABLES ////////////
 /////////////////////////////////
 
-
-
-
-
-
 //// not any longer defined in preferences:
 
-  
-
-
-
-
-
-
-
-
-
-  //CWword.reserve(144);
-  //clearText.reserve(50);
-
-
-
+//CWword.reserve(144);
+//clearText.reserve(50);
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
 /// interrupt service routine - needs to be positioned BEFORE all other functions, including setup() and loop()
 /// interrupt service routine
 
-void IRAM_ATTR isr ()  {                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
+void IRAM_ATTR isr()
+{                    // Interrupt service routine is executed when a HIGH to LOW transition is detected on CLK
     MorseRotaryEncoder::isr();
 }
 
-
-
-int IRAM_ATTR checkEncoder() {
+int IRAM_ATTR checkEncoder()
+{
     return MorseRotaryEncoder::checkEncoder();
 }
-
 
 ////////////////////////   S E T U P /////////////////////////////
 
 void setup()
 {
- 
-  Serial.begin(115200);
-  delay(200); // give me time to bring up serial monitor
 
-  // enable Vext
-  #if BOARDVERSION == 3
-  pinMode(Vext, OUTPUT);
-  digitalWrite(Vext,LOW);
-  #endif
+    Serial.begin(115200);
+    delay(200); // give me time to bring up serial monitor
 
-  
-  // set up the encoder - we need external pull-ups as the pins used do not have built-in pull-ups!
-  pinMode(PinCLK,INPUT_PULLUP);
-  pinMode(PinDT,INPUT_PULLUP);  
-  pinMode(keyerPin, OUTPUT);        // we can use the built-in LED to show when the transmitter is being keyed
-  pinMode(leftPin, INPUT);          // external keyer left paddle
-  pinMode(rightPin, INPUT);         // external keyer right paddle
+    // enable Vext
+#if BOARDVERSION == 3
+    pinMode(Vext, OUTPUT);
+    digitalWrite(Vext, LOW);
+#endif
 
-  /// enable deep sleep
-  esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, (esp_sleep_ext1_wakeup_mode_t) 0); //1 = High, 0 = Low
-  analogSetAttenuation(ADC_0db);
+    // set up the encoder - we need external pull-ups as the pins used do not have built-in pull-ups!
+    pinMode(PinCLK, INPUT_PULLUP);
+    pinMode(PinDT, INPUT_PULLUP);
+    pinMode(keyerPin, OUTPUT);        // we can use the built-in LED to show when the transmitter is being keyed
+    pinMode(leftPin, INPUT);          // external keyer left paddle
+    pinMode(rightPin, INPUT);         // external keyer right paddle
 
+    /// enable deep sleep
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_0, (esp_sleep_ext1_wakeup_mode_t) 0); //1 = High, 0 = Low
+    analogSetAttenuation(ADC_0db);
 
 // we MUST reset the OLED RST pin for 50 ms! for the old board only, but as it does not hurt we do it anyway
 //#if BOARDVERSION == 2
-  pinMode(OLED_RST,OUTPUT);
-  digitalWrite(OLED_RST, LOW);     // set GPIO16 low to reset OLED
-  delay(50); 
-  digitalWrite(OLED_RST, HIGH);    // while OLED is running, must set GPIO16 in high
+    pinMode(OLED_RST, OUTPUT);
+    digitalWrite(OLED_RST, LOW);     // set GPIO16 low to reset OLED
+    delay(50);
+    digitalWrite(OLED_RST, HIGH);    // while OLED is running, must set GPIO16 in high
 //# endif
 
- // init display
-  
-  MorseDisplay::init();
+    // init display
 
-  MorseSound::setup();
-  
-  //call ISR when any high/low changed seen
-  //on any of the enoder pins
-  attachInterrupt (digitalPinToInterrupt(PinDT), isr, CHANGE);   
-  attachInterrupt (digitalPinToInterrupt(PinCLK), isr, CHANGE);
- 
-MorseRotaryEncoder::setup();
+    MorseDisplay::init();
+
+    MorseSound::setup();
+
+    //call ISR when any high/low changed seen
+    //on any of the enoder pins
+    attachInterrupt(digitalPinToInterrupt(PinDT), isr, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(PinCLK), isr, CHANGE);
+
+    MorseRotaryEncoder::setup();
 
 /// set up for encoder button
-  pinMode(modeButtonPin, INPUT);
-  pinMode(volButtonPin, INPUT_PULLUP);               // external pullup for all GPIOS > 32 with ESP32-LORA
-                                                     // wake up also works without external pullup! Interesting!
-  
-  MorseUI::setup();
+    pinMode(modeButtonPin, INPUT);
+    pinMode(volButtonPin, INPUT_PULLUP);               // external pullup for all GPIOS > 32 with ESP32-LORA
+                                                       // wake up also works without external pullup! Interesting!
 
+    MorseUI::setup();
 
+    // to calibrate sensors, we record the values in untouched state
+    MorseKeyer::setup();
 
-  // to calibrate sensors, we record the values in untouched state
-  MorseKeyer::setup();
-  
-  // read preferences from non-volatile storage
-  // if version cannot be read, we have a new ESP32 and need to write the preferences first
-  MorsePreferences::readPreferences("morserino");
+    // read preferences from non-volatile storage
+    // if version cannot be read, we have a new ESP32 and need to write the preferences first
+    MorsePreferences::readPreferences("morserino");
 
-  Koch::setup();
+    Koch::setup();
 
+    MorseLoRa::setup();
 
-  MorseLoRa::setup();
+    /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
 
-
-
-  /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
-
-  
-MorsePlayerFile::setup();
-  MorseDisplay::displayStartUp();
+    MorsePlayerFile::setup();
+    MorseDisplay::displayStartUp();
 
     ///delay(2500);  //// just to be able to see the startup screen for a while - is contained in displayStartUp()
 
-  ////
+    ////
 
-  MorseMenu::menu_();
+    MorseMenu::menu_();
 } /////////// END setup()
-
-
-
-
-
-
-
-
-
-
 
 ///////////////////////// THE MAIN LOOP - do this OFTEN! /////////////////////////////////
 
-void loop() {
+void loop()
+{
 // static uint64_t loopC = 0;
-   int t;
+    int t;
 
-   boolean activeOld = MorseEchoTrainer::active;
-   MorseKeyer::checkPaddles();
-   switch (MorseMachine::getMode()) {
-      case MorseMachine::morseKeyer:    if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
-                               return;                                                        // we are busy keying and so need a very tight loop !
-                          }
-                          break;
-      case MorseMachine::loraTrx:      if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
-                               return;                                                        // we are busy keying and so need a very tight loop !
-                          }
-                          MorseGenerator::generateCW();
-                          break;
-      case MorseMachine::morseTrx:      if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey)) {
-                               return;                                                        // we are busy keying and so need a very tight loop !
-                          }  
-                          Decoder::doDecode();
-                          if (Decoder::speedChanged) {
-                            Decoder::speedChanged = false;
-                            MorseDisplay::displayCWspeed();
-                          }
-                          break;    
-      case MorseMachine::morseGenerator:  if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey  || MorseKeyer::rightKey)   {                                    // touching a paddle starts and stops the generation of code
-                          // for debouncing:
-                          while (MorseKeyer::checkPaddles() )
-                              ;                                                           // wait until paddles are released
+    boolean activeOld = MorseEchoTrainer::active;
+    MorseKeyer::checkPaddles();
+    switch (MorseMachine::getMode())
+    {
+        case MorseMachine::morseKeyer:
+            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            {
+                return;                                                        // we are busy keying and so need a very tight loop !
+            }
+            break;
+        case MorseMachine::loraTrx:
+            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            {
+                return;                                                        // we are busy keying and so need a very tight loop !
+            }
+            MorseGenerator::generateCW();
+            break;
+        case MorseMachine::morseTrx:
+            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            {
+                return;                                                        // we are busy keying and so need a very tight loop !
+            }
+            Decoder::doDecode();
+            if (Decoder::speedChanged)
+            {
+                Decoder::speedChanged = false;
+                MorseDisplay::displayCWspeed();
+            }
+            break;
+        case MorseMachine::morseGenerator:
+            if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
+            {                                    // touching a paddle starts and stops the generation of code
+                // for debouncing:
+                while (MorseKeyer::checkPaddles())
+                    ;                                                           // wait until paddles are released
 
-                          if (MorseGenerator::effectiveAutoStop) {
-                              MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
-                            switch (MorseGenerator::autoStop) {
-                              case MorseGenerator::off : {
-                                  break;
-                                  //
-                                }
-                              case MorseGenerator::stop1: {
-                                  MorseGenerator::autoStop = MorseGenerator::stop2;
-                                  break;
-                                }
-                              case MorseGenerator::stop2: {
-                                  MorseDisplay::printToScroll(REGULAR, "\n");
-                                  MorseGenerator::autoStop = MorseGenerator::off;
-                                  break;
-                                }
-                            }
-                          }
-                          else {
-                              MorseEchoTrainer::active = !MorseEchoTrainer::active;
-                            MorseGenerator::autoStop = MorseGenerator::off;
-                          }
-
-                          //delay(100);
-                          } /// end squeeze
-                          
-                          ///// check stopFlag triggered by maxSequence
-                          if (MorseGenerator::stopFlag) {
-                              MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
-                          }
-                          if (activeOld != MorseEchoTrainer::active) {
-                            if (!MorseEchoTrainer::active) {
-                               MorseGenerator::keyOut(false, true, 0, 0);
-                               MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                            }
-                          else {
-                               //cleanStartSettings();        
-                              MorseGenerator::generatorState = MorseGenerator::KEY_UP;
-                              MorseGenerator::genTimer = millis()-1;           // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-                            }
-                          }
-                          if (MorseEchoTrainer::active)
-                            MorseGenerator::generateCW();
-                          break;
-      case MorseMachine::echoTrainer:                             ///// check stopFlag triggered by maxSequence
-                          if (MorseGenerator::stopFlag) {
-                              MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
-                            MorseGenerator::keyOut(false, true, 0, 0);
-                            MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                          }
-                          if (!MorseEchoTrainer::active && (MorseKeyer::leftKey  || MorseKeyer::rightKey))   {                       // touching a paddle starts  the generation of code
-                              // for debouncing:
-                              while (MorseKeyer::checkPaddles() )
-                                  ;                                                           // wait until paddles are released
-                              MorseEchoTrainer::active = !MorseEchoTrainer::active;
-             
-                              MorseMenu::cleanStartSettings();
-                          } /// end touch to start
-                          if (MorseEchoTrainer::active)
-                          switch (MorseEchoTrainer::getState()) {
-                            case  MorseEchoTrainer::START_ECHO:
-                            case  MorseEchoTrainer::SEND_WORD:
-                            case  MorseEchoTrainer::REPEAT_WORD:  MorseEchoTrainer::echoResponse = ""; MorseGenerator::generateCW();
-                                                break;
-                            case  MorseEchoTrainer::EVAL_ANSWER:  MorseEchoTrainer::echoTrainerEval();
-                                                break;
-                            case  MorseEchoTrainer::COMPLETE_ANSWER:
-                            case  MorseEchoTrainer::GET_ANSWER:   if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
-                                                    return;                             // we are busy keying and so need a very tight loop !
-                                                break;
-                            }                              
+                if (MorseGenerator::effectiveAutoStop)
+                {
+                    MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
+                    switch (MorseGenerator::autoStop)
+                    {
+                        case MorseGenerator::off:
+                        {
                             break;
-      case MorseMachine::morseDecoder: Decoder::doDecode();
-                         if (Decoder::speedChanged) {
-                             Decoder::speedChanged = false;
-                            MorseDisplay::displayCWspeed();
-                          }
-                         break;
-      default:            break;
-            
-                        
-  } // end switch and code depending on state of metaMorserino
+                            //
+                        }
+                        case MorseGenerator::stop1:
+                        {
+                            MorseGenerator::autoStop = MorseGenerator::stop2;
+                            break;
+                        }
+                        case MorseGenerator::stop2:
+                        {
+                            MorseDisplay::printToScroll(REGULAR, "\n");
+                            MorseGenerator::autoStop = MorseGenerator::off;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    MorseEchoTrainer::active = !MorseEchoTrainer::active;
+                    MorseGenerator::autoStop = MorseGenerator::off;
+                }
+
+                //delay(100);
+            } /// end squeeze
+
+            ///// check stopFlag triggered by maxSequence
+            if (MorseGenerator::stopFlag)
+            {
+                MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
+            }
+            if (activeOld != MorseEchoTrainer::active)
+            {
+                if (!MorseEchoTrainer::active)
+                {
+                    MorseGenerator::keyOut(false, true, 0, 0);
+                    MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+                }
+                else
+                {
+                    //cleanStartSettings();        
+                    MorseGenerator::generatorState = MorseGenerator::KEY_UP;
+                    MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
+                }
+            }
+            if (MorseEchoTrainer::active)
+                MorseGenerator::generateCW();
+            break;
+        case MorseMachine::echoTrainer:                             ///// check stopFlag triggered by maxSequence
+            if (MorseGenerator::stopFlag)
+            {
+                MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
+                MorseGenerator::keyOut(false, true, 0, 0);
+                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+            }
+            if (!MorseEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
+            {                       // touching a paddle starts  the generation of code
+                // for debouncing:
+                while (MorseKeyer::checkPaddles())
+                    ;                                                           // wait until paddles are released
+                MorseEchoTrainer::active = !MorseEchoTrainer::active;
+
+                MorseMenu::cleanStartSettings();
+            } /// end touch to start
+            if (MorseEchoTrainer::active)
+                switch (MorseEchoTrainer::getState())
+                {
+                    case MorseEchoTrainer::START_ECHO:
+                    case MorseEchoTrainer::SEND_WORD:
+                    case MorseEchoTrainer::REPEAT_WORD:
+                        MorseEchoTrainer::echoResponse = "";
+                        MorseGenerator::generateCW();
+                        break;
+                    case MorseEchoTrainer::EVAL_ANSWER:
+                        MorseEchoTrainer::echoTrainerEval();
+                        break;
+                    case MorseEchoTrainer::COMPLETE_ANSWER:
+                    case MorseEchoTrainer::GET_ANSWER:
+                        if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+                            return;                             // we are busy keying and so need a very tight loop !
+                        break;
+                }
+            break;
+        case MorseMachine::morseDecoder:
+            Decoder::doDecode();
+            if (Decoder::speedChanged)
+            {
+                Decoder::speedChanged = false;
+                MorseDisplay::displayCWspeed();
+            }
+            break;
+        default:
+            break;
+
+    } // end switch and code depending on state of metaMorserino
 
 /// if we have time check for button presses
 
     MorseUI::modeButton.Update();
     MorseUI::volButton.Update();
-    
-    switch (MorseUI::volButton.clicks) {
-      case 1:   if (MorseMachine::isEncoderMode(MorseMachine::scrollMode)) {
-                    if (MorseMachine::isMode(MorseMachine::morseDecoder)) {
-                        MorseMachine::encoderState = MorseMachine::speedSettingMode;
-                    }
-                    else {
-                        MorseMachine::encoderState = MorseMachine::volumeSettingMode;
-                    }
-                    MorseDisplay::relPos = MorseDisplay::maxPos;
-                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
-                    MorseDisplay::displayScrollBar(false);
-                } else if (MorseMachine::encoderState == MorseMachine::volumeSettingMode && !MorseMachine::isMode(MorseMachine::morseDecoder)) {          //  single click toggles encoder between speed and volume
-                   MorseMachine::encoderState = MorseMachine::speedSettingMode;
-                  MorsePreferences::writeVolume();
-                  MorseDisplay::displayCWspeed();
-                  MorseDisplay::displayVolume();
+
+    switch (MorseUI::volButton.clicks)
+    {
+        case 1:
+            if (MorseMachine::isEncoderMode(MorseMachine::scrollMode))
+            {
+                if (MorseMachine::isMode(MorseMachine::morseDecoder))
+                {
+                    MorseMachine::encoderState = MorseMachine::speedSettingMode;
                 }
-                else {
-                    MorseMachine::encoderState = MorseMachine::volumeSettingMode;
-                  MorseDisplay::displayCWspeed();
-                  MorseDisplay::displayVolume();
-                }
-                break;
-      case -1:  if (MorseMachine::encoderState == MorseMachine::scrollMode) {
-                  MorseMachine::encoderState = (MorseMachine::isMode(MorseMachine::morseDecoder) ? MorseMachine::volumeSettingMode : MorseMachine::speedSettingMode);
-                  MorseDisplay::relPos = MorseDisplay::maxPos;
-                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
-                    MorseDisplay::displayScrollBar(false);
-                }       
-                else {
-                    MorseMachine::encoderState = MorseMachine::scrollMode;
-                    MorseDisplay::displayScrollBar(true);
-                }
-                break;
-    }
-   
-    switch (MorseUI::modeButton.clicks) {                                // actions based on enocder button
-       case -1:   MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
-                  return;
-       case 1:    if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)) {//  start/stop in trainer modi, in others does nothing currently
-           MorseEchoTrainer::active = !MorseEchoTrainer::active;
-                  if (!MorseEchoTrainer::active) {
-                        //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
-                        //pwmNoTone(); 
-                        MorseGenerator::keyOut(false, true, 0, 0);
-                        MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                  }
-                  else {
-                      MorseMenu::cleanStartSettings();
-                  }
-                        
-              }
-              break;
-       case 2:  MorsePreferencesMenu::setupPreferences(MorsePreferences::prefs.menuPtr);                               // double click shows the preferences menu (true would select a specific option only)
-                MorseDisplay::clear();                                  // restore display
-                MorseDisplay::displayTopLine();
-                if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
-                    MorseGenerator::stopFlag = true;                                  // we stop what we had been doing
                 else
-                    MorseGenerator::stopFlag = false;
-                //startFirst = true;
-                //firstTime = true;
-                break;
-     default: break;
+                {
+                    MorseMachine::encoderState = MorseMachine::volumeSettingMode;
+                }
+                MorseDisplay::relPos = MorseDisplay::maxPos;
+                MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
+                MorseDisplay::displayScrollBar(false);
+            }
+            else if (MorseMachine::encoderState == MorseMachine::volumeSettingMode && !MorseMachine::isMode(MorseMachine::morseDecoder))
+            {          //  single click toggles encoder between speed and volume
+                MorseMachine::encoderState = MorseMachine::speedSettingMode;
+                MorsePreferences::writeVolume();
+                MorseDisplay::displayCWspeed();
+                MorseDisplay::displayVolume();
+            }
+            else
+            {
+                MorseMachine::encoderState = MorseMachine::volumeSettingMode;
+                MorseDisplay::displayCWspeed();
+                MorseDisplay::displayVolume();
+            }
+            break;
+        case -1:
+            if (MorseMachine::encoderState == MorseMachine::scrollMode)
+            {
+                MorseMachine::encoderState =
+                        (MorseMachine::isMode(MorseMachine::morseDecoder) ? MorseMachine::volumeSettingMode : MorseMachine::speedSettingMode);
+                MorseDisplay::relPos = MorseDisplay::maxPos;
+                MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
+                MorseDisplay::displayScrollBar(false);
+            }
+            else
+            {
+                MorseMachine::encoderState = MorseMachine::scrollMode;
+                MorseDisplay::displayScrollBar(true);
+            }
+            break;
     }
-    
+
+    switch (MorseUI::modeButton.clicks)
+    {                                // actions based on enocder button
+        case -1:
+            MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
+            return;
+        case 1:
+            if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
+            {                                       //  start/stop in trainer modi, in others does nothing currently
+                MorseEchoTrainer::active = !MorseEchoTrainer::active;
+                if (!MorseEchoTrainer::active)
+                {
+                    //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
+                    //pwmNoTone(); 
+                    MorseGenerator::keyOut(false, true, 0, 0);
+                    MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+                }
+                else
+                {
+                    MorseMenu::cleanStartSettings();
+                }
+
+            }
+            break;
+        case 2:
+            MorsePreferencesMenu::setupPreferences(MorsePreferences::prefs.menuPtr); // double click shows the preferences menu (true would select a specific option only)
+            MorseDisplay::clear();                                  // restore display
+            MorseDisplay::displayTopLine();
+            if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
+                MorseGenerator::stopFlag = true;                                  // we stop what we had been doing
+            else
+                MorseGenerator::stopFlag = false;
+            //startFirst = true;
+            //firstTime = true;
+            break;
+        default:
+            break;
+    }
+
 /// and we have time to check the encoder
-     if ((t = checkEncoder())) {
+    if ((t = checkEncoder()))
+    {
         //Serial.println("t: " + String(t));
         MorseUI::click();
-        switch (MorseMachine::encoderState) {
-          case MorseMachine::speedSettingMode:
-                                  MorseEchoTrainer::changeSpeed(t);
-                                  break;
-          case MorseMachine::volumeSettingMode:
-                                  MorsePreferences::prefs.sidetoneVolume += (t*10)+11;
-                                  MorsePreferences::prefs.sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) -11;
-                                  //Serial.println(MorsePreferences::prefs.sidetoneVolume);
-                                  MorseDisplay::displayVolume();
-                                  break;
-          case MorseMachine::scrollMode:
-                                  if (t == 1 && MorseDisplay::relPos < MorseDisplay::maxPos ) {        // up = scroll towards bottom
-                                    ++MorseDisplay::relPos;
-                                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
-                                  }
-                                  else if (t == -1 && MorseDisplay::relPos > 0) {
-                                    --MorseDisplay::relPos;
-                                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
-                                  }
-                                  //encoderPos = 0;
-                                  //portEXIT_CRITICAL(&mux);
-                                  MorseDisplay::displayScrollBar(true);
-                                  break;
-          }
+        switch (MorseMachine::encoderState)
+        {
+            case MorseMachine::speedSettingMode:
+                MorseEchoTrainer::changeSpeed(t);
+                break;
+            case MorseMachine::volumeSettingMode:
+                MorsePreferences::prefs.sidetoneVolume += (t * 10) + 11;
+                MorsePreferences::prefs.sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) - 11;
+                //Serial.println(MorsePreferences::prefs.sidetoneVolume);
+                MorseDisplay::displayVolume();
+                break;
+            case MorseMachine::scrollMode:
+                if (t == 1 && MorseDisplay::relPos < MorseDisplay::maxPos)
+                {        // up = scroll towards bottom
+                    ++MorseDisplay::relPos;
+                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
+                }
+                else if (t == -1 && MorseDisplay::relPos > 0)
+                {
+                    --MorseDisplay::relPos;
+                    MorseDisplay::refreshScrollArea((MorseDisplay::bottomLine + 1 + MorseDisplay::relPos) % NoOfLines);
+                }
+                //encoderPos = 0;
+                //portEXIT_CRITICAL(&mux);
+                MorseDisplay::displayScrollBar(true);
+                break;
+        }
     } // encoder 
     MorseSystem::checkShutDown(false);         // check for time out
-    
+
 }     /////////////////////// end of loop() /////////
-
-
-
-
 
 // toggle polarity of paddles
 //void togglePolarity () {
 //      MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;
 //     //displayPolarity();
 //}
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
