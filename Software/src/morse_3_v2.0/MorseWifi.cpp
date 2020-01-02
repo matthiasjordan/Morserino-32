@@ -7,6 +7,7 @@
 #include "MorseWifi.h"
 #include "MorseDisplay.h"
 #include "MorsePreferences.h"
+#include "MorseUI.h"
 
 
 using namespace MorseWifi;
@@ -78,8 +79,8 @@ void MorseWifi::startAP() {
   while (true) {
       server.handleClient();
       delay(20);
-      volButton.Update();
-      if (volButton.clicks) {
+      MorseUI::volButton.Update();
+      if (MorseUI::volButton.clicks) {
         MorseDisplay::clear();
         MorseDisplay::printOnStatusLine(true, 0, "Resetting now...");
         delay(2000);

@@ -188,15 +188,7 @@ MorseRotaryEncoder::setup();
   pinMode(volButtonPin, INPUT_PULLUP);               // external pullup for all GPIOS > 32 with ESP32-LORA
                                                      // wake up also works without external pullup! Interesting!
   
-  // Setup button timers (all in milliseconds / ms)
-  // (These are default if not set, but changeable for convenience)
-  modeButton.debounceTime   = 11;   // Debounce timer in ms
-  modeButton.multiclickTime = 220;  // Time limit for multi clicks
-  modeButton.longClickTime  = 350; // time until "held-down clicks" register
-
-  volButton.debounceTime   = 11;   // Debounce timer in ms
-  volButton.multiclickTime = 220;  // Time limit for multi clicks
-  volButton.longClickTime  = 350; // time until "held-down clicks" register
+  MorseUI::setup();
 
 
 
@@ -354,10 +346,10 @@ void loop() {
 
 /// if we have time check for button presses
 
-    modeButton.Update();
-    volButton.Update();
+    MorseUI::modeButton.Update();
+    MorseUI::volButton.Update();
     
-    switch (volButton.clicks) {
+    switch (MorseUI::volButton.clicks) {
       case 1:   if (MorseMachine::isEncoderMode(MorseMachine::scrollMode)) {
                     if (MorseMachine::isMode(MorseMachine::morseDecoder)) {
                         MorseMachine::encoderState = MorseMachine::speedSettingMode;
@@ -393,7 +385,7 @@ void loop() {
                 break;
     }
    
-    switch (modeButton.clicks) {                                // actions based on enocder button
+    switch (MorseUI::modeButton.clicks) {                                // actions based on enocder button
        case -1:   MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
                   return;
        case 1:    if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)) {//  start/stop in trainer modi, in others does nothing currently

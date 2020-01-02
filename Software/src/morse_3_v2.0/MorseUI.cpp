@@ -8,6 +8,24 @@
 
 using namespace MorseUI;
 
+
+// define the buttons for the clickbutton library
+ClickButton modeButton(modeButtonPin);  // initialize mode button
+ClickButton volButton(volButtonPin);    // external pullup for this one
+
+
+void MorseUI::setup() {
+    // Setup button timers (all in milliseconds / ms)
+    // (These are default if not set, but changeable for convenience)
+    modeButton.debounceTime   = 11;   // Debounce timer in ms
+    modeButton.multiclickTime = 220;  // Time limit for multi clicks
+    modeButton.longClickTime  = 350; // time until "held-down clicks" register
+
+    volButton.debounceTime   = 11;   // Debounce timer in ms
+    volButton.multiclickTime = 220;  // Time limit for multi clicks
+    volButton.longClickTime  = 350; // time until "held-down clicks" register
+}
+
 void MorseUI::click() {
     MorseSound::pwmClick(MorsePreferences::prefs.sidetoneVolume);         /// click
 }

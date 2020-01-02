@@ -9,6 +9,7 @@
 #include "MorsePreferences.h"
 #include "MorsePreferencesMenu.h"
 #include "MorseDisplay.h"
+#include "MorseUI.h"
 
 
 using namespace MorsePreferences;
@@ -20,13 +21,15 @@ using namespace MorsePreferences;
 
 
 const String prefOption[] =
-{"Sentinel",
+{
         "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
         "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
         "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
         "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
         "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-        "Max # of Words"};
+        "Max # of Words",
+        //
+        "Sentinel"};
 
 prefPos keyerOptions[] =
 {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
@@ -473,7 +476,7 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
     memPtr = 0;
     MorsePreferencesMenu::displayKeyerPreferencesMenu(posSnapStore);
     MorsePreferencesMenu::adjustKeyerPreference(posSnapStore);
-    volButton.Update();
+    MorseUI::volButton.Update();
     //Serial.println("store memPtr: " + String(memPtr));
     if (memPtr != 8)
     {

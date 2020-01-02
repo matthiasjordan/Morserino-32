@@ -170,8 +170,8 @@ void MorseMenu::menu_() {
             MorseDisplay::printOnScrollFlash(2, REGULAR, 1, "QUICK START");
         }
         else {
-            modeButton.Update();
-            command = modeButton.clicks;
+            MorseUI::modeButton.Update();
+            command = MorseUI::modeButton.clicks;
         }
 
         switch (command) {                                          // actions based on enocder button
@@ -205,9 +205,9 @@ void MorseMenu::menu_() {
           newMenuPtr =  menuItems[newMenuPtr].nav[(t == -1) ? naviLeft : naviRight];
        }
 
-       volButton.Update();
+       MorseUI::volButton.Update();
 
-       switch (volButton.clicks) {
+       switch (MorseUI::volButton.clicks) {
           case -1:  MorseUI::audioLevelAdjust();                         /// for adjusting line-in audio level (at the same time keying tx and sending oudio on line-out
                     MorseDisplay::clear();
                     internal::menuDisplay(disp);

@@ -10,9 +10,9 @@
 namespace MorseDisplay
 {
 
-    const int8_t maxPos = NoOfLines - 3;
-    int8_t relPos = maxPos;
-    uint8_t bottomLine = 0;
+    extern const int8_t maxPos;
+    extern int8_t relPos;
+    extern uint8_t bottomLine;
 
 
     void init();

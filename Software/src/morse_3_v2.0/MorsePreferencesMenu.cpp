@@ -579,8 +579,8 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
     int t;
     while (true)
     {                            // we wait for single click = selection or long click = exit
-        modeButton.Update();
-        switch (modeButton.clicks)
+        MorseUI::modeButton.Update();
+        switch (MorseUI::modeButton.clicks)
         {
             case -1: //delay(200);
                 return true;
@@ -591,8 +591,8 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         }
         if (pos == MorsePreferences::posSnapRecall)
         {         // here we can delete a memory....
-            volButton.Update();
-            if (volButton.clicks)
+            MorseUI::volButton.Update();
+            if (MorseUI::volButton.clicks)
             {
                 if (MorsePreferences::memCounter)
                     MorsePreferences::clearMemory (MorsePreferences::memPtr);
@@ -874,8 +874,8 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
   MorseDisplay::printOnScroll(2, REGULAR, 0,  " ");
 
   while (true) {                            // we wait for single click = selection or long click = exit - or single or long click or RED button
-        modeButton.Update();
-        switch (modeButton.clicks) {            // button was clicked
+        MorseUI::modeButton.Update();
+        switch (MorseUI::modeButton.clicks) {            // button was clicked
           case 1:     // change the option corresponding to pos
                       if (adjustKeyerPreference(posPtr))
                          goto exitFromHere;
@@ -887,8 +887,8 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
                         break;
           }
 
-          volButton.Update();                 // RED button
-          switch (volButton.clicks) {         // was clicked
+        MorseUI::volButton.Update();                 // RED button
+          switch (MorseUI::volButton.clicks) {         // was clicked
             case 1:     // recall snapshot
                         if (MorsePreferences::recallSnapshot())
                             MorsePreferences::writePreferences("morserino");
@@ -899,8 +899,8 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
 
                         if (MorsePreferences::storeSnapshot(atMenu))
                             MorsePreferences::writePreferences("morserino");
-                        while(volButton.clicks)
-                          volButton.Update();
+                        while(MorseUI::volButton.clicks)
+                            MorseUI::volButton.Update();
                         return false;
                         break;
           }

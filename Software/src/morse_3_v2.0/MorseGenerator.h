@@ -9,7 +9,9 @@ namespace MorseGenerator {
 
     enum MORSE_TYPE {KEY_DOWN, KEY_UP };                    //   State Machine Defines
 
-    enum AutoStopModes {off, stop1, stop2}  autoStop = off;
+    enum AutoStopModes {off, stop1, stop2};
+
+    extern AutoStopModes autoStop;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
     extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode

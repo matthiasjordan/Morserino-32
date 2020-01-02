@@ -13,7 +13,6 @@ namespace MorsePreferences
 
     enum prefPos
     {
-        sentinel,
         posClicks,
         posPitch,
         posExtPaddles,
@@ -50,7 +49,9 @@ namespace MorsePreferences
         posLoraQRG,
         posSnapRecall,
         posSnapStore,
-        posMaxSequence
+        posMaxSequence,
+        //
+        sentinel
     };
 
     extern const String prefOption[];

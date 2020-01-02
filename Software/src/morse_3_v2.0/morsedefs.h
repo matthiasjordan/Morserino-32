@@ -2,7 +2,6 @@
 #define MORSEDEFS_H
 
 #include <Arduino.h>
-#include "ClickButton.h"   // button control library
 
 //////// Program Version
 #define BETA false
@@ -150,11 +149,6 @@ const int lineOutPin = 17; // for NF line out
 const int modeButtonPin = 37;    // input pin for mode button - needs external pullup!
 
 ///////////////////////////////////////// END OF HARDWARE DEFS ////////////////////////////////////////////////////////////////////
-
-
-// define the buttons for the clickbutton library
-ClickButton modeButton(modeButtonPin);  // initialize mode button
-ClickButton volButton(volButtonPin);    // external pullup for this one
 
 
 #endif

@@ -105,6 +105,8 @@ const byte pool[][2]  = {
 boolean startFirst = true;                        // to indicate that we are starting a new sequence in the trainer modi
 String CWword = "";
 
+AutoStopModes autoStop = off;
+
 
    String clearText = "";
    int repeats = 0;
