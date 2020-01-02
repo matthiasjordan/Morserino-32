@@ -9,7 +9,7 @@
 namespace Koch
 {
 
-    String kochChars;
+    extern String kochChars;
 
     void setup();
     void updateKochChars(boolean lcwoKochSeq);
