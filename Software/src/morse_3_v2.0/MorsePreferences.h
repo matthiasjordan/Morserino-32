@@ -13,6 +13,7 @@ namespace MorsePreferences
 
     enum prefPos
     {
+        sentinel,
         posClicks,
         posPitch,
         posExtPaddles,
@@ -52,57 +53,21 @@ namespace MorsePreferences
         posMaxSequence
     };
 
-    const String prefOption[] =
-    {"Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
-            "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
-            "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
-            "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-            "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-            "Max # of Words"};
+    extern const String prefOption[];
 
-    prefPos keyerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posKeyTrainerMode, posTimeOut, posQuickStart};
-    prefPos generatorOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-            posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
-            posLoraSyncW, posTimeOut, posQuickStart};
-    prefPos headOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-            posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart};
-    prefPos playerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
-            posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart};
-    prefPos echoPlayerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
-            posEchoConf, posTimeOut, posQuickStart};
-    prefPos echoTrainerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-            posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart};
-    prefPos kochGenOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
-            posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
-            posQuickStart};
-    prefPos kochEchoOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
-            posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart};
-    prefPos loraTrxOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW};
-    prefPos extTrxOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart};
-    prefPos decoderOptions[] =
-    {posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart};
+    extern prefPos keyerOptions[];
+    extern prefPos generatorOptions[];
+    extern prefPos headOptions[];
+    extern prefPos playerOptions[];
+    extern prefPos echoPlayerOptions[];
+    extern prefPos echoTrainerOptions[];
+    extern prefPos kochGenOptions[];
+    extern prefPos kochEchoOptions[];
+    extern prefPos loraTrxOptions[];
+    extern prefPos extTrxOptions[];
+    extern prefPos decoderOptions[];
+    extern prefPos allOptions[];
 
-    prefPos allOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-            posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
-            posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart};
 
     class MorsePrefs
     {
@@ -175,16 +140,15 @@ namespace MorsePreferences
 
 
     /// variables for managing snapshots
-    uint8_t memories[8];
-    uint8_t memCounter;
-    uint8_t memPtr = 0;
+    extern uint8_t memories[8];
+    extern uint8_t memCounter;
+    extern uint8_t memPtr;
 
-    MorsePrefs prefs;
+    extern MorsePrefs prefs;
 
-    prefPos *currentOptions = allOptions;
+    extern prefPos *currentOptions;
 
-    int currentOptionSize;
-    unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
+    extern unsigned long charCounter; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
 
     MorsePrefs readPreferences(String repository);

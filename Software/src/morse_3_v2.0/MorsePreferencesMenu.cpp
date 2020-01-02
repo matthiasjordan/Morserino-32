@@ -53,6 +53,8 @@ namespace internal {
     void displayLoraQRG();
     void displaySnapRecall();
     void displaySnapStore();
+
+    int calcNewIndexWraparound(int ptrIndex, int encoderDelta);
 }
 
 
@@ -833,6 +835,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     MorsePreferences::memPtr = (MorsePreferences::memPtr + t + 9) % 9;
                     internal::displaySnapStore();
                     break;
+                default: ;
             }   // end switch(pos)
             MorseDisplay::displayDisplay();                                                      // update the display
 
@@ -851,14 +854,14 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
   static int oldPos = 1;
   int t;
 
-  int ptrIndex, ptrMax;
+  int ptrIndex;
   MorsePreferences::prefPos posPtr;
 
-  ptrMax = MorsePreferences::currentOptionSize;
 
   ///// we should check here if the old ptr (oldIndex) is contained in the current preferences collection (currentOptions)
   ptrIndex = 1;
-  for (int i = 0; i < ptrMax; ++i) {
+
+  for (int i = 0; (MorsePreferences::currentOptions[i] != MorsePreferences::sentinel); ++i) {
       if (MorsePreferences::currentOptions[i] == oldPos) {
           ptrIndex = i;
           break;
@@ -907,7 +910,8 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
 
          if ((t = MorseRotaryEncoder::checkEncoder())) {
             MorseUI::click();
-            ptrIndex = (ptrIndex +ptrMax + t) % ptrMax;
+
+            ptrIndex = internal::calcNewIndexWraparound(ptrIndex, t);
             //Serial.println("ptrIndex: " + String(ptrIndex));
             posPtr = MorsePreferences::currentOptions[ptrIndex];
             //oldIndex = ptrIndex;                                                              // remember menu position
@@ -923,3 +927,23 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu) {
   } // end while - we leave as soon as the button has been pressed long
 }   // end function setupKeyerPreferences()
 
+
+int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta) {
+    int dir = (encoderDelta < 0) ? -1 : 1;
+    while (encoderDelta != 0) {
+        ptrIndex += dir;
+        if (MorsePreferences::currentOptions[ptrIndex] == MorsePreferences::sentinel) {
+            // sentinel element found - wrap around to 0
+            ptrIndex = 0;
+        }
+        else if (ptrIndex < 0) {
+            // too far left - set pointer to leftmost element
+            while (MorsePreferences::currentOptions[ptrIndex] != MorsePreferences::sentinel) {
+                ptrIndex += 1;
+            }
+            // now we are at the sentinel - or very deep in trouble. Let's assume we're fine and step to the left.
+            ptrIndex -= 1;
+        }
+    }
+    return ptrIndex;
+}

@@ -10,9 +10,86 @@
 #include "MorsePreferencesMenu.h"
 #include "MorseDisplay.h"
 
-Preferences pref;               // use the Preferences library for storing and retrieving objects
 
 using namespace MorsePreferences;
+
+
+
+
+
+
+
+const String prefOption[] =
+{"Sentinel",
+        "Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
+        "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
+        "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
+        "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
+        "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
+        "Max # of Words"};
+
+prefPos keyerOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posKeyTrainerMode, posTimeOut, posQuickStart, sentinel};
+prefPos generatorOptions[] =
+{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
+        posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
+        posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+prefPos headOptions[] =
+{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
+        posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+prefPos playerOptions[] =
+{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
+        posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+prefPos echoPlayerOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
+        posEchoConf, posTimeOut, posQuickStart, sentinel};
+prefPos echoTrainerOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+        posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
+prefPos kochGenOptions[] =
+{posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
+        posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
+        posQuickStart, sentinel};
+prefPos kochEchoOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
+        posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
+prefPos loraTrxOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
+prefPos extTrxOptions[] =
+{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+        posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
+prefPos decoderOptions[] =
+{posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
+
+//prefPos allOptions[] =
+//{posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+//        posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+//        posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
+//        posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
+
+
+
+Preferences pref;               // use the Preferences library for storing and retrieving objects
+
+
+/// variables for managing snapshots
+uint8_t memories[8];
+uint8_t memCounter;
+uint8_t memPtr = 0;
+
+MorsePrefs prefs;
+
+prefPos *currentOptions = allOptions;
+
+unsigned long charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
+
+
+
 
 
 //MorsePrefs prefs;

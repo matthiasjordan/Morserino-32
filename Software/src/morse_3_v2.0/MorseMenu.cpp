@@ -153,7 +153,6 @@ void MorseMenu::menu_() {
     MorseGenerator::keyOut(false, false, 0, 0);
     MorseMachine::encoderState = MorseMachine::speedSettingMode;             // always start with this encoderstate (decoder will change it anyway)
     MorsePreferences::currentOptions = MorsePreferences::allOptions;                 // this is the array of options when we double click the BLACK button: while in menu, you can change all of them
-    MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::allOptions);
 
     MorsePreferences::writeWordPointer();
 
@@ -273,7 +272,7 @@ boolean internal::menuExec() {                                          // retur
   Koch::setKochActive(false);
   switch (MorsePreferences::prefs.menuPtr) {
     case  _keyer:  /// keyer
-                setCurrentOptions(MorsePreferences::keyerOptions);
+                MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
                 MorseMachine::morseState = MorseMachine::morseKeyer;
                 MorseDisplay::clear();
                 MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer" );
@@ -293,25 +292,22 @@ boolean internal::menuExec() {                                          // retur
      case _headMixed:      /// head copying
                 MorseGenerator::setupHeadCopying();
                 MorsePreferences::currentOptions = MorsePreferences::headOptions;
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::headOptions);
                 goto startTrainer;
      case _genRand:
      case _genAbb:
      case _genWords:
      case _genCalls:
      case _genMixed:      /// generator
-                 setCurrentOptions(MorsePreferences::generatorOptions)
+         MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
 //         MorsePreferences::currentOptions = MorsePreferences::generatorOptions;                            // list of available options in generator mode
 //         MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::generatorOptions);
                 goto startTrainer;
      case _headPlayer:
                 MorseGenerator::setupHeadCopying();
                 MorsePreferences::currentOptions = MorsePreferences::headOptions;
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::headOptions);
                 goto startPlayer;
      case _genPlayer:
          MorsePreferences::currentOptions = MorsePreferences::playerOptions;                               // list of available options in player mode
-         MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::playerOptions);
      startPlayer:
                  MorsePlayerFile::openAndSkip();
 
@@ -337,13 +333,11 @@ boolean internal::menuExec() {                                          // retur
       case  _echoCalls:
       case  _echoMixed:
           MorsePreferences::currentOptions = MorsePreferences::echoTrainerOptions;                        // list of available options in echo trainer mode
-          MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::echoTrainerOptions);
           MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
                 goto startEcho;
       case  _echoPlayer:    /// echo trainer
           MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
                 MorsePreferences::currentOptions = MorsePreferences::echoPlayerOptions;                         // list of available options in echo player mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::echoPlayerOptions);
                 MorsePlayerFile::openAndSkip();
        startEcho:
                 MorseGenerator::startFirst = true;
@@ -371,59 +365,49 @@ boolean internal::menuExec() {                                          // retur
       case  _kochLearn:   // Koch Learn New .  /// just a new generatormode....
                 MorseGenerator::generatorMode = MorseGenerator::KOCH_LEARN;
                 MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;                          // list of available options in Koch echo mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochEchoOptions);
                 goto startEcho;
       case  _kochGenRand: // RANDOMS
           MorseGenerator::generatorMode = MorseGenerator::RANDOMS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;                          // list of available options in Koch generator mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochGenOptions);
                 goto startTrainer;
       case  _kochGenAbb: // ABBREVS - 2
           MorseGenerator::generatorMode = MorseGenerator::ABBREVS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;                          // list of available options in Koch generator mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochGenOptions);
                 goto startTrainer;
       case  _kochGenWords: // WORDS - 3
           MorseGenerator::generatorMode = MorseGenerator::WORDS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;                          // list of available options in Koch generator mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochGenOptions);
                 goto startTrainer;
       case  _kochGenMixed: // KOCH_MIXED - 5
           MorseGenerator::generatorMode = MorseGenerator::KOCH_MIXED;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;                          // list of available options in Koch generator mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochGenOptions);
                 goto startTrainer;
       case  _kochEchoRand: // Koch Echo Random
           MorseGenerator::generatorMode = MorseGenerator::RANDOMS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;                          // list of available options in Koch echo trainer mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochEchoOptions);
                 goto startEcho;
       case  _kochEchoAbb: // ABBREVS - 2
           MorseGenerator::generatorMode = MorseGenerator::ABBREVS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;                          // list of available options in Koch echo trainer mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochEchoOptions);
                 goto startEcho;
       case  _kochEchoWords: // WORDS - 3
           MorseGenerator::generatorMode = MorseGenerator::WORDS;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;                          // list of available options in Koch echo trainer mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochEchoOptions);
                 goto startEcho;
       case  _kochEchoMixed: // KOCH_MIXED - 5
           MorseGenerator::generatorMode = MorseGenerator::KOCH_MIXED;
           Koch::setKochActive(true);
                 MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;                          // list of available options in Koch echo trainer mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::kochEchoOptions);
                 goto startEcho;
       case  _trxLora: // LoRa Transceiver
                 MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;                            // list of available options in lora trx mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::loraTrxOptions);
                 MorseMachine::morseState = MorseMachine::loraTrx;
                 MorseDisplay::clear();
                 MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx" );
@@ -439,7 +423,6 @@ boolean internal::menuExec() {                                          // retur
                 break;
       case  _trxIcw: /// icw/ext TRX
                 MorsePreferences::currentOptions = MorsePreferences::extTrxOptions;                            // list of available options in ext trx mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::extTrxOptions);
                 MorseMachine::morseState = MorseMachine::morseTrx;
                 MorseDisplay::clear();
                 MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx" );
@@ -449,7 +432,6 @@ boolean internal::menuExec() {                                          // retur
 
       case  _decode: /// decoder
                 MorsePreferences::currentOptions = MorsePreferences::decoderOptions;                            // list of available options in lora trx mode
-                MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::decoderOptions);
                 MorseMachine::morseState = MorseMachine::morseDecoder;
                   /// here we will do the init for decoder mode
                 //trainerMode = false;
