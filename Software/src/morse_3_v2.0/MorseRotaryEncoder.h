@@ -6,17 +6,17 @@
 namespace MorseRotaryEncoder {
 
     // things for reading the encoder
-    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+    extern portMUX_TYPE mux;
 
 
-    volatile int8_t _oldState;
+    extern volatile int8_t _oldState;
 
     #define LATCHSTATE 3
 
-    volatile int8_t encoderPos = 0;
-    volatile uint64_t IRTime = 0;   // interrupt time
-    const int encoderWaitTime = 100 ;         // how long to wait for next reading from encoder in microseconds
-    volatile uint8_t stateRegister = 0;
+    extern volatile int8_t encoderPos;
+    extern volatile uint64_t IRTime;   // interrupt time
+    extern const int encoderWaitTime;         // how long to wait for next reading from encoder in microseconds
+    extern volatile uint8_t stateRegister;
 
 
     void setup();

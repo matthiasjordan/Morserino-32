@@ -13,9 +13,9 @@ namespace MorseMachine {
     // define modes for state machine of the various modi the encoder can be in
     enum encoderMode {speedSettingMode, volumeSettingMode, scrollMode };
 
-    encoderMode encoderState = speedSettingMode;    // we start with adjusting the speed
+    extern encoderMode encoderState;    // we start with adjusting the speed
 
-    morserinoMode morseState = morseKeyer;
+    extern morserinoMode morseState;
 
     morserinoMode getMode();
     boolean isMode(morserinoMode mode);
