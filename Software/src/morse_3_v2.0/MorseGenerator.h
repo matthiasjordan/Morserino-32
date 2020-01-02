@@ -11,29 +11,29 @@ namespace MorseGenerator {
 
     enum AutoStopModes {off, stop1, stop2}  autoStop = off;
 
-    unsigned char generatorState; // should be MORSE_TYPE instead of uns char
-    unsigned long genTimer;                         // timer used for generating morse code in trainer mode
-    boolean startFirst = true;                        // to indicate that we are starting a new sequence in the trainer modi
-    String CWword = "";
+    extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
+    extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode
+    extern boolean startFirst;                        // to indicate that we are starting a new sequence in the trainer modi
+    extern String CWword;
 
 
-       String clearText = "";
+       extern String clearText;
 
-       int repeats = 0;
-       uint8_t wordCounter = 0;                          // for maxSequence
+       extern int repeats;
+       extern uint8_t wordCounter;                          // for maxSequence
 
-       int rxDitLength = 0;                    // set new value for length of dits and dahs and other timings
-       int rxDahLength = 0;
-       int rxInterCharacterSpace = 0;
-       int rxInterWordSpace = 0;
+//       extern int rxDitLength;                    // set new value for length of dits and dahs and other timings
+//       extern int rxDahLength;
+//       extern int rxInterCharacterSpace;
+//       extern int rxInterWordSpace;
 
-       GEN_TYPE generatorMode = RANDOMS;          // trainer: what symbol (groups) are we going to send?            0 -  5
+       extern GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
 
-       uint8_t effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
+       extern uint8_t effectiveTrainerDisplay;
 
-       boolean stopFlag = false;                         // for maxSequence
-       boolean effectiveAutoStop = false;                 // If to stop after each word in generator modes
-       boolean firstTime = true;                         /// for word doubler mode
+       extern boolean stopFlag;                         // for maxSequence
+       extern boolean effectiveAutoStop;                 // If to stop after each word in generator modes
+       extern boolean firstTime;                         /// for word doubler mode
 
        void generateCW();
        void keyOut(boolean on,  boolean fromHere, int f, int volume);

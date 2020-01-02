@@ -42,7 +42,8 @@ unsigned int dahLength ;        // dahs are 3 dits long
 KSTYPE keyerState;
 uint8_t sensor;                 // what we read from checking the touch sensors
 boolean leftKey, rightKey;
-unsigned int interCharacterSpace, interWordSpace;   // need to be properly initialised!
+extern unsigned int interCharacterSpace;
+extern unsigned int interWordSpace;   // need to be properly initialised!
 unsigned int effWpm;                                // calculated effective speed in WpM
 
 boolean keyTx = false;             // when state is set by manual key or touch paddle, then true!
