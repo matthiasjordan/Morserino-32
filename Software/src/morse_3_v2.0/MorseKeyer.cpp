@@ -22,6 +22,8 @@ namespace internal {
 
 }
 
+boolean DIT_FIRST = false; // first latched was dit?
+boolean keyTx = false;
 
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;

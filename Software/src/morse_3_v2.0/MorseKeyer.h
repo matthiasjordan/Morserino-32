@@ -36,17 +36,17 @@ namespace MorseKeyer {
 unsigned char keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
 
 
-boolean DIT_FIRST = false; // first latched was dit?
-unsigned int ditLength ;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
-unsigned int dahLength ;        // dahs are 3 dits long
-KSTYPE keyerState;
-uint8_t sensor;                 // what we read from checking the touch sensors
-boolean leftKey, rightKey;
+extern boolean DIT_FIRST; // first latched was dit?
+extern unsigned int ditLength ;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
+extern unsigned int dahLength ;        // dahs are 3 dits long
+extern KSTYPE keyerState;
+extern uint8_t sensor;                 // what we read from checking the touch sensors
+extern boolean leftKey, rightKey;
 extern unsigned int interCharacterSpace;
 extern unsigned int interWordSpace;   // need to be properly initialised!
-unsigned int effWpm;                                // calculated effective speed in WpM
+extern unsigned int effWpm;                                // calculated effective speed in WpM
 
-boolean keyTx = false;             // when state is set by manual key or touch paddle, then true!
+extern boolean keyTx;             // when state is set by manual key or touch paddle, then true!
                                    // we use this to decide if Tx should be keyed or not
 void setup();
 void updateTimings();
