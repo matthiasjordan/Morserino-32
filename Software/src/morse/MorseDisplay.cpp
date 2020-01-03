@@ -53,7 +53,8 @@ char numBuffer[16];                // for number to string conversion with sprin
 // display startup screen and check battery status
 void MorseDisplay::displayStartUp()
 {
-    String stat = "Morserino-32m ";
+    String stat = PROJECTNAME;
+    stat += " ";
     clearDisplay();
 
     stat += String(MorsePreferences::prefs.loraQRG / 10000);

@@ -1,6 +1,8 @@
 #ifndef MORSEDEFS_H
 #define MORSEDEFS_H
 
+const String PROJECTNAME = "Morselino-32";
+
 #include <Arduino.h>
 
 //////// Program Version
