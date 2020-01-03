@@ -379,6 +379,7 @@ boolean internal::menuExec()
     switch (MorsePreferences::prefs.menuPtr)
     {
         case _keyer:  /// keyer
+            MorseKeyer::setup();
             MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
             MorseMachine::morseState = MorseMachine::morseKeyer;
             MorseDisplay::clear();

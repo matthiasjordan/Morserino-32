@@ -146,9 +146,6 @@ void setup()
 
     MorseUI::setup();
 
-    // to calibrate sensors, we record the values in untouched state
-    MorseKeyer::setup();
-
     // read preferences from non-volatile storage
     // if version cannot be read, we have a new ESP32 and need to write the preferences first
     MorsePreferences::readPreferences("morserino");

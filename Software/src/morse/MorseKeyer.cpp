@@ -41,7 +41,9 @@ unsigned int rUntouched = 0;
 
 void MorseKeyer::setup()
 {
+    // to calibrate sensors, we record the values in untouched state
     internal::initSensors();
+    MorseKeyer::updateTimings();
 }
 
 void MorseKeyer::updateTimings()
