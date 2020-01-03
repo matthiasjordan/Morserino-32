@@ -12,7 +12,9 @@ The "**source**" directory contains the program sources (you need an Arduino IDE
 The "**binary**" directory contains the compiled code in binary format, ready for upload to the Morserino-32 via WiFi (see User Manual for instructions).
 
 
-# How to build
+# How to build 
+
+## General preparation
 
 * Install Arduino IDE following instructions on https://www.arduino.cc/en/Guide/Linux
 * Libraries besorgen (wie in morse_3_v1.3.ino, Zeilen 33ff. beschrieben)
@@ -23,5 +25,16 @@ The "**binary**" directory contains the compiled code in binary format, ready fo
 **** ln -s Heltec_ESP32_Dev-Boards/src/lora/ .
 ** ClickButton als RAR runterladen, extrahieren, installieren
 * If the compiler complains about Vext being declared a second time, check that the two declarations yield the same value and then comment out the one in the Morserino source code.
+
+
+## Arduino IDE
+
 * Start Arduino IDE, Voreinstellungen öffnen
-** 
+
+
+## Eclipse Sloeber
+
+* Choose "Arduino -> Import Project into Workspace." from the context menu
+** Source Folder Location is <gitrepo>/Software/src/morse
+** Build project
+

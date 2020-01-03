@@ -16,64 +16,61 @@
 					<folderInfo id="io.sloeber.core.toolChain.release.1906130047.420198185" name="/" resourcePath="">
 						<toolChain id="io.sloeber.core.toolChain.release.528091271" name="Arduino Toolchain (Sloeber edition)" superClass="io.sloeber.core.toolChain.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="io.sloeber.targetplatform.1273795190" name="Arduino Target" osList="all" superClass="io.sloeber.targetplatform"/>
-							<builder buildPath="${workspace_loc:/morse_3_v2_0}/Release" id="io.sloeber.sketch.builder.389840881" superClass="io.sloeber.sketch.builder"/>
+							<builder buildPath="${workspace_loc:/morse_3_v2_0}/Release" id="io.sloeber.sketch.builder.389840881" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" superClass="io.sloeber.sketch.builder"/>
 							<tool id="io.sloeber.tool.sketch.compiler.cpp.1230847778" name="Arduino C++ Compiler" superClass="io.sloeber.tool.sketch.compiler.cpp">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.cpp.sketch.option.incpath.1881178158" name="Include Paths (-I)" superClass="io.sloeber.compiler.cpp.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ClickButton}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ESPmDNS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/FS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/lora}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/oled}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Preferences/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPIFFS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Update/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WebServer/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WiFi/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Heltec_ESP32_Dev-Boards/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ClickButton}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/lora}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/oled}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Preferences/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPIFFS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.439827934" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
 							<tool id="io.sloeber.tool.compiler.c.870832588" name="Arduino C Compiler" superClass="io.sloeber.tool.compiler.c">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.c.sketch.option.incpath.959553533" name="Include Paths (-I)" superClass="io.sloeber.compiler.c.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ClickButton}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ESPmDNS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/FS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/lora}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/oled}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Preferences/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPIFFS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Update/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WebServer/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WiFi/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Heltec_ESP32_Dev-Boards/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ClickButton}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/lora}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/oled}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Preferences/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPIFFS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.1667097470" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
 							<tool id="io.sloeber.tool.sketch.compiler.s.942657970" name="Arduino Assembler" superClass="io.sloeber.tool.sketch.compiler.s">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="io.sloeber.compiler.asm.sketch.option.incpath.387091492" name="Include Paths (-I)" superClass="io.sloeber.compiler.asm.sketch.option.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ClickButton}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/ESPmDNS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/FS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/lora}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/oled}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Preferences/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/SPIFFS/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Update/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WebServer/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/WiFi/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Wire/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/libraries/Heltec_ESP32_Dev-Boards/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse_3_v2_0/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/core}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/core/variant}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ClickButton}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/ESPmDNS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/FS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/lora}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/oled}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Preferences/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPI/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/SPIFFS/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Update/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WebServer/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/WiFi/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/morse/libraries/Wire/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.2089045481" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>

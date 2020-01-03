@@ -427,7 +427,7 @@ environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.COM_PORT
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.COM_PORT/value=/dev/ttyUSB0
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.ECLIPSE_LOCATION/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.ECLIPSE_LOCATION/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}///////////////////
+environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}////////////////////////////
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.EXTRA.ALL/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.EXTRA.ALL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.EXTRA.ALL/value=
@@ -463,7 +463,7 @@ environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PACKAGE_
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PACKAGE_ID/value=Heltec-esp32
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PROJECT_NAME/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PROJECT_NAME/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PROJECT_NAME/value=morse_3_v2_0
+environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.PROJECT_NAME/value=morse
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.SELECTED.PLATFORM/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.SELECTED.PLATFORM/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1906130047/JANTJE.SELECTED.PLATFORM/value=${eclipse_home}/arduinoPlugin/packages/Heltec-esp32/hardware/esp32/0.0.4
