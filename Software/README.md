@@ -1,4 +1,10 @@
-# Morserino-32
+# Morselino-32
+This is Morselino-32, a fork of Morserino-32 originally by Willi Kraml OE1WKL.
+
+The aim of this fork is to provide a code base that is easier to maintain and extend.
+
+
+# Morserino-32 
 Morserino-32 multi-functional Morse code machine, based on ESP32
 
 The "**source**" directory contains the program sources (you need an Arduino IDE with the necessary hardware definitions for the heltec module if you want to compile the source).

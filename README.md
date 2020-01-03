@@ -1,3 +1,7 @@
+# Morselino-32
+Morselino-32 is a fork of Morserino-32.
+
+
 # Morserino-32 
 Morserino-32 multi-functional Morse code machine, based on ESP32
 
