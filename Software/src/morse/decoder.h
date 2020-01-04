@@ -52,6 +52,7 @@ namespace Decoder
     void interWordTimerOff();
     String CWwordToClearText(String cwword);
     void displayMorse();
+    uint8_t getDecodedWpm();
 
 }
 

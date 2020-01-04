@@ -199,7 +199,7 @@ void loop()
                         }
                         case MorseGenerator::stop2:
                         {
-                            MorseDisplay::printToScroll(REGULAR, "\n");
+                            MorseDisplay::printToScroll(REGULAR, " \n"); // "\n"
                             MorseGenerator::autoStop = MorseGenerator::off;
                             break;
                         }
@@ -231,6 +231,7 @@ void loop()
                     //cleanStartSettings();        
                     MorseGenerator::generatorState = MorseGenerator::KEY_UP;
                     MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
+                    MorseDisplay::displayTopLine();
                 }
             }
             if (MorseEchoTrainer::active)

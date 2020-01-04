@@ -25,6 +25,7 @@
 #include "MorseMachine.h"
 #include "MorseGenerator.h"
 #include "MorseKeyer.h"
+#include "decoder.h"
 
 using namespace MorseDisplay;
 
@@ -107,6 +108,9 @@ void MorseDisplay::displayStartUp()
     }
     else
     {
+        if (volt > 5000) {
+            volt /= 2;
+        }
         MorseDisplay::displayBatteryStatus(volt);
     }
     delay(3000);
@@ -244,6 +248,7 @@ void MorseDisplay::clearScrollBuffer()
 
 void MorseDisplay::flushScroll()
 {
+    printToScroll_buffer.replace("\n", "");
     uint8_t len = printToScroll_buffer.length();
     if (len != 0)
     {
@@ -643,18 +648,26 @@ void MorseDisplay::displayTopLine()
     MorseDisplay::displayDisplay();
 }
 
+
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
 void MorseDisplay::displayCWspeed()
 {
-    if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)))
+    uint8_t wpmDecoded = Decoder::getDecodedWpm();
+    if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))) {
         sprintf(numBuffer, "(%2i)", MorseKeyer::effWpm);
-    else
+    }
+    else if (MorseMachine::isMode(MorseMachine::morseTrx)) {
+        sprintf(numBuffer, "r%2is", wpmDecoded);
+    }
+    else {
         sprintf(numBuffer, "    ");
+    }
 
     MorseDisplay::printOnStatusLine(false, 3, numBuffer);                                         // effective wpm
 
-    sprintf(numBuffer, "%2i", MorsePreferences::prefs.wpm);
+    uint8_t wpm = (MorseMachine::isMode(MorseMachine::morseDecoder) ? wpmDecoded : MorsePreferences::prefs.wpm);
+    sprintf(numBuffer, "%2i", wpm);
     MorseDisplay::printOnStatusLine(MorseMachine::isEncoderMode(MorseMachine::speedSettingMode) ? true : false, 7, numBuffer);
     MorseDisplay::printOnStatusLine(false, 10, "WpM");
     MorseDisplay::displayDisplay();

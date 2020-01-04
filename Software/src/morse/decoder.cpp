@@ -101,6 +101,8 @@ const struct linklist Decoder::CWtree[67] =
                 {"<err>", 66, 63}      // 66 !! Error - backspace
     };
 
+uint8_t wpmDecoded;
+
 boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
 
@@ -192,6 +194,11 @@ void Decoder::setupGoertzel()
     sine = sin(omega);                                              // 0,007210753
     cosine = cos(omega);                                            // 0,999999739
     coeff = 2.0 * cosine;                                           // 1,999999479
+}
+
+
+uint8_t Decoder::getDecodedWpm() {
+    return wpmDecoded;
 }
 
 /////////////////////////////////////   MORSE DECODER ///////////////////////////////
@@ -353,10 +360,10 @@ void Decoder::doDecode()
                 if (lowDuration > (lacktime * ditAvg))
                 {
                     displayMorse();                                             /// decode the morse character and display it
-                    wpm = (MorsePreferences::prefs.wpm + (int) (7200 / (dahAvg + 3 * ditAvg))) / 2;     //// recalculate speed in wpm
-                    if (MorsePreferences::prefs.wpm != wpm)
+                     wpm = (wpmDecoded + (int) (7200 / (dahAvg + 3*ditAvg))) / 2;     //// recalculate speed in wpm
+                    if (wpmDecoded != wpm)
                     {
-                        MorsePreferences::prefs.wpm = wpm;
+                        wpmDecoded = wpm;
                         speedChanged = true;
                     }
                     decoderState = INTERCHAR_;
@@ -373,9 +380,9 @@ void Decoder::doDecode()
             {
                 lowDuration = millis() - startTimeLow;             // we record the length of the pause
                 lacktime = 5;                 ///  when high speeds we have to have a little more pause before new word
-                if (MorsePreferences::prefs.wpm > 35)
+                if (wpmDecoded > 35)
                     lacktime = 6;
-                else if (MorsePreferences::prefs.wpm > 30)
+                else if (wpmDecoded > 30)
                     lacktime = 5.5;
                 if (lowDuration > (lacktime * ditAvg))
                 {

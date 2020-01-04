@@ -21,7 +21,7 @@ const String PROJECTNAME = "Morselino-32";
 #define CWLORAVERSION B01
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 0
+#define VERSION_MINOR 1
 
 enum DISPLAY_TYPE
 {
