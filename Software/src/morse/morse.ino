@@ -136,6 +136,7 @@ void setup()
     MorsePlayerFile::setup();
     MorseDisplay::displayStartUp();
 
+    MorseMenu::setup();
     MorseMenu::menu_();
 } /////////// END setup()
 

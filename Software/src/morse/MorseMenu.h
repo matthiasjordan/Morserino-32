@@ -6,6 +6,7 @@
 namespace MorseMenu
 {
 
+    void setup();
     void menu_();
     void cleanStartSettings();
 }

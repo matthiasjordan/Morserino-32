@@ -204,8 +204,14 @@ namespace internal
 {
     void menuDisplay(uint8_t ptr);
     boolean menuExec();
-    void cleanStartSettings();
 }
+
+
+void MorseMenu::setup() {
+    /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
+    quickStart = MorsePreferences::prefs.quickStart;
+}
+
 
 void MorseMenu::menu_()
 {
@@ -213,7 +219,6 @@ void MorseMenu::menu_()
     uint8_t disp = 0;
     int t, command;
 
-    quickStart = MorsePreferences::prefs.quickStart;
 
     //// initialize a few things now
     //Serial.println("THE MENU");
