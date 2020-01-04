@@ -938,13 +938,11 @@ int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta)
     while (encoderDelta != 0)
     {
         ptrIndex += dir;
-        if (MorsePreferences::currentOptions[ptrIndex] == MorsePreferences::sentinel)
+        encoderDelta -= dir;
+
+        if (ptrIndex < 0)
         {
-            // sentinel element found - wrap around to 0
             ptrIndex = 0;
-        }
-        else if (ptrIndex < 0)
-        {
             // too far left - set pointer to leftmost element
             while (MorsePreferences::currentOptions[ptrIndex] != MorsePreferences::sentinel)
             {
@@ -952,6 +950,11 @@ int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta)
             }
             // now we are at the sentinel - or very deep in trouble. Let's assume we're fine and step to the left.
             ptrIndex -= 1;
+        }
+        else if (MorsePreferences::currentOptions[ptrIndex] == MorsePreferences::sentinel)
+        {
+            // sentinel element found - wrap around to 0
+            ptrIndex = 0;
         }
     }
     return ptrIndex;
