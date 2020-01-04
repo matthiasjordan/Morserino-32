@@ -135,6 +135,11 @@ namespace internal
     String generateCWword(String symbols);
 }
 
+void MorseGenerator::setup() {
+    MorseKeyer::setup();
+}
+
+
 void MorseGenerator::generateCW()
 {          // this is called from loop() (frequently!)  and generates CW
 
@@ -190,12 +195,15 @@ void MorseGenerator::generateCW()
             //// insert code here for outputting only on display, and not as morse characters - for echo trainer
             //// genTimer vy short (1ms?)
             //// no keyOut()
-            if (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay == DISP_ONLY)
+            if (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay == DISP_ONLY) {
                 genTimer = millis() + 2;      // very short timing
-            else if (MorseMachine::isMode(MorseMachine::loraTrx))
+            }
+            else if (!MorseMachine::isMode(MorseMachine::loraTrx)) {
                 genTimer = millis() + (c == '1' ? MorseKeyer::ditLength : MorseKeyer::dahLength); // start a dit or a dah, acording to the next element
-            else
+            }
+            else {
                 genTimer = millis() + (c == '1' ? rxDitLength : rxDahLength);
+            }
             if (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == 1) // send the element to LoRa
                 c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
             /// if Koch learn character we show dit or dah
@@ -509,8 +517,9 @@ void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
         {                    // not from here
             extTone = true;
             extPitch = f;
-            if (!intTone)
+            if (!intTone) {
                 MorseSound::pwmTone(extPitch, volume, false);
+            }
         }
     }
     else
@@ -518,17 +527,20 @@ void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
         if (fromHere)
         {
             intTone = false;
-            if (extTone)
+            if (extTone) {
                 MorseSound::pwmTone(extPitch, volume, false);
-            else
+            }
+            else {
                 MorseSound::pwmNoTone();
+            }
             digitalWrite(keyerPin, LOW);      // stop keying Tx
         }
         else
         {                 // not from here
             extTone = false;
-            if (!intTone)
+            if (!intTone) {
                 MorseSound::pwmNoTone();
+            }
         }
     }   // end key off
 }

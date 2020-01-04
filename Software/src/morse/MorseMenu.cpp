@@ -422,6 +422,7 @@ boolean internal::menuExec()
             MorseGenerator::startFirst = true;
             MorseGenerator::firstTime = true;
             MorseMachine::morseState = MorseMachine::morseGenerator;
+            MorseGenerator::setup();
             MorseDisplay::clear();
             MorseDisplay::printOnScroll(0, REGULAR, 0, "Generator     ");
             MorseDisplay::printOnScroll(1, REGULAR, 0, "Start/Stop:   ");
@@ -447,6 +448,7 @@ boolean internal::menuExec()
             MorsePlayerFile::openAndSkip();
             startEcho: MorseGenerator::startFirst = true;
             MorseMachine::morseState = MorseMachine::echoTrainer;
+            MorseGenerator::setup();
             MorseEchoTrainer::echoStop = false;
             MorseDisplay::clear();
             MorseDisplay::printOnScroll(0, REGULAR, 0,

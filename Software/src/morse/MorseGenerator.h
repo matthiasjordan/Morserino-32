@@ -48,6 +48,7 @@ namespace MorseGenerator
     extern boolean effectiveAutoStop;                 // If to stop after each word in generator modes
     extern boolean firstTime;                         /// for word doubler mode
 
+    void setup();
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
     void setupHeadCopying();
