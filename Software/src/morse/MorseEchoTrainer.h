@@ -15,7 +15,6 @@ namespace MorseEchoTrainer
     {
         START_ECHO, SEND_WORD, REPEAT_WORD, GET_ANSWER, COMPLETE_ANSWER, EVAL_ANSWER
     };
-    extern String echoTrainerPrompt;
     extern String echoTrainerWord;
     extern boolean echoStop;                         // for maxSequence
     extern boolean active;                           // flag for trainer mode

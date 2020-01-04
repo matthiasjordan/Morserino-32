@@ -465,6 +465,7 @@ boolean internal::menuExec()
             MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
             MorsePreferences::currentOptions = MorsePreferences::echoPlayerOptions;         // list of available options in echo player mode
             MorsePlayerFile::openAndSkip();
+
             startEcho: MorseGenerator::startFirst = true;
             MorseMachine::morseState = MorseMachine::echoTrainer;
             MorseGenerator::setup();

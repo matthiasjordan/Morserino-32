@@ -108,7 +108,8 @@ void MorseDisplay::displayStartUp()
     }
     else
     {
-        if (volt > 5000) {
+        if (volt > 5000)
+        {
             volt /= 2;
         }
         MorseDisplay::displayBatteryStatus(volt);
@@ -226,11 +227,11 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     printToScroll_lastStyle = style;
 
     boolean linebreak = text.endsWith("\n");
-    boolean printToScroll_autoflush = !MorseGenerator::effectiveAutoStop;
+    boolean isHeadCopyMode = MorseGenerator::effectiveAutoStop;
+    boolean printToScroll_autoflush = !(MorseMachine::isMode(MorseMachine::morseGenerator) && isHeadCopyMode);
+
     //Serial.println("AUTO: " + String(printToScroll_autoflush));
     //((Serial.println("morseState: " + String(morseState));
-    if (MorseMachine::isMode(MorseMachine::morseGenerator))
-        printToScroll_autoflush = true;
     if (printToScroll_autoflush || linebreak)
     {
         //Serial.print("auto/line " + printToScroll_autoflush + SP + linebreak + SP);
@@ -248,7 +249,7 @@ void MorseDisplay::clearScrollBuffer()
 
 void MorseDisplay::flushScroll()
 {
-    printToScroll_buffer.replace("\n", "");
+//    printToScroll_buffer.replace("\n", "");
     uint8_t len = printToScroll_buffer.length();
     if (len != 0)
     {
@@ -648,19 +649,21 @@ void MorseDisplay::displayTopLine()
     MorseDisplay::displayDisplay();
 }
 
-
 //////// Display the current CW speed
 /////// pos 7-8, "Wpm" on 10-12
 void MorseDisplay::displayCWspeed()
 {
     uint8_t wpmDecoded = Decoder::getDecodedWpm();
-    if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))) {
+    if ((MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer)))
+    {
         sprintf(numBuffer, "(%2i)", MorseKeyer::effWpm);
     }
-    else if (MorseMachine::isMode(MorseMachine::morseTrx)) {
+    else if (MorseMachine::isMode(MorseMachine::morseTrx))
+    {
         sprintf(numBuffer, "r%2is", wpmDecoded);
     }
-    else {
+    else
+    {
         sprintf(numBuffer, "    ");
     }
 
