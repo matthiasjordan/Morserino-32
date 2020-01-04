@@ -9,7 +9,7 @@ using namespace MorseSystem;
 //// measure battery voltage in mV
 int16_t MorseSystem::batteryVoltage()
 {
-    int32_t c, diff;
+    int32_t c;
 
 #if BOARDVERSION == 3
     WiFi.mode(WIFI_MODE_NULL);      // make sure WiFi is not running, as it uses the same ADC as battery measurement!

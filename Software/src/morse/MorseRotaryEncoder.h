@@ -3,15 +3,19 @@
 
 #include <Arduino.h>
 
+#define LATCHSTATE 3
+
 namespace MorseRotaryEncoder
 {
 
     // things for reading the encoder
     extern portMUX_TYPE mux;
-
     extern volatile int8_t _oldState;
 
-#define LATCHSTATE 3
+    // positions: [3] 1 0 2 [3] 1 0 2 [3]
+    // [3] is the positions where my rotary switch detends
+    // ==> right, count up
+    // <== left,  count down
 
     extern volatile int8_t encoderPos;
     extern volatile uint64_t IRTime;   // interrupt time

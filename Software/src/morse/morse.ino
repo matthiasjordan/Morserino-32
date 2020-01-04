@@ -62,22 +62,6 @@
 #include "MorseMenu.h"
 #include "MorseEchoTrainer.h"
 
-// positions: [3] 1 0 2 [3] 1 0 2 [3]
-// [3] is the positions where my rotary switch detends
-// ==> right, count up
-// <== left,  count down
-
-//// for adjusting preferences
-
-///////////////////////////////////
-//// Other Global VARIABLES ////////////
-/////////////////////////////////
-
-//// not any longer defined in preferences:
-
-//CWword.reserve(144);
-//clearText.reserve(50);
-
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
 /// interrupt service routine - needs to be positioned BEFORE all other functions, including setup() and loop()
@@ -126,10 +110,7 @@ void setup()
     digitalWrite(OLED_RST, HIGH);    // while OLED is running, must set GPIO16 in high
 //# endif
 
-    // init display
-
     MorseDisplay::init();
-
     MorseSound::setup();
 
     //call ISR when any high/low changed seen
@@ -139,7 +120,7 @@ void setup()
 
     MorseRotaryEncoder::setup();
 
-/// set up for encoder button
+    // set up for encoder button
     pinMode(modeButtonPin, INPUT);
     pinMode(volButtonPin, INPUT_PULLUP);               // external pullup for all GPIOS > 32 with ESP32-LORA
                                                        // wake up also works without external pullup! Interesting!
@@ -151,17 +132,9 @@ void setup()
     MorsePreferences::readPreferences("morserino");
 
     Koch::setup();
-
     MorseLoRa::setup();
-
-    /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
-
     MorsePlayerFile::setup();
     MorseDisplay::displayStartUp();
-
-    ///delay(2500);  //// just to be able to see the startup screen for a while - is contained in displayStartUp()
-
-    ////
 
     MorseMenu::menu_();
 } /////////// END setup()
@@ -170,7 +143,6 @@ void setup()
 
 void loop()
 {
-// static uint64_t loopC = 0;
     int t;
 
     boolean activeOld = MorseEchoTrainer::active;
@@ -311,7 +283,7 @@ void loop()
 
     } // end switch and code depending on state of metaMorserino
 
-/// if we have time check for button presses
+    // if we have time check for button presses
 
     MorseUI::modeButton.Update();
     MorseUI::volButton.Update();
@@ -365,9 +337,10 @@ void loop()
     }
 
     switch (MorseUI::modeButton.clicks)
-    {                                // actions based on enocder button
+    {                                // actions based on encoder button
         case -1:
-            MorseMenu::menu_();                                       // long click exits current mode and goes to top menu
+            // long click exits current mode and goes to top menu
+            MorseMenu::menu_();
             return;
         case 1:
             if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
@@ -375,8 +348,6 @@ void loop()
                 MorseEchoTrainer::active = !MorseEchoTrainer::active;
                 if (!MorseEchoTrainer::active)
                 {
-                    //digitalWrite(keyerPin, LOW);           // turn the LED off, unkey transmitter, or whatever
-                    //pwmNoTone(); 
                     MorseGenerator::keyOut(false, true, 0, 0);
                     MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
                 }
@@ -395,17 +366,14 @@ void loop()
                 MorseGenerator::stopFlag = true;                                  // we stop what we had been doing
             else
                 MorseGenerator::stopFlag = false;
-            //startFirst = true;
-            //firstTime = true;
             break;
         default:
             break;
     }
 
-/// and we have time to check the encoder
+    // and we have time to check the encoder
     if ((t = checkEncoder()))
     {
-        //Serial.println("t: " + String(t));
         MorseUI::click();
         switch (MorseMachine::encoderState)
         {
@@ -438,10 +406,4 @@ void loop()
     MorseSystem::checkShutDown(false);         // check for time out
 
 }     /////////////////////// end of loop() /////////
-
-// toggle polarity of paddles
-//void togglePolarity () {
-//      MorsePreferences::prefs.didah = !MorsePreferences::prefs.didah;
-//     //displayPolarity();
-//}
 

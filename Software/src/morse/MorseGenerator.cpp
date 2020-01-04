@@ -123,15 +123,12 @@ namespace internal
 {
     void fetchNewWord();
     void dispGeneratedChar();
-//    String encodeProSigns( String &input );
 
     String getRandomChars(int maxLength, int option);
     String getRandomCall(int maxLength);
     String getRandomWord(int maxLength);
     String getRandomAbbrev(int maxLength);
 
-//    String cleanUpText(String w);
-//    String utf8umlaut(String s);
     String generateCWword(String symbols);
 }
 
