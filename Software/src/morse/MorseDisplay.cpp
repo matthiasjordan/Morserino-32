@@ -84,19 +84,12 @@ void MorseDisplay::displayStartUp()
      } */
     printOnStatusLine(true, 0, stat);
 
-    printOnScroll(0, REGULAR, 0, "Ver. ");
-
-    sprintf(numBuffer, "%2i", VERSION_MAJOR);
-    printOnScroll(0, REGULAR, 5, numBuffer);
-
-    printOnScroll(0, REGULAR, 7, ".");
-    sprintf(numBuffer, "%1i", VERSION_MINOR);
-    printOnScroll(0, REGULAR, 8, numBuffer);
+    MorseDisplay::vprintOnScroll(0, REGULAR, 0, "Ver. %1i.%1i.%1i", VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX);
 
     if (BETA)
         printOnScroll(0, REGULAR, 10, "beta");
 
-    printOnScroll(1, REGULAR, 0, "© 2018 f.");
+    printOnScroll(1, REGULAR, 0, "© 2018-2020");
 
     uint16_t volt = MorseSystem::batteryVoltage();
     //Serial.println(volt);
@@ -425,7 +418,7 @@ uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos
     va_start(arglist, format);
     vsprintf(numBuffer, format, arglist);
     va_end(arglist);
-    return MorseDisplay::printOnScroll(2, REGULAR, 1, numBuffer);
+    return MorseDisplay::printOnScroll(line, how, xpos, numBuffer);
 }
 
 uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring)

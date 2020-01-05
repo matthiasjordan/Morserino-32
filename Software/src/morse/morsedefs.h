@@ -22,6 +22,7 @@ const String PROJECTNAME = "Morselino-32";
 
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 1
+#define VERSION_BUGFIX 0
 
 enum DISPLAY_TYPE
 {
