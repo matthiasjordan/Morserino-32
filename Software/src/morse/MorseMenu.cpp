@@ -426,8 +426,6 @@ boolean internal::menuExec()
         case _genCalls:
         case _genMixed:      /// generator
             MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
-//         MorsePreferences::currentOptions = MorsePreferences::generatorOptions;                            // list of available options in generator mode
-//         MorsePreferences::currentOptionSize = SizeOfArray(MorsePreferences::generatorOptions);
             goto startTrainer;
         case _headPlayer:
             MorseGenerator::setupHeadCopying();

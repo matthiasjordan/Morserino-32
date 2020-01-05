@@ -25,8 +25,10 @@ namespace internal
 {
     String cleanUpText(String w);
     String utf8umlaut(String s);
-
+    void reopen();
 }
+
+const String playerFileName = "/player.txt";
 
 File file;
 
@@ -37,17 +39,20 @@ void MorsePlayerFile::setup()
 
     if (!SPIFFS.begin(FORMAT_SPIFFS_IF_FAILED))
     {     ///// if SPIFFS cannot be mounted, it does not exist. So create  (format) it, and mount it
-        //Serial.println("SPIFFS Mount Failed");
+          //Serial.println("SPIFFS Mount Failed");
         return;
     }
+
+    Serial.println("Initializing player file");
+
     //////////////////////// create file player.txt if it does not exist|
     const char * defaultFile =
             "This is just an initial dummy file for the player. Dies ist nur die anfänglich enthaltene Standarddatei für den Player.\n"
                     "Did you not upload your own file? Hast du keine eigene Datei hochgeladen?";
 
-    if (!SPIFFS.exists("/player.txt"))
+    if (!SPIFFS.exists(playerFileName))
     {                                    // file does not exist, therefor we create it from the text above
-        File file = SPIFFS.open("/player.txt", FILE_WRITE);
+        File file = MorsePlayerFile::openForWriting();
         if (!file)
         {
             Serial.println("- failed to open file for writing");
@@ -66,10 +71,15 @@ void MorsePlayerFile::setup()
 
 }
 
+File MorsePlayerFile::openForWriting()
+{
+    return SPIFFS.open(playerFileName, FILE_WRITE);
+}
+
 void MorsePlayerFile::openAndSkip()
 {
     uint32_t wcount = 0;
-    file = SPIFFS.open("/player.txt");                            // open file
+    file = SPIFFS.open(playerFileName);                            // open file
     //skip MorsePreferences::prefs.fileWordPointer words, as they have been played before
     wcount = MorsePreferences::prefs.fileWordPointer;
     MorsePreferences::prefs.fileWordPointer = 0;
@@ -80,27 +90,56 @@ String MorsePlayerFile::getWord()
 {
     String result = "";
     byte c;
+    boolean wordFinished = false;
+    boolean reopened = false;
 
-    while (file.available())
+    while (!wordFinished && file.available())
     {
         c = file.read();
-        //Serial.println((int) c);
+        if (c == 255)
+        {
+            if (!reopened)
+            {
+                // Some weird file - try to reopen;
+                internal::reopen();
+                reopened = true;
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+
         if (!isSpace(c))
+        {
             result += (char) c;
+        }
         else if (result.length() > 0)
         {               // end of word
             ++MorsePreferences::prefs.fileWordPointer;
-            //Serial.println("word: " + result);
-            return result;
+            wordFinished = true;
         }
     }
-    file.close();
-    file = SPIFFS.open("/player.txt");
-    MorsePreferences::prefs.fileWordPointer = 0;
-    while (!file.available())
-        ;
+
+    if (!file.available())
+    {
+        internal::reopen();
+    }
+
     result = internal::cleanUpText(result);
     return result;                                    // at eof
+}
+
+void internal::reopen()
+{
+    file.close();
+    file = SPIFFS.open(playerFileName);
+    MorsePreferences::prefs.fileWordPointer = 0;
+    while (!file.available())
+    {
+        // not sure - wait?
+    }
 }
 
 void MorsePlayerFile::skipWords(uint32_t count)

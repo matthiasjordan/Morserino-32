@@ -492,16 +492,10 @@ void internal::fetchNewWord()
                         }
                         break;
                     case PLAYER:
-                        if (MorsePreferences::prefs.randomFile)
+                        if (MorsePreferences::prefs.randomFile) {
                             MorsePlayerFile::skipWords(random(MorsePreferences::prefs.randomFile + 1));
+                        }
                         MorseGenerator::clearText = MorsePlayerFile::getWord();
-                        /*
-                         if (clearText == String()) {        /// at end of file: go to beginning again
-                         MorsePreferences::prefs.fileWordPointer = 0;
-                         file.close(); file = SPIFFS.open("/player.txt");
-                         }
-                         ++MorsePreferences::prefs.fileWordPointer;
-                         */
                         break;
                     case NA:
                         break;
@@ -587,15 +581,16 @@ String internal::generateCWword(String symbols)
     for (int i = 0; i < l; ++i)
     {
         char c = symbols.charAt(i);                                 // next char in string
-        pointer = CWchars.indexOf(c);                               // at which position is the character in CWchars?
+        pointer = CWchars.indexOf(c);                             // at which position is the character in CWchars?
+        if (pointer == -1) {
+            return "111111110"; // <err>
+        }
         NoE = pool[pointer][1];                                     // how many elements in this morse code symbol?
         bitMask = pool[pointer][0];                                 // bitMask indicates which of the elements are dots and which are dashes
         for (int j = 0; j < NoE; ++j)
         {
             result += (bitMask & B10000000 ? "2" : "1");     // get MSB and store it in string - 2 is dah, 1 is dit, 0 = inter-element space
             bitMask = bitMask << 1;                               // shift bitmask 1 bit to the left
-            //Serial.print("Bitmask: ");
-            //Serial.println(bitmask, BIN);
         } /// now we are at the end of one character, therefore we add enough space for inter-character
         result += "0";
     }     /// now we are at the end of the word, therefore we remove the final 0!
