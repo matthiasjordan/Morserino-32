@@ -626,12 +626,12 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     break;
                 case MorsePreferences::posCurtisBDahTiming:
                     MorsePreferences::prefs.curtisBTiming += (t * 5);                          // Curtis B timing dah (enhanced Curtis mode)
-                    MorsePreferences::prefs.curtisBTiming = constrain(MorsePreferences::prefs.curtisBTiming, 0, 100);
+                    MorsePreferences::prefs.curtisBTiming = uconstrain(MorsePreferences::prefs.curtisBTiming, 100);
                     internal::displayCurtisBTiming();
                     break;
                 case MorsePreferences::posCurtisBDotTiming:
                     MorsePreferences::prefs.curtisBDotTiming += (t * 5);                   // Curtis B timing dit (enhanced Curtis mode)
-                    MorsePreferences::prefs.curtisBDotTiming = constrain(MorsePreferences::prefs.curtisBDotTiming, 0, 100);
+                    MorsePreferences::prefs.curtisBDotTiming = uconstrain(MorsePreferences::prefs.curtisBDotTiming, 100);
                     internal::displayCurtisBDotTiming();
                     break;
                 case MorsePreferences::posACS:
@@ -683,9 +683,6 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                     MorsePreferences::prefs.kochFilter = constrain(MorsePreferences::prefs.kochFilter + t, 1, Koch::kochChars.length());
                     internal::displayKochFilter();
                     break;
-                    //case  posGenerate : MorsePreferences::prefs.generatorMode = (MorsePreferences::prefs.generatorMode + t + 6) % 6;     // what trainer generates (0 - 5)
-                    //               displayGenerate();
-                    //               break;
                 case MorsePreferences::posRandomOption:
                     MorsePreferences::prefs.randomOption = (MorsePreferences::prefs.randomOption + t + 10) % 10; // which char set for random chars?
                     internal::displayRandomOption();

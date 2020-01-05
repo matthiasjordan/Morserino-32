@@ -51,7 +51,7 @@ void MorseSound::pwmTone(unsigned int frequency, unsigned int volume, boolean li
 { // frequency in Hertz, volume in range 0 - 100; we use 10 bit resolution
     const uint16_t vol[] =
         {0, 1, 2, 3, 16, 150, 380, 580, 700, 880, 1023};
-    int i = constrain(volume / 10, 0, 10);
+    int i = uconstrain(volume / 10, 10);
     //Serial.println(vol[i]);
     //Serial.println(frequency);
     if (lineOut)

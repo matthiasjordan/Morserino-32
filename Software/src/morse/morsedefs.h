@@ -160,3 +160,4 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 // we need this for some strange reason: the min definition breaks with WiFi
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
+#define uconstrain(amt,high) (amt)>(high)?(high):(amt)
