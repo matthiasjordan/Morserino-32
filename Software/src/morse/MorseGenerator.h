@@ -35,11 +35,6 @@ namespace MorseGenerator
     extern int repeats;
     extern uint8_t wordCounter;                          // for maxSequence
 
-//       extern int rxDitLength;                    // set new value for length of dits and dahs and other timings
-//       extern int rxDahLength;
-//       extern int rxInterCharacterSpace;
-//       extern int rxInterWordSpace;
-
     extern GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
 
     extern uint8_t effectiveTrainerDisplay;
