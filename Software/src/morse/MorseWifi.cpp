@@ -22,6 +22,7 @@
 #include "MorseDisplay.h"
 #include "MorsePreferences.h"
 #include "MorseUI.h"
+#include "MorsePlayerFile.h"
 
 //using namespace MorseWifi;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +174,6 @@ namespace internal
 {
     void startMDNS();
     boolean errorConnect(String msg);
-    boolean wifiConnect();
     String getContentType(String filename);
     void handleNotFound();
     bool handleFileRead(String path);
@@ -427,7 +427,7 @@ String internal::getContentType(String filename)
 
 bool internal::handleFileRead(String path)
 { // send the right file to the client (if it exists)
-    //Serial.println("handleFileRead: " + path);
+  //Serial.println("handleFileRead: " + path);
     if (path.endsWith("/"))
         path += "index.html";          // If a folder is requested, send the index file
     String contentType = internal::getContentType(path);             // Get the MIME type
@@ -455,7 +455,7 @@ void internal::handleFileUpload()
         if (!filename.startsWith("/"))
             filename = "/" + filename;
         //Serial.print("handleFileUpload Name: "); Serial.println(filename);
-        MorseWifi::fsUploadFile = SPIFFS.open("/player.txt", "w");       // Open the file for writing in SPIFFS (create if it doesn't exist)
+        MorseWifi::fsUploadFile = MorsePlayerFile::openForWriting();     // Open the file for writing in SPIFFS (create if it doesn't exist)
         filename = String();
     }
     else if (upload.status == UPLOAD_FILE_WRITE)
