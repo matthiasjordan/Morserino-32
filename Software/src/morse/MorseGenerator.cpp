@@ -45,8 +45,6 @@ const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöü
 // for each character:
 // byte length// byte morse encoding as binary value, beginning with most significant bit
 
-byte poolPair[2];           // storage in RAM for one morse code character
-
 const byte pool[][2] =
     {
 // letters
