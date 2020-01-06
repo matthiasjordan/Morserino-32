@@ -66,6 +66,7 @@ namespace MorsePreferences
     extern prefPos extTrxOptions[];
     extern prefPos decoderOptions[];
     extern prefPos allOptions[];
+    extern prefPos noOptions[];
 
     class MorsePrefs
     {

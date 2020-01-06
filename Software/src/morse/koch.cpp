@@ -16,6 +16,8 @@
 #include "MorsePreferences.h"
 #include "abbrev.h"
 #include "english_words.h"
+#include "MorseGenerator.h"
+#include "MorseEchoTrainer.h"
 
 using namespace Koch;
 
@@ -36,6 +38,25 @@ void Koch::setup()
     //// populate the array for abbreviations and words according to length and Koch filter
     createKochWords(MorsePreferences::prefs.wordLength, MorsePreferences::prefs.kochFilter);  //
     createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
+}
+
+boolean Koch::menuExec(String mode)
+{
+    if (mode == "learn")
+    {
+        MorseEchoTrainer::startEcho();
+    }
+    else if (mode == "trainer")
+    {
+        Koch::setKochActive(true);
+        MorseGenerator::startTrainer();
+    }
+    else if (mode == "echo")
+    {
+        Koch::setKochActive(true);
+        MorseEchoTrainer::startEcho();
+    }
+    return true;
 }
 
 boolean Koch::isKochActive()

@@ -197,6 +197,39 @@ void Decoder::setupGoertzel()
 }
 
 
+boolean Decoder::menuExec(String mode) {
+    MorsePreferences::currentOptions = MorsePreferences::decoderOptions;               // list of available options in lora trx mode
+    MorseMachine::morseState = MorseMachine::morseDecoder;
+    MorseMachine::encoderState = MorseMachine::volumeSettingMode;
+    MorseKeyer::keyTx = false;
+    MorseDisplay::clear();
+    MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Decoder");
+
+    Decoder::startDecoder();
+    return true;
+}
+
+
+void Decoder::startDecoder() {
+    Decoder::speedChanged = true;
+    delay(650);
+    MorseDisplay::clear();
+    MorseDisplay::displayTopLine();
+    MorseDisplay::drawInputStatus(false);
+    MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+
+    MorseDisplay::displayCWspeed();
+    MorseDisplay::displayVolume();
+
+    /// set up variables for Goertzel Morse Decoder
+    Decoder::setupGoertzel();
+    Decoder::filteredState = Decoder::filteredStateBefore = false;
+    Decoder::decoderState = Decoder::LOW_;
+    Decoder::ditAvg = 60;
+    Decoder::dahAvg = 180;
+}
+
+
 uint8_t Decoder::getDecodedWpm() {
     return wpmDecoded;
 }

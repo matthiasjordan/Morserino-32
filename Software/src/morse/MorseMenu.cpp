@@ -30,6 +30,7 @@
 #include "MorseMachine.h"
 #include "MorsePlayerFile.h"
 #include "MorseWifi.h"
+#include "MorseHeadCopying.h"
 
 using namespace MorseMenu;
 
@@ -101,114 +102,115 @@ typedef struct MenuItem
         menuNo no;
         uint8_t nav[5];
         MorseGenerator::GEN_TYPE generatorMode;
+        MorsePreferences::prefPos *options;
         boolean remember;
 } menuItem_t;
 
 const menuItem_t menuItems[] =
     {
         {"", _dummy,
-            {0, 0, 0, 0, 0}, MorseGenerator::NA, true},
+            {0, 0, 0, 0, 0}, MorseGenerator::NA, MorsePreferences::allOptions, true},
         {"CW Keyer", _keyer,
-            {0, _goToSleep, _gen, _dummy, 0}, MorseGenerator::NA, true},
+            {0, _goToSleep, _gen, _dummy, 0}, MorseGenerator::NA, MorsePreferences::keyerOptions, true},
 
         {"CW Generator", _gen,
-            {0, _keyer, _echo, _dummy, _genRand}, MorseGenerator::NA, true},
+            {0, _keyer, _echo, _dummy, _genRand}, MorseGenerator::NA, MorsePreferences::generatorOptions, true},
         {"Random", _genRand,
-            {1, _genPlayer, _genAbb, _gen, 0}, MorseGenerator::RANDOMS, true},
+            {1, _genPlayer, _genAbb, _gen, 0}, MorseGenerator::RANDOMS, MorsePreferences::generatorOptions, true},
         {"CW Abbrevs", _genAbb,
-            {1, _genRand, _genWords, _gen, 0}, MorseGenerator::ABBREVS, true},
+            {1, _genRand, _genWords, _gen, 0}, MorseGenerator::ABBREVS, MorsePreferences::generatorOptions, true},
         {"English Words", _genWords,
-            {1, _genAbb, _genCalls, _gen, 0}, MorseGenerator::WORDS, true},
+            {1, _genAbb, _genCalls, _gen, 0}, MorseGenerator::WORDS, MorsePreferences::generatorOptions, true},
         {"Call Signs", _genCalls,
-            {1, _genWords, _genMixed, _gen, 0}, MorseGenerator::CALLS, true},
+            {1, _genWords, _genMixed, _gen, 0}, MorseGenerator::CALLS, MorsePreferences::generatorOptions, true},
         {"Mixed", _genMixed,
-            {1, _genCalls, _genPlayer, _gen, 0}, MorseGenerator::MIXED, true},
+            {1, _genCalls, _genPlayer, _gen, 0}, MorseGenerator::MIXED, MorsePreferences::generatorOptions, true},
         {"File Player", _genPlayer,
-            {1, _genMixed, _genRand, _gen, 0}, MorseGenerator::PLAYER, true},
+            {1, _genMixed, _genRand, _gen, 0}, MorseGenerator::PLAYER, MorsePreferences::playerOptions, true},
 
         {"Echo Trainer", _echo,
-            {0, _gen, _koch, _dummy, _echoRand}, MorseGenerator::NA, true},
+            {0, _gen, _koch, _dummy, _echoRand}, MorseGenerator::NA, MorsePreferences::echoTrainerOptions, true},
         {"Random", _echoRand,
-            {1, _echoPlayer, _echoAbb, _echo, 0}, MorseGenerator::RANDOMS, true},
+            {1, _echoPlayer, _echoAbb, _echo, 0}, MorseGenerator::RANDOMS, MorsePreferences::echoTrainerOptions, true},
         {"CW Abbrevs", _echoAbb,
-            {1, _echoRand, _echoWords, _echo, 0}, MorseGenerator::ABBREVS, true},
+            {1, _echoRand, _echoWords, _echo, 0}, MorseGenerator::ABBREVS, MorsePreferences::echoTrainerOptions, true},
         {"English Words", _echoWords,
-            {1, _echoAbb, _echoCalls, _echo, 0}, MorseGenerator::WORDS, true},
+            {1, _echoAbb, _echoCalls, _echo, 0}, MorseGenerator::WORDS, MorsePreferences::echoTrainerOptions, true},
         {"Call Signs", _echoCalls,
-            {1, _echoWords, _echoMixed, _echo, 0}, MorseGenerator::CALLS, true},
+            {1, _echoWords, _echoMixed, _echo, 0}, MorseGenerator::CALLS, MorsePreferences::echoTrainerOptions, true},
         {"Mixed", _echoMixed,
-            {1, _echoCalls, _echoPlayer, _echo, 0}, MorseGenerator::MIXED, true},
+            {1, _echoCalls, _echoPlayer, _echo, 0}, MorseGenerator::MIXED, MorsePreferences::echoTrainerOptions, true},
         {"File Player", _echoPlayer,
-            {1, _echoMixed, _echoRand, _echo, 0}, MorseGenerator::PLAYER, true},
+            {1, _echoMixed, _echoRand, _echo, 0}, MorseGenerator::PLAYER, MorsePreferences::echoPlayerOptions, true},
 
         {"Koch Trainer", _koch,
-            {0, _echo, _head, _dummy, _kochSel}, MorseGenerator::NA, true},
+            {0, _echo, _head, _dummy, _kochSel}, MorseGenerator::NA, MorsePreferences::kochEchoOptions, true},
         {"Select Lesson", _kochSel,
-            {1, _kochEcho, _kochLearn, _koch, 0}, MorseGenerator::NA, true},
+            {1, _kochEcho, _kochLearn, _koch, 0}, MorseGenerator::NA, MorsePreferences::kochEchoOptions, true},
         {"Learn New Chr", _kochLearn,
-            {1, _kochSel, _kochGen, _koch, 0}, MorseGenerator::NA, true},
+            {1, _kochSel, _kochGen, _koch, 0}, MorseGenerator::KOCH_LEARN, MorsePreferences::kochEchoOptions, true},
         {"CW Generator", _kochGen,
-            {1, _kochLearn, _kochEcho, _koch, _kochGenRand}, MorseGenerator::NA, true},
+            {1, _kochLearn, _kochEcho, _koch, _kochGenRand}, MorseGenerator::NA, MorsePreferences::kochGenOptions, true},
         {"Random", _kochGenRand,
-            {2, _kochGenMixed, _kochGenAbb, _kochGen, 0}, MorseGenerator::RANDOMS, true},
+            {2, _kochGenMixed, _kochGenAbb, _kochGen, 0}, MorseGenerator::RANDOMS, MorsePreferences::kochGenOptions, true},
         {"CW Abbrevs", _kochGenAbb,
-            {2, _kochGenRand, _kochGenWords, _kochGen, 0}, MorseGenerator::ABBREVS, true},
+            {2, _kochGenRand, _kochGenWords, _kochGen, 0}, MorseGenerator::ABBREVS, MorsePreferences::kochGenOptions, true},
         {"English Words", _kochGenWords,
-            {2, _kochGenAbb, _kochGenMixed, _kochGen, 0}, MorseGenerator::WORDS, true},
+            {2, _kochGenAbb, _kochGenMixed, _kochGen, 0}, MorseGenerator::WORDS, MorsePreferences::kochGenOptions, true},
         {"Mixed", _kochGenMixed,
-            {2, _kochGenWords, _kochGenRand, _kochGen, 0}, MorseGenerator::MIXED, true},
+            {2, _kochGenWords, _kochGenRand, _kochGen, 0}, MorseGenerator::MIXED, MorsePreferences::kochGenOptions, true},
 
         {"Echo Trainer", _kochEcho,
-            {1, _kochGen, _kochSel, _koch, _kochEchoRand}, MorseGenerator::NA, true},
+            {1, _kochGen, _kochSel, _koch, _kochEchoRand}, MorseGenerator::NA, MorsePreferences::kochEchoOptions, true},
         {"Random", _kochEchoRand,
-            {2, _kochEchoMixed, _kochEchoAbb, _kochEcho, 0}, MorseGenerator::RANDOMS, true},
+            {2, _kochEchoMixed, _kochEchoAbb, _kochEcho, 0}, MorseGenerator::RANDOMS, MorsePreferences::kochEchoOptions, true},
         {"CW Abbrevs", _kochEchoAbb,
-            {2, _kochEchoRand, _kochEchoWords, _kochEcho, 0}, MorseGenerator::ABBREVS, true},
+            {2, _kochEchoRand, _kochEchoWords, _kochEcho, 0}, MorseGenerator::ABBREVS, MorsePreferences::kochEchoOptions, true},
         {"English Words", _kochEchoWords,
-            {2, _kochEchoAbb, _kochEchoMixed, _kochEcho, 0}, MorseGenerator::WORDS, true},
+            {2, _kochEchoAbb, _kochEchoMixed, _kochEcho, 0}, MorseGenerator::WORDS, MorsePreferences::kochEchoOptions, true},
         {"Mixed", _kochEchoMixed,
-            {2, _kochEchoWords, _kochEchoRand, _kochEcho, 0}, MorseGenerator::MIXED, true},
+            {2, _kochEchoWords, _kochEchoRand, _kochEcho, 0}, MorseGenerator::MIXED, MorsePreferences::kochEchoOptions, true},
 
         {"Head Copying", _head,
-            {0, _koch, _trx, _dummy, _headRand}, MorseGenerator::NA, true},
+            {0, _koch, _trx, _dummy, _headRand}, MorseGenerator::NA, MorsePreferences::headOptions, true},
         {"Random", _headRand,
-            {1, _headPlayer, _headAbb, _head, 0}, MorseGenerator::RANDOMS, true},
+            {1, _headPlayer, _headAbb, _head, 0}, MorseGenerator::RANDOMS, MorsePreferences::headOptions, true},
         {"CW Abbrevs", _headAbb,
-            {1, _headRand, _headWords, _head, 0}, MorseGenerator::ABBREVS, true},
+            {1, _headRand, _headWords, _head, 0}, MorseGenerator::ABBREVS, MorsePreferences::headOptions, true},
         {"English Words", _headWords,
-            {1, _headAbb, _headCalls, _head, 0}, MorseGenerator::WORDS, true},
+            {1, _headAbb, _headCalls, _head, 0}, MorseGenerator::WORDS, MorsePreferences::headOptions, true},
         {"Call Signs", _headCalls,
-            {1, _headWords, _headMixed, _head, 0}, MorseGenerator::CALLS, true},
+            {1, _headWords, _headMixed, _head, 0}, MorseGenerator::CALLS, MorsePreferences::headOptions, true},
         {"Mixed", _headMixed,
-            {1, _headCalls, _headPlayer, _head, 0}, MorseGenerator::MIXED, true},
+            {1, _headCalls, _headPlayer, _head, 0}, MorseGenerator::MIXED, MorsePreferences::headOptions, true},
         {"File Player", _headPlayer,
-            {1, _headMixed, _headRand, _head, 0}, MorseGenerator::PLAYER, true},
+            {1, _headMixed, _headRand, _head, 0}, MorseGenerator::PLAYER, MorsePreferences::headOptions, true},
 
         {"Transceiver", _trx,
-            {0, _head, _decode, _dummy, _trxLora}, MorseGenerator::NA, true},
+            {0, _head, _decode, _dummy, _trxLora}, MorseGenerator::NA, MorsePreferences::noOptions, true},
         {"LoRa Trx", _trxLora,
-            {1, _trxIcw, _trxIcw, _trx, 0}, MorseGenerator::NA, true},
+            {1, _trxIcw, _trxIcw, _trx, 0}, MorseGenerator::NA, MorsePreferences::loraTrxOptions, true},
         {"iCW/Ext Trx", _trxIcw,
-            {1, _trxLora, _trxLora, _trx, 0}, MorseGenerator::NA, true},
+            {1, _trxLora, _trxLora, _trx, 0}, MorseGenerator::NA, MorsePreferences::extTrxOptions, true},
 
         {"CW Decoder", _decode,
-            {0, _trx, _wifi, _dummy, 0}, MorseGenerator::NA, true},
+            {0, _trx, _wifi, _dummy, 0}, MorseGenerator::NA, MorsePreferences::decoderOptions, true},
 
         {"WiFi Functions", _wifi,
-            {0, _decode, _goToSleep, _dummy, _wifi_mac}, MorseGenerator::NA, false},
+            {0, _decode, _goToSleep, _dummy, _wifi_mac}, MorseGenerator::NA, MorsePreferences::noOptions, false},
         {"Disp MAC Addr", _wifi_mac,
-            {1, _wifi_update, _wifi_config, _wifi, 0}, MorseGenerator::NA, false},
+            {1, _wifi_update, _wifi_config, _wifi, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false},
         {"Config WiFi", _wifi_config,
-            {1, _wifi_mac, _wifi_check, _wifi, 0}, MorseGenerator::NA, false},
+            {1, _wifi_mac, _wifi_check, _wifi, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false},
         {"Check WiFi", _wifi_check,
-            {1, _wifi_config, _wifi_upload, _wifi, 0}, MorseGenerator::NA, false},
+            {1, _wifi_config, _wifi_upload, _wifi, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false},
         {"Upload File", _wifi_upload,
-            {1, _wifi_check, _wifi_update, _wifi, 0}, MorseGenerator::NA, false},
+            {1, _wifi_check, _wifi_update, _wifi, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false},
         {"Update Firmw", _wifi_update,
-            {1, _wifi_upload, _wifi_mac, _wifi, 0}, MorseGenerator::NA, false},
+            {1, _wifi_upload, _wifi_mac, _wifi, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false},
 
         {"Go To Sleep", _goToSleep,
-            {0, _wifi, _keyer, _dummy, 0}, MorseGenerator::NA, false}
+            {0, _wifi, _keyer, _dummy, 0}, MorseGenerator::NA, MorsePreferences::noOptions, false}
 
     };
 
@@ -220,19 +222,17 @@ namespace internal
     boolean menuExec();
 }
 
-
-void MorseMenu::setup() {
+void MorseMenu::setup()
+{
     /// set up quickstart - this should only be done once at startup - after successful quickstart we disable it to allow normal menu operation
     quickStart = MorsePreferences::prefs.quickStart;
 }
-
 
 void MorseMenu::menu_()
 {
     uint8_t newMenuPtr = MorsePreferences::prefs.menuPtr;
     uint8_t disp = 0;
     int t, command;
-
 
     //// initialize a few things now
     //Serial.println("THE MENU");
@@ -395,234 +395,83 @@ boolean internal::menuExec()
     MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
     Koch::setKochActive(false);
+    MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
+    MorsePreferences::currentOptions = menuItems[MorsePreferences::prefs.menuPtr].options;
+
     switch (MorsePreferences::prefs.menuPtr)
     {
-        case _keyer:  /// keyer
-            MorseKeyer::setup();
-            MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
-            MorseMachine::morseState = MorseMachine::morseKeyer;
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer");
-            delay(500);
-            MorseDisplay::clear();
-            MorseDisplay::displayTopLine();
-            MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-            MorseKeyer::clearPaddleLatches();
-            MorseKeyer::keyTx = true;
-            return true;
-            break;
-
+        case _keyer:
+        {
+            return MorseKeyer::menuExec("a");
+        }
         case _headRand:
         case _headAbb:
         case _headWords:
         case _headCalls:
-        case _headMixed:      /// head copying
-            MorseGenerator::setupHeadCopying();
-            MorsePreferences::currentOptions = MorsePreferences::headOptions;
-            goto startTrainer;
+        case _headMixed:
+        {      /// head copying
+            return MorseHeadCopying::menuExec("a");
+        }
         case _genRand:
         case _genAbb:
         case _genWords:
         case _genCalls:
-        case _genMixed:      /// generator
-            MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
-            goto startTrainer;
+        case _genMixed:
+        {      /// generator
+            return MorseGenerator::menuExec("a");
+        }
         case _headPlayer:
-            MorseGenerator::setupHeadCopying();
-            MorsePreferences::currentOptions = MorsePreferences::headOptions;
-            goto startPlayer;
+        {
+            return MorseHeadCopying::menuExec("player");
+        }
         case _genPlayer:
-            MorsePreferences::currentOptions = MorsePreferences::playerOptions;                  // list of available options in player mode
-            startPlayer: MorsePlayerFile::openAndSkip();
-
-            startTrainer: MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
-            MorseGenerator::startFirst = true;
-            MorseGenerator::firstTime = true;
-            MorseMachine::morseState = MorseMachine::morseGenerator;
-            MorseGenerator::setup();
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(0, REGULAR, 0, "Generator     ");
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start/Stop:   ");
-            MorseDisplay::printOnScroll(2, REGULAR, 0, "Paddle | BLACK");
-            delay(1250);
-            MorseDisplay::clear();
-            MorseDisplay::displayTopLine();
-            MorseDisplay::clearScroll();      // clear the buffer
-            MorseKeyer::keyTx = true;
-            return true;
-            break;
+        {
+            return MorseGenerator::menuExec("player");
+        }
         case _echoRand:
         case _echoAbb:
         case _echoWords:
         case _echoCalls:
         case _echoMixed:
-            MorsePreferences::currentOptions = MorsePreferences::echoTrainerOptions;       // list of available options in echo trainer mode
-            MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
-            goto startEcho;
-        case _echoPlayer:    /// echo trainer
-            MorseGenerator::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
-            MorsePreferences::currentOptions = MorsePreferences::echoPlayerOptions;         // list of available options in echo player mode
-            MorsePlayerFile::openAndSkip();
-
-            startEcho: MorseGenerator::startFirst = true;
-            MorseMachine::morseState = MorseMachine::echoTrainer;
-            MorseGenerator::setup();
-            MorseEchoTrainer::echoStop = false;
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(0, REGULAR, 0,
-                    MorseGenerator::generatorMode == MorseGenerator::KOCH_LEARN ? "New Character:" : "Echo Trainer:");
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
-            MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
-            delay(1250);
-            MorseDisplay::clear();
-            MorseDisplay::displayTopLine();
-            MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-            MorseKeyer::keyTx = false;
-            return true;
-            break;
+        {
+            return MorseEchoTrainer::menuExec("a");
+        }
+        case _echoPlayer:
+        {    /// echo trainer
+            return MorseEchoTrainer::menuExec("player");
+        }
         case _kochSel: // Koch Select
-            MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posKochFilter);
-            MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posKochFilter);
-            MorsePreferences::writePreferences("morserino");
-            //createKochWords(MorsePreferences::prefs.wordLength, MorsePreferences::prefs.kochFilter) ;  // update the arrays!
-            //createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
-            return false;
-            break;
+            return MorsePreferencesMenu::selectKochFilter();
         case _kochLearn:   // Koch Learn New .  /// just a new generatormode....
-            MorseGenerator::generatorMode = MorseGenerator::KOCH_LEARN;
-            MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;             // list of available options in Koch echo mode
-            goto startEcho;
+            return Koch::menuExec("learn");
         case _kochGenRand: // RANDOMS
-            MorseGenerator::generatorMode = MorseGenerator::RANDOMS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;         // list of available options in Koch generator mode
-            goto startTrainer;
         case _kochGenAbb: // ABBREVS - 2
-            MorseGenerator::generatorMode = MorseGenerator::ABBREVS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;         // list of available options in Koch generator mode
-            goto startTrainer;
         case _kochGenWords: // WORDS - 3
-            MorseGenerator::generatorMode = MorseGenerator::WORDS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;         // list of available options in Koch generator mode
-            goto startTrainer;
-        case _kochGenMixed: // KOCH_MIXED - 5
-            MorseGenerator::generatorMode = MorseGenerator::KOCH_MIXED;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochGenOptions;         // list of available options in Koch generator mode
-            goto startTrainer;
+        case _kochGenMixed:
+        { // KOCH_MIXED - 5
+            return Koch::menuExec("trainer");
+        }
         case _kochEchoRand: // Koch Echo Random
-            MorseGenerator::generatorMode = MorseGenerator::RANDOMS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;     // list of available options in Koch echo trainer mode
-            goto startEcho;
         case _kochEchoAbb: // ABBREVS - 2
-            MorseGenerator::generatorMode = MorseGenerator::ABBREVS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;     // list of available options in Koch echo trainer mode
-            goto startEcho;
         case _kochEchoWords: // WORDS - 3
-            MorseGenerator::generatorMode = MorseGenerator::WORDS;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;     // list of available options in Koch echo trainer mode
-            goto startEcho;
-        case _kochEchoMixed: // KOCH_MIXED - 5
-            MorseGenerator::generatorMode = MorseGenerator::KOCH_MIXED;
-            Koch::setKochActive(true);
-            MorsePreferences::currentOptions = MorsePreferences::kochEchoOptions;     // list of available options in Koch echo trainer mode
-            goto startEcho;
+        case _kochEchoMixed:
+        { // KOCH_MIXED - 5
+            return Koch::menuExec("echo");
+        }
         case _trxLora: // LoRa Transceiver
-            MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
-            MorseMachine::morseState = MorseMachine::loraTrx;
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
-            delay(600);
-            MorseDisplay::clear();
-            MorseDisplay::displayTopLine();
-            MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-            MorseKeyer::clearPaddleLatches();
-            MorseKeyer::keyTx = false;
-            MorseGenerator::clearText = "";
-            MorseLoRa::receive();
-            return true;
-            break;
+            return MorseLoRa::menuExec("trx");
         case _trxIcw: /// icw/ext TRX
-            MorsePreferences::currentOptions = MorsePreferences::extTrxOptions;                 // list of available options in ext trx mode
-            MorseMachine::morseState = MorseMachine::morseTrx;
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx");
-            MorseKeyer::clearPaddleLatches();
-            MorseKeyer::keyTx = true;
-            goto setupDecoder;
+            return MorseKeyer::menuExec("trx");
 
         case _decode: /// decoder
-            MorsePreferences::currentOptions = MorsePreferences::decoderOptions;               // list of available options in lora trx mode
-            MorseMachine::morseState = MorseMachine::morseDecoder;
-            /// here we will do the init for decoder mode
-            //trainerMode = false;
-            MorseMachine::encoderState = MorseMachine::volumeSettingMode;
-            MorseKeyer::keyTx = false;
-            MorseDisplay::clear();
-            MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Decoder");
-            setupDecoder: Decoder::speedChanged = true;
-            delay(650);
-            MorseDisplay::clear();
-            MorseDisplay::displayTopLine();
-            MorseDisplay::drawInputStatus(false);
-            MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-
-            MorseDisplay::displayCWspeed();
-            MorseDisplay::displayVolume();
-
-            /// set up variables for Goertzel Morse Decoder
-            Decoder::setupGoertzel();
-            Decoder::filteredState = Decoder::filteredStateBefore = false;
-            Decoder::decoderState = Decoder::LOW_;
-            Decoder::ditAvg = 60;
-            Decoder::dahAvg = 180;
-            return true;
-            break;
+            return Decoder::menuExec("a");
         case _wifi_mac:
-            WiFi.mode(WIFI_MODE_STA);               // init WiFi as client
-            MorseDisplay::clearDisplay();
-            MorseDisplay::printOnStatusLine(true, 0, WiFi.macAddress());
-            delay(2000);
-            MorseDisplay::printOnScroll(0, REGULAR, 0, "RED: restart");
-            delay(1000);
-            while (true)
-            {
-                MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
-                if (digitalRead(volButtonPin) == LOW)
-                    ESP.restart();
-            }
-            break;
+            return MorseWifi::menuExec("mac");
         case _wifi_config:
             MorseWifi::startAP();          // run as AP to get WiFi credentials from user
             break;
         case _wifi_check:
-            MorseDisplay::clearDisplay();
-            MorseDisplay::printOnStatusLine(true, 0, "Connecting... ");
-            if (!MorseWifi::wifiConnect())
-                ; //return false;
-            else
-            {
-                MorseDisplay::printOnStatusLine(true, 0, "Connected!    ");
-                MorseDisplay::printOnScroll(0, REGULAR, 0, MorsePreferences::prefs.wlanSSID);
-                MorseDisplay::printOnScroll(1, REGULAR, 0, WiFi.localIP().toString());
-            }
-            WiFi.mode(WIFI_MODE_NULL); // switch off WiFi
-            delay(1000);
-            MorseDisplay::printOnScroll(2, REGULAR, 0, "RED: return");
-            while (true)
-            {
-                MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
-                if (digitalRead(volButtonPin) == LOW)
-                {
-                    return false;
-                }
-            }
-            break;
+            return MorseWifi::menuExec("check");
         case _wifi_upload:
             MorseWifi::uploadFile();       // upload a text file
             break;

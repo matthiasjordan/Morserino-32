@@ -10,6 +10,7 @@ namespace MorsePreferencesMenu
     boolean setupPreferences(uint8_t atMenu);
     void displayKeyerPreferencesMenu(int pos);
     boolean adjustKeyerPreference(MorsePreferences::prefPos pos);
+    boolean selectKochFilter();
 }
 
 #endif /* MORSEPREFERENCESMENU_H_ */

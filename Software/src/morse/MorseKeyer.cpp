@@ -60,6 +60,35 @@ void MorseKeyer::setup()
     MorseKeyer::updateTimings();
 }
 
+boolean MorseKeyer::menuExec(String mode)
+{
+    if (mode == "a")
+    {
+        MorseKeyer::setup();
+//        MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
+        MorseMachine::morseState = MorseMachine::morseKeyer;
+        MorseDisplay::clear();
+        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer");
+        delay(500);
+        MorseDisplay::clear();
+        MorseDisplay::displayTopLine();
+        MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+        MorseKeyer::clearPaddleLatches();
+        MorseKeyer::keyTx = true;
+    }
+    else if (mode == "trx")
+    {
+//        MorsePreferences::currentOptions = MorsePreferences::extTrxOptions;                 // list of available options in ext trx mode
+        MorseMachine::morseState = MorseMachine::morseTrx;
+        MorseDisplay::clear();
+        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx");
+        MorseKeyer::clearPaddleLatches();
+        MorseKeyer::keyTx = true;
+        Decoder::startDecoder();
+    }
+    return true;
+}
+
 void MorseKeyer::updateTimings()
 {
     ditLength = 1200 / MorsePreferences::prefs.wpm;                    // set new value for length of dits and dahs and other timings

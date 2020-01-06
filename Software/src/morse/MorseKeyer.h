@@ -50,6 +50,8 @@ namespace MorseKeyer
     extern boolean keyTx;             // when state is set by manual key or touch paddle, then true!
                                       // we use this to decide if Tx should be keyed or not
     void setup();
+    boolean menuExec(String mode);
+
     void updateTimings();
     void keyTransmitter();
     boolean doPaddleIambic(boolean dit, boolean dah);

@@ -1,10 +1,12 @@
 #ifndef MORSELORA_H_
 #define MORSELORA_H_
 
+
 namespace MorseLoRa
 {
 
     void setup();
+    boolean menuExec(String mode);
     void idle();
 
     void cwForLora(int element);

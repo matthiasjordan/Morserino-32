@@ -83,6 +83,8 @@ prefPos MorsePreferences::allOptions[] =
             posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart,
             sentinel};
 
+prefPos MorsePreferences::noOptions[] = {};
+
 Preferences pref;               // use the Preferences library for storing and retrieving objects
 
 /// variables for managing snapshots
@@ -95,7 +97,6 @@ MorsePrefs MorsePreferences::prefs;
 prefPos *MorsePreferences::currentOptions = MorsePreferences::allOptions;
 
 unsigned long MorsePreferences::charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
-
 
 MorsePrefs MorsePreferences::readPreferences(String repository)
 {

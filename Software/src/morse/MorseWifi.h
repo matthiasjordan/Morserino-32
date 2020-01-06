@@ -38,6 +38,7 @@ namespace MorseWifi
     extern const char* updateLoginIndex;
     extern const char* serverIndex;
 
+    boolean menuExec(String mode);
     void startAP();
     boolean wifiConnect();
     void uploadFile();

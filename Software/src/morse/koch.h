@@ -12,6 +12,7 @@ namespace Koch
     extern String kochChars;
 
     void setup();
+    boolean menuExec(String mode);
     void updateKochChars(boolean lcwoKochSeq);
 
     uint8_t wordIsKoch(String thisWord);

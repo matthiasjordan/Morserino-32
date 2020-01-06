@@ -970,3 +970,13 @@ int internal::calcNewIndexWraparound(int ptrIndex, int encoderDelta)
     }
     return ptrIndex;
 }
+
+boolean MorsePreferencesMenu::selectKochFilter()
+{
+    MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posKochFilter);
+    MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posKochFilter);
+    MorsePreferences::writePreferences("morserino");
+    //createKochWords(MorsePreferences::prefs.wordLength, MorsePreferences::prefs.kochFilter) ;  // update the arrays!
+    //createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
+    return false;
+}

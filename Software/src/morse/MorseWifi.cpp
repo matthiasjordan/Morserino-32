@@ -23,6 +23,7 @@
 #include "MorsePreferences.h"
 #include "MorseUI.h"
 #include "MorsePlayerFile.h"
+#include "MorseSystem.h"
 
 //using namespace MorseWifi;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +179,54 @@ namespace internal
     void handleNotFound();
     bool handleFileRead(String path);
     void handleFileUpload();
+}
+
+boolean MorseWifi::menuExec(String mode)
+{
+    if (mode == "mac")
+    {
+        WiFi.mode(WIFI_MODE_STA);               // init WiFi as client
+        MorseDisplay::clearDisplay();
+        MorseDisplay::printOnStatusLine(true, 0, WiFi.macAddress());
+        delay(2000);
+        MorseDisplay::printOnScroll(0, REGULAR, 0, "RED: restart");
+        delay(1000);
+        while (true)
+        {
+            MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
+            if (digitalRead(volButtonPin) == LOW)
+            {
+                ESP.restart();
+            }
+        }
+    }
+    else if (mode == "check")
+    {
+        MorseDisplay::clearDisplay();
+        MorseDisplay::printOnStatusLine(true, 0, "Connecting... ");
+        if (!MorseWifi::wifiConnect())
+        {
+            ; //return false;
+        }
+        else
+        {
+            MorseDisplay::printOnStatusLine(true, 0, "Connected!    ");
+            MorseDisplay::printOnScroll(0, REGULAR, 0, MorsePreferences::prefs.wlanSSID);
+            MorseDisplay::printOnScroll(1, REGULAR, 0, WiFi.localIP().toString());
+        }
+        WiFi.mode(WIFI_MODE_NULL); // switch off WiFi
+        delay(1000);
+        MorseDisplay::printOnScroll(2, REGULAR, 0, "RED: return");
+        while (true)
+        {
+            MorseSystem::checkShutDown(false);  // possibly time-out: go to sleep
+            if (digitalRead(volButtonPin) == LOW)
+            {
+                break;
+            }
+        }
+    }
+    return false;
 }
 
 void internal::handleNotFound()

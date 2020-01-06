@@ -19,6 +19,9 @@ namespace MorseEchoTrainer
     extern boolean echoStop;                         // for maxSequence
     extern boolean active;                           // flag for trainer mode
 
+    boolean menuExec(String mode);
+    void startEcho();
+
     void echoTrainerEval();
 
     void storeCharInResponse(String symbol);

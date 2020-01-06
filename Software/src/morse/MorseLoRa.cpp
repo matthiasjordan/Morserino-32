@@ -23,6 +23,8 @@
 #include "MorsePreferencesMenu.h"
 #include "MorseMachine.h"
 #include "MorseLoRa.h"
+#include "MorseKeyer.h"
+#include "MorseGenerator.h"
 
 using namespace MorseLoRa;
 
@@ -82,6 +84,26 @@ void MorseLoRa::setup()
     /// initialise the serial number
     loRaSerial = random(64);
 
+}
+
+boolean MorseLoRa::menuExec(String mode)
+{
+    if (mode == "trx")
+    {
+        MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
+        MorseMachine::morseState = MorseMachine::loraTrx;
+        MorseDisplay::clear();
+        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
+        delay(600);
+        MorseDisplay::clear();
+        MorseDisplay::displayTopLine();
+        MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+        MorseKeyer::clearPaddleLatches();
+        MorseKeyer::keyTx = false;
+        MorseGenerator::clearText = "";
+        MorseLoRa::receive();
+    }
+    return true;
 }
 
 void MorseLoRa::idle()

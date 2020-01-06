@@ -44,6 +44,8 @@ namespace MorseGenerator
     extern boolean firstTime;                         /// for word doubler mode
 
     void setup();
+    boolean menuExec(String mode);
+    void startTrainer();
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
     void setupHeadCopying();

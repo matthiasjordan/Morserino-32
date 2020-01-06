@@ -18,6 +18,8 @@
 #include "MorseSound.h"
 #include "MorseDisplay.h"
 #include "MorseGenerator.h"
+#include "MorsePlayerFile.h"
+#include "MorseMachine.h"
 
 using namespace MorseEchoTrainer;
 
@@ -26,6 +28,39 @@ echoStates echoTrainerState = START_ECHO;
 boolean MorseEchoTrainer::echoStop = false;                         // for maxSequence
 boolean MorseEchoTrainer::active = false;                           // flag for trainer mode
 String MorseEchoTrainer::echoTrainerWord;
+
+boolean MorseEchoTrainer::menuExec(String mode)
+{
+    if (mode == "a")
+    {
+//        MorsePreferences::currentOptions = MorsePreferences::echoTrainerOptions;       // list of available options in echo trainer mode
+    }
+    else if (mode == "player")
+    {
+//        MorsePreferences::currentOptions = MorsePreferences::echoPlayerOptions;         // list of available options in echo player mode
+        MorsePlayerFile::openAndSkip();
+    }
+    MorseEchoTrainer::startEcho();
+    return true;
+}
+
+void MorseEchoTrainer::startEcho()
+{
+    MorseGenerator::startFirst = true;
+    MorseMachine::morseState = MorseMachine::echoTrainer;
+    MorseGenerator::setup();
+    MorseEchoTrainer::echoStop = false;
+    MorseDisplay::clear();
+    MorseDisplay::printOnScroll(0, REGULAR, 0,
+            MorseGenerator::generatorMode == MorseGenerator::KOCH_LEARN ? "New Character:" : "Echo Trainer:");
+    MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
+    MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
+    delay(1250);
+    MorseDisplay::clear();
+    MorseDisplay::displayTopLine();
+    MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+    MorseKeyer::keyTx = false;
+}
 
 boolean MorseEchoTrainer::isState(echoStates state)
 {

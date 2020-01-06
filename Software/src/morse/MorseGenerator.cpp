@@ -149,6 +149,38 @@ void MorseGenerator::setup()
     MorseKeyer::setup();
 }
 
+boolean MorseGenerator::menuExec(String mode)
+{
+    if (mode == "a")
+    {
+//        MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
+    }
+    else if (mode == "player")
+    {
+//        MorsePreferences::currentOptions = MorsePreferences::playerOptions;                  // list of available options in player mode
+        MorsePlayerFile::openAndSkip();
+    }
+    MorseGenerator::startTrainer();
+    return true;
+}
+
+void MorseGenerator::startTrainer()
+{
+    MorseGenerator::startFirst = true;
+    MorseGenerator::firstTime = true;
+    MorseMachine::morseState = MorseMachine::morseGenerator;
+    MorseGenerator::setup();
+    MorseDisplay::clear();
+    MorseDisplay::printOnScroll(0, REGULAR, 0, "Generator     ");
+    MorseDisplay::printOnScroll(1, REGULAR, 0, "Start/Stop:   ");
+    MorseDisplay::printOnScroll(2, REGULAR, 0, "Paddle | BLACK");
+    delay(1250);
+    MorseDisplay::clear();
+    MorseDisplay::displayTopLine();
+    MorseDisplay::clearScroll();      // clear the buffer
+    MorseKeyer::keyTx = true;
+}
+
 void MorseGenerator::generateCW()
 {          // this is called from loop() (frequently!)  and generates CW
 
@@ -411,7 +443,8 @@ void internal::fetchNewWord()
 
             randomGenerate: MorseGenerator::repeats = 0;
             clearText = "";
-            if ((MorsePreferences::prefs.maxSequence != 0) && (generatorMode != KOCH_LEARN)) {
+            if ((MorsePreferences::prefs.maxSequence != 0) && (generatorMode != KOCH_LEARN))
+            {
                 if (MorseMachine::isMode(MorseMachine::echoTrainer)
                         || ((MorseMachine::isMode(MorseMachine::morseGenerator)) && !effectiveAutoStop))
                 {
@@ -490,7 +523,8 @@ void internal::fetchNewWord()
                         }
                         break;
                     case PLAYER:
-                        if (MorsePreferences::prefs.randomFile) {
+                        if (MorsePreferences::prefs.randomFile)
+                        {
                             MorsePlayerFile::skipWords(random(MorsePreferences::prefs.randomFile + 1));
                         }
                         MorseGenerator::clearText = MorsePlayerFile::getWord();
@@ -580,7 +614,8 @@ String internal::generateCWword(String symbols)
     {
         char c = symbols.charAt(i);                                 // next char in string
         pointer = CWchars.indexOf(c);                             // at which position is the character in CWchars?
-        if (pointer == -1) {
+        if (pointer == -1)
+        {
             return "111111110"; // <err>
         }
         NoE = pool[pointer][1];                                     // how many elements in this morse code symbol?
