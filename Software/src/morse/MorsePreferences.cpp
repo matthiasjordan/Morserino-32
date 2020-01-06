@@ -96,12 +96,7 @@ prefPos *MorsePreferences::currentOptions = MorsePreferences::allOptions;
 
 unsigned long MorsePreferences::charCounter = 25; // we use this to count characters after changing speed - after n characters we decide to write the config into NVS
 
-//MorsePrefs prefs;
 
-/**
- * Clients have to call     updateTimings();
- * after calling this!
- */
 MorsePrefs MorsePreferences::readPreferences(String repository)
 {
     MorsePrefs p;
