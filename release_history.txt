@@ -1,0 +1,11 @@
+Work-in-progress 2.1.0
+
+* Source code extensively refactored into smaller files for easier navigation
+  and maintenance. In particular the menu subsystem was changed so new menu
+  items can be added easier and with fewer side effects.
+  
+* Removed "auto stop" feature and changed it into a new menu option 
+  "Head Copying".
+
+* Removed some dead code.
+
