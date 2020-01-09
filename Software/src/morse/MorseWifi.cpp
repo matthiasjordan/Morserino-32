@@ -226,6 +226,18 @@ boolean MorseWifi::menuExec(String mode)
             }
         }
     }
+    else if (mode == "startAp")
+    {
+        MorseWifi::startAP();
+    }
+    else if (mode == "upload")
+    {
+        MorseWifi::uploadFile();
+    }
+    else if (mode == "update")
+    {
+        MorseWifi::updateFirmware();
+    }
     return false;
 }
 

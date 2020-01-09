@@ -20,6 +20,16 @@
 
 using namespace MorseSystem;
 
+boolean MorseSystem::menuExec(String mode)
+{
+    if (mode == "sleep")
+    {
+        MorseSystem::checkShutDown(true);
+    }
+
+    return false;
+}
+
 //// measure battery voltage in mV
 int16_t MorseSystem::batteryVoltage()
 {

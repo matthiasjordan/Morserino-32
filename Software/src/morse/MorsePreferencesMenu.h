@@ -6,7 +6,8 @@
 namespace MorsePreferencesMenu
 {
 
-    boolean setupPreferences(uint8_t atMenu);
+    boolean menuExec(String mode);
+
     boolean setupPreferences(uint8_t atMenu);
     void displayKeyerPreferencesMenu(int pos);
     boolean adjustKeyerPreference(MorsePreferences::prefPos pos);

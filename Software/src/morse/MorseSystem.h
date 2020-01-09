@@ -6,6 +6,8 @@
 namespace MorseSystem
 {
 
+    boolean menuExec(String mode);
+
     void resetTOT();
     void checkShutDown(boolean enforce);
 

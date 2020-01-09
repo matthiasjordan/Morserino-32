@@ -70,6 +70,15 @@ namespace internal
     int calcNewIndexWraparound(int ptrIndex, int encoderDelta);
 }
 
+boolean MorsePreferencesMenu::menuExec(String mode)
+{
+    if (mode == "selectKoch")
+    {
+        return MorsePreferencesMenu::selectKochFilter();
+    }
+    return false;
+}
+
 //////// Display the preferences menu - we display the following preferences
 
 void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
