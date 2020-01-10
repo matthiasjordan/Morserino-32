@@ -27,7 +27,6 @@ namespace MorseGenerator
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
     extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode
-    extern boolean startFirst;                        // to indicate that we are starting a new sequence in the trainer modi
     extern String CWword;
 
     extern String clearText;
@@ -49,6 +48,9 @@ namespace MorseGenerator
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
     void setupHeadCopying();
+
+    void setNextWordvvvA(); // to indicate that we want vvvA
+    void setSendCWToLoRa(boolean mode);
 
 }
 

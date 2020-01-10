@@ -420,7 +420,7 @@ void MorseMenu::cleanStartSettings()
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
     MorseGenerator::genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
     MorseGenerator::wordCounter = 0;                             // reset word counter for maxSequence
-    MorseGenerator::startFirst = true;
+    MorseGenerator::setNextWordvvvA();
     MorseDisplay::displayTopLine();
 }
 

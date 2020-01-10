@@ -31,13 +31,8 @@ String MorseEchoTrainer::echoTrainerWord;
 
 boolean MorseEchoTrainer::menuExec(String mode)
 {
-    if (mode == "a")
+    if (mode == "player")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::echoTrainerOptions;       // list of available options in echo trainer mode
-    }
-    else if (mode == "player")
-    {
-//        MorsePreferences::currentOptions = MorsePreferences::echoPlayerOptions;         // list of available options in echo player mode
         MorsePlayerFile::openAndSkip();
     }
     MorseEchoTrainer::startEcho();
@@ -46,7 +41,7 @@ boolean MorseEchoTrainer::menuExec(String mode)
 
 void MorseEchoTrainer::startEcho()
 {
-    MorseGenerator::startFirst = true;
+
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setup();
     MorseEchoTrainer::echoStop = false;
