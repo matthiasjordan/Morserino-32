@@ -48,7 +48,7 @@ namespace Decoder
 
     boolean menuExec(String mode);
     void startDecoder();
-    void doDecode();
+    void doDecodeShow();
     void setupGoertzel();
     void drawInputStatus(boolean on);
     void interWordTimerOff();

@@ -24,8 +24,7 @@
 
 using namespace Decoder;
 
-const struct linklist Decoder::CWtree[67] =
-    {
+const struct linklist Decoder::CWtree[67] = { //
         {"", 1, 2},            // 0
                 {"e", 3, 4},         // 1
                 {"t", 5, 6},          // 2
@@ -99,7 +98,7 @@ const struct linklist Decoder::CWtree[67] =
                 {"*", 65, 63},       // 64
                 {"*", 66, 63},       // 65
                 {"<err>", 66, 63}      // 66 !! Error - backspace
-    };
+        };
 
 uint8_t wpmDecoded;
 
@@ -175,7 +174,7 @@ namespace internal
     String encodeProSigns(String &input);
     boolean straightKey();
     boolean checkTone();
-
+    void doDecode();
 }
 
 void Decoder::setupGoertzel()
@@ -196,8 +195,8 @@ void Decoder::setupGoertzel()
     coeff = 2.0 * cosine;                                           // 1,999999479
 }
 
-
-boolean Decoder::menuExec(String mode) {
+boolean Decoder::menuExec(String mode)
+{
     MorsePreferences::currentOptions = MorsePreferences::decoderOptions;               // list of available options in lora trx mode
     MorseMachine::morseState = MorseMachine::morseDecoder;
     MorseMachine::encoderState = MorseMachine::volumeSettingMode;
@@ -209,8 +208,8 @@ boolean Decoder::menuExec(String mode) {
     return true;
 }
 
-
-void Decoder::startDecoder() {
+void Decoder::startDecoder()
+{
     Decoder::speedChanged = true;
     delay(650);
     MorseDisplay::clear();
@@ -229,8 +228,8 @@ void Decoder::startDecoder() {
     Decoder::dahAvg = 180;
 }
 
-
-uint8_t Decoder::getDecodedWpm() {
+uint8_t Decoder::getDecodedWpm()
+{
     return wpmDecoded;
 }
 
@@ -371,7 +370,7 @@ boolean internal::checkTone()
     }
 }   /// end checkTone()
 
-void Decoder::doDecode()
+void internal::doDecode()
 {
     float lacktime;
     int wpm;
@@ -393,7 +392,7 @@ void Decoder::doDecode()
                 if (lowDuration > (lacktime * ditAvg))
                 {
                     displayMorse();                                             /// decode the morse character and display it
-                     wpm = (wpmDecoded + (int) (7200 / (dahAvg + 3*ditAvg))) / 2;     //// recalculate speed in wpm
+                    wpm = (wpmDecoded + (int) (7200 / (dahAvg + 3 * ditAvg))) / 2;     //// recalculate speed in wpm
                     if (wpmDecoded != wpm)
                     {
                         wpmDecoded = wpm;
@@ -438,6 +437,16 @@ void Decoder::doDecode()
                 decoderState = INTERELEMENT_;
             }
             break;
+    }
+}
+
+void Decoder::doDecodeShow()
+{
+    internal::doDecode();
+    if (Decoder::speedChanged)
+    {
+        Decoder::speedChanged = false;
+        MorseDisplay::displayCWspeed();
     }
 }
 

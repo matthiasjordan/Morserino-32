@@ -168,12 +168,7 @@ void loop()
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
-            Decoder::doDecode();
-            if (Decoder::speedChanged)
-            {
-                Decoder::speedChanged = false;
-                MorseDisplay::displayCWspeed();
-            }
+            Decoder::doDecodeShow();
             break;
         case MorseMachine::morseGenerator:
             if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
@@ -273,12 +268,7 @@ void loop()
                 }
             break;
         case MorseMachine::morseDecoder:
-            Decoder::doDecode();
-            if (Decoder::speedChanged)
-            {
-                Decoder::speedChanged = false;
-                MorseDisplay::displayCWspeed();
-            }
+            Decoder::doDecodeShow();
             break;
         default:
             break;
