@@ -140,8 +140,8 @@ namespace internal
     String getRandomCall(int maxLength);
     String getRandomWord(int maxLength);
     String getRandomAbbrev(int maxLength);
-
     String generateCWword(String symbols);
+    String getRandomCWChars(int option, int maxLength);
 }
 
 void MorseGenerator::setup()
@@ -662,6 +662,54 @@ void internal::dispGeneratedChar()
     MorsePreferences::fireCharSeen(true);
 }
 
+String internal::getRandomCWChars(int option, int maxLength)
+{
+    int s = 0, e = 50;
+    switch (option)
+    {
+        case OPT_NUM:
+        case OPT_NUMPUNCT:
+        case OPT_NUMPUNCTPRO:
+            s = 26;
+            break;
+        case OPT_PUNCT:
+        case OPT_PUNCTPRO:
+            s = 36;
+            break;
+        case OPT_PRO:
+            s = 44;
+            break;
+        default:
+            s = 0;
+            break;
+    }
+    switch (option)
+    {
+        case OPT_ALPHA:
+            e = 26;
+            break;
+        case OPT_ALNUM:
+        case OPT_NUM:
+            e = 36;
+            break;
+        case OPT_ALNUMPUNCT:
+        case OPT_NUMPUNCT:
+        case OPT_PUNCT:
+            e = 45;
+            break;
+        default:
+            e = 50;
+            break;
+    }
+    String  result = "";
+    for (int i = 0; i < maxLength; ++i)
+    {
+        result += CWchars.charAt(random(s, e));
+    }
+
+    return result;
+}
+
 // we use substrings as char pool for trainer mode
 // SANK will be replaced by <as>, <ka>, <kn> and <sk>
 // Options:
@@ -680,59 +728,20 @@ void internal::dispGeneratedChar()
 
 String internal::getRandomChars(int maxLength, int option)
 {             /// random char string, eg. group of 5, 9 differing character pools; maxLength = 1-6
-    String result = "";
-    String pool;
-    int s = 0, e = 50;
-    int i;
+    String result;
+
     if (maxLength > 6)
     {                                        // we use a random length!
         maxLength = random(2, maxLength - 3);                     // maxLength is max 10, so random upper limit is 7, means max 6 chars...
     }
+
     if (Koch::isKochActive())
-    {                                           // kochChars = "mkrsuaptlowi.njef0yv,g5/q9zh38b?427c1d6x-=KA+SNE@:"
-        result += Koch::getRandomChars(maxLength);
+    {
+        result = Koch::getRandomChars(maxLength);
     }
     else
     {
-        switch (option)
-        {
-            case OPT_NUM:
-            case OPT_NUMPUNCT:
-            case OPT_NUMPUNCTPRO:
-                s = 26;
-                break;
-            case OPT_PUNCT:
-            case OPT_PUNCTPRO:
-                s = 36;
-                break;
-            case OPT_PRO:
-                s = 44;
-                break;
-            default:
-                s = 0;
-                break;
-        }
-        switch (option)
-        {
-            case OPT_ALPHA:
-                e = 26;
-                break;
-            case OPT_ALNUM:
-            case OPT_NUM:
-                e = 36;
-                break;
-            case OPT_ALNUMPUNCT:
-            case OPT_NUMPUNCT:
-            case OPT_PUNCT:
-                e = 45;
-                break;
-            default:
-                e = 50;
-                break;
-        }
-
-        for (i = 0; i < maxLength; ++i)
-            result += CWchars.charAt(random(s, e));
+        result = internal::getRandomCWChars(option, maxLength);
     }
     return result;
 }
