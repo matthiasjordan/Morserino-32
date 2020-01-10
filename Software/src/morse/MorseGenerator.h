@@ -14,7 +14,7 @@ namespace MorseGenerator
 
     enum MORSE_TYPE
     {
-        KEY_DOWN, KEY_UP
+        KEY_DOWN, KEY_UP, WORD_BREAK
     };
     //   State Machine Defines
 
