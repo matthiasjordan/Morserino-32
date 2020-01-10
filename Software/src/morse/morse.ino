@@ -151,20 +151,20 @@ void loop()
     switch (MorseMachine::getMode())
     {
         case MorseMachine::morseKeyer:
-            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             break;
         case MorseMachine::loraTrx:
-            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             MorseGenerator::generateCW();
             break;
         case MorseMachine::morseTrx:
-            if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+            if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
@@ -262,7 +262,7 @@ void loop()
                         break;
                     case MorseEchoTrainer::COMPLETE_ANSWER:
                     case MorseEchoTrainer::GET_ANSWER:
-                        if (MorseKeyer::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey))
+                        if (MorseKeyer::doPaddleIambic())
                             return;                             // we are busy keying and so need a very tight loop !
                         break;
                 }

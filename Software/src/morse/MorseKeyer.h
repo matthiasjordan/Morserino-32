@@ -54,7 +54,7 @@ namespace MorseKeyer
 
     void updateTimings();
     void keyTransmitter();
-    boolean doPaddleIambic(boolean dit, boolean dah);
+    boolean doPaddleIambic();
     boolean checkPaddles();
     void clearPaddleLatches();
 

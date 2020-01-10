@@ -30,7 +30,7 @@ namespace internal
     void updatePaddleLatch(boolean dit, boolean dah);
     void setDITstate();
     void setDAHstate();
-
+    boolean doPaddleIambic(boolean dit, boolean dah);
     uint8_t readSensors(int left, int right);
     void initSensors();
 
@@ -116,7 +116,12 @@ void MorseKeyer::keyTransmitter()
 // we use the paddle for iambic keying
 /////
 
-boolean MorseKeyer::doPaddleIambic(boolean dit, boolean dah)
+boolean MorseKeyer::doPaddleIambic()
+{
+    return internal::doPaddleIambic(MorseKeyer::leftKey, MorseKeyer::rightKey);
+}
+
+boolean internal::doPaddleIambic(boolean dit, boolean dah)
 {
     boolean paddleSwap;                      // temp storage if we need to swap left and right
     static long ktimer;                      // timer for current element (dit or dah)
