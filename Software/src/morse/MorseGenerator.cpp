@@ -133,6 +133,7 @@ boolean MorseGenerator::firstTime = true;                         /// for word d
 namespace internal
 {
     void fetchNewWord();
+    String fetchRandomWord();
     void dispGeneratedChar();
 
     String getRandomChars(int maxLength, int option);
@@ -212,6 +213,11 @@ void MorseGenerator::generateCW()
                         clearText = "";
                     }
                 }
+                if ((MorseMachine::isMode(MorseMachine::morseGenerator)) && !MorseGenerator::effectiveAutoStop)
+                {
+                    MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+                }
+
                 internal::fetchNewWord();
                 //Serial.println("New Word: " + CWword);
                 if (CWword.length() == 0)
@@ -353,67 +359,155 @@ void MorseGenerator::generateCW()
     }   /// end switch (generatorState)
 }
 
+String internal::fetchRandomWord()
+{
+    String word = "";
+
+    switch (MorseGenerator::generatorMode)
+    {
+        case RANDOMS:
+        {
+            word = internal::getRandomChars(MorsePreferences::prefs.randomLength, MorsePreferences::prefs.randomOption);
+            break;
+        }
+        case CALLS:
+        {
+            word = internal::getRandomCall(MorsePreferences::prefs.callLength);
+            break;
+        }
+        case ABBREVS:
+        {
+            word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
+            break;
+        }
+        case WORDS:
+        {
+            word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
+            break;
+        }
+        case KOCH_LEARN:
+        {
+            word = Koch::getChar(MorsePreferences::prefs.kochFilter);
+            break;
+        }
+        case MIXED:
+        {
+            switch (random(4))
+            {
+                case 0:
+                    word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
+                    break;
+                case 1:
+                    word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
+                    break;
+                case 2:
+                    word = internal::getRandomCall(MorsePreferences::prefs.callLength);
+                    break;
+                case 3:
+                    word = internal::getRandomChars(1, OPT_PUNCTPRO); // just a single pro-sign or interpunct
+                    break;
+            }
+            break;
+        }
+        case KOCH_MIXED:
+        {
+            switch (random(3))
+            {
+                case 0:
+                    word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
+                    break;
+                case 1:
+                    word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
+                    break;
+                case 2:
+                    word = internal::getRandomChars(MorsePreferences::prefs.randomLength, OPT_KOCH); // Koch option!
+                    break;
+            }
+            break;
+        }
+        case PLAYER:
+        {
+            if (MorsePreferences::prefs.randomFile)
+            {
+                MorsePlayerFile::skipWords(random(MorsePreferences::prefs.randomFile + 1));
+            }
+            word = MorsePlayerFile::getWord();
+            break;
+        }
+        case NA:
+        {
+            break;
+        }
+    } // end switch (generatorMode)
+    return word;
+}
+
+String fetchNewWordFromLoRa()
+{
+    String word;
+    int rssi, rxWpm;
+    uint8_t header = MorseLoRa::decodePacket(&rssi, &rxWpm, &MorseGenerator::CWword);
+    //Serial.println("Header: " + (String) header);
+    //Serial.println("CWword: " + (String) CWword);
+    //Serial.println("Speed: " + (String) rxWpm);
+    if ((header >> 6) != 1)
+    {
+        // invalid protocol version
+        word = "";
+    }
+    if ((rxWpm < 5) || (rxWpm > 60))
+    {
+        // invalid speed
+        word = "";
+    }
+    word = Decoder::CWwordToClearText(MorseGenerator::CWword);
+    //Serial.println("clearText: " + (String) clearText);
+    //Serial.println("RX Speed: " + (String)rxWpm);
+    //Serial.println("RSSI: " + (String)rssi);
+    rxDitLength = 1200 / rxWpm; // set new value for length of dits and dahs and other timings
+    rxDahLength = 3 * rxDitLength; // calculate the other timing values
+    rxInterCharacterSpace = 3 * rxDitLength;
+    rxInterWordSpace = 7 * rxDitLength;
+    MorseDisplay::vprintOnStatusLine(true, 4, "%2ir", rxWpm);
+    MorseDisplay::printOnStatusLine(true, 9, "s");
+    MorseDisplay::updateSMeter(rssi); // indicate signal strength of new packet
+    return word;
+}
+
+/**
+ * we check the rxBuffer and see if we received something
+ */
+String fetchNewWord_LoRa()
+{
+    // we check the rxBuffer and see if we received something
+    MorseDisplay::updateSMeter(0); // at end of word we set S-meter to 0 until we receive something again
+    //Serial.print("end of word - S0? ");
+    MorseGenerator::startFirst = false;
+    ////// from here: retrieve next CWword from buffer!
+    String word;
+    if (MorseLoRa::loRaBuReady())
+    {
+        word = fetchNewWordFromLoRa();
+    }
+    else
+    {
+        // we did not receive anything
+        word = "";
+    }
+    return word;
+}
+
 void internal::fetchNewWord()
 {
 
 //Serial.println("startFirst: " + String((startFirst ? "true" : "false")));
 //Serial.println("firstTime: " + String((firstTime ? "true" : "false")));
     if (MorseMachine::isMode(MorseMachine::loraTrx))
-    {                                // we check the rxBuffer and see if we received something
-        MorseDisplay::updateSMeter(0);                                // at end of word we set S-meter to 0 until we receive something again
-        //Serial.print("end of word - S0? ");
-        MorseGenerator::startFirst = false;
-        ////// from here: retrieve next CWword from buffer!
-        if (MorseLoRa::loRaBuReady())
-        {
-            int rssi, rxWpm;
-            MorseDisplay::printToScroll(BOLD, " ");
-            uint8_t header = MorseLoRa::decodePacket(&rssi, &rxWpm, &MorseGenerator::CWword);
-            //Serial.println("Header: " + (String) header);
-            //Serial.println("CWword: " + (String) CWword);
-            //Serial.println("Speed: " + (String) rxWpm);
-
-            if ((header >> 6) != 1)
-            {
-                // invalid protocol version
-                return;
-            }
-
-            if ((rxWpm < 5) || (rxWpm > 60))
-            {
-                // invalid speed
-                return;
-            }
-
-            MorseGenerator::clearText = Decoder::CWwordToClearText(MorseGenerator::CWword);
-            //Serial.println("clearText: " + (String) clearText);
-            //Serial.println("RX Speed: " + (String)rxWpm);
-            //Serial.println("RSSI: " + (String)rssi);
-
-            rxDitLength = 1200 / rxWpm;                      // set new value for length of dits and dahs and other timings
-            rxDahLength = 3 * rxDitLength;                      // calculate the other timing values
-            rxInterCharacterSpace = 3 * rxDitLength;
-            rxInterWordSpace = 7 * rxDitLength;
-            MorseDisplay::vprintOnStatusLine(true, 4, "%2ir", rxWpm);
-            MorseDisplay::printOnStatusLine(true, 9, "s");
-            MorseDisplay::updateSMeter(rssi);                                 // indicate signal strength of new packet
-        }
-        else
-        {
-            // we did not receive anything
-            return;
-        }
-
+    {
+        MorseGenerator::clearText = fetchNewWord_LoRa();
     } // end if loraTrx
     else
     {
-
-        //if (morseState != echoTrainer)
-        if ((MorseMachine::isMode(MorseMachine::morseGenerator)) && !MorseGenerator::effectiveAutoStop)
-        {
-            MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
-        }
-
         if (MorseGenerator::generatorMode == KOCH_LEARN)
         {
             MorseGenerator::startFirst = false;
@@ -490,74 +584,7 @@ void internal::fetchNewWord()
             }
             if (MorseGenerator::clearText != "+")
             {
-                switch (MorseGenerator::generatorMode)
-                {
-                    case RANDOMS: {
-                        MorseGenerator::clearText = internal::getRandomChars(MorsePreferences::prefs.randomLength,
-                                MorsePreferences::prefs.randomOption);
-                        break;
-                    }
-                    case CALLS: {
-                        MorseGenerator::clearText = internal::getRandomCall(MorsePreferences::prefs.callLength);
-                        break;
-                    }
-                    case ABBREVS: {
-                        MorseGenerator::clearText = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-                        break;
-                    }
-                    case WORDS: {
-                        MorseGenerator::clearText = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-                        break;
-                    }
-                    case KOCH_LEARN: {
-                        MorseGenerator::clearText = Koch::getChar(MorsePreferences::prefs.kochFilter);
-                        break;
-                    }
-                    case MIXED: {
-                        switch (random(4))
-                        {
-                            case 0:
-                                MorseGenerator::clearText = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-                                break;
-                            case 1:
-                                MorseGenerator::clearText = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-                                break;
-                            case 2:
-                                MorseGenerator::clearText = internal::getRandomCall(MorsePreferences::prefs.callLength);
-                                break;
-                            case 3:
-                                MorseGenerator::clearText = internal::getRandomChars(1, OPT_PUNCTPRO); // just a single pro-sign or interpunct
-                                break;
-                        }
-                        break;
-                    }
-                    case KOCH_MIXED: {
-                        switch (random(3))
-                        {
-                            case 0:
-                                MorseGenerator::clearText = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-                                break;
-                            case 1:
-                                MorseGenerator::clearText = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-                                break;
-                            case 2:
-                                MorseGenerator::clearText = internal::getRandomChars(MorsePreferences::prefs.randomLength, OPT_KOCH); // Koch option!
-                                break;
-                        }
-                        break;
-                    }
-                    case PLAYER: {
-                        if (MorsePreferences::prefs.randomFile)
-                        {
-                            MorsePlayerFile::skipWords(random(MorsePreferences::prefs.randomFile + 1));
-                        }
-                        MorseGenerator::clearText = MorsePlayerFile::getWord();
-                        break;
-                    }
-                    case NA: {
-                        break;
-                    }
-                }   // end switch (generatorMode)
+                MorseGenerator::clearText = fetchRandomWord();
             }
             MorseGenerator::firstTime = false;
         }       /// end if else - we either already had something in trainer mode, or we got a new word
