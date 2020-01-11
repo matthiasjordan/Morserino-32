@@ -49,6 +49,7 @@ namespace MorseGenerator
     extern boolean firstTime;                         /// for word doubler mode
 
     void setup();
+    void setStart();
     boolean menuExec(String mode);
     void startTrainer();
     void generateCW();

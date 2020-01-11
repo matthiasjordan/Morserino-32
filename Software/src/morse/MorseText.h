@@ -11,7 +11,7 @@ namespace MorseText {
 
     extern GEN_TYPE generatorMode;
 
-    void start();
+    void start(GEN_TYPE genType);
     void proceed();
     String getCurrentWord();
     String generateWord();

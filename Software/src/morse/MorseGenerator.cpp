@@ -106,7 +106,6 @@ const byte pool[][2] = {
         {B11110000, 4}   // ch   53  H
 };
 
-String MorseGenerator::CWword = "";
 
 AutoStopModes MorseGenerator::autoStop = off;
 boolean MorseGenerator::effectiveAutoStop = false;                 // If to stop after each word in generator modes
@@ -114,6 +113,7 @@ boolean MorseGenerator::effectiveAutoStop = false;                 // If to stop
 unsigned char MorseGenerator::generatorState; // should be MORSE_TYPE instead of uns char
 unsigned long MorseGenerator::genTimer;                         // timer used for generating morse code in trainer mode
 
+String MorseGenerator::CWword = "";
 String MorseGenerator::clearText = "";
 uint8_t MorseGenerator::wordCounter = 0;                          // for maxSequence
 
@@ -131,7 +131,6 @@ namespace internal
 {
     String fetchNewWord();
     void dispGeneratedChar();
-    void setStart();
 
     String textToCWword(String symbols);
 
@@ -167,16 +166,17 @@ void MorseGenerator::setSendCWToLoRa(boolean mode)
     generatorConfig.sendCWToLoRa = mode;
 }
 
-void internal::setStart()
+void MorseGenerator::setStart()
 {
-    MorseText::start();
     CWword = "";
     clearText = "";
+    genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
+    wordCounter = 0;                             // reset word counter for maxSequence
 }
 
 void MorseGenerator::startTrainer()
 {
-    internal::setStart();
+    MorseGenerator::setStart();
     MorseMachine::morseState = MorseMachine::morseGenerator;
     MorseGenerator::setup();
     MorseDisplay::clear();
@@ -198,6 +198,8 @@ void MorseGenerator::generateCW()
         // if not at end of key up or down we need to wait, so we just return to loop()
         return;
     }
+
+    Serial.println("genCW() 1");
 
     switch (generatorState)
     {                                             // CW generator state machine - key is up or down

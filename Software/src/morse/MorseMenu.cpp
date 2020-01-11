@@ -353,7 +353,7 @@ boolean internal::menuExec()
     MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
     Koch::setKochActive(false);
-    MorseText::generatorMode = menuItems[MorsePreferences::prefs.menuPtr].generatorMode;
+    MorseText::start(menuItems[MorsePreferences::prefs.menuPtr].generatorMode);
     MorsePreferences::currentOptions = menuItems[MorsePreferences::prefs.menuPtr].options;
 
     if (menuItems[MorsePreferences::prefs.menuPtr].menufx != 0)
@@ -368,15 +368,12 @@ boolean internal::menuExec()
 
 void MorseMenu::cleanStartSettings()
 {
-    MorseGenerator::clearText = "";
-    MorseGenerator::CWword = "";
     MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
     MorseGenerator::generatorState = MorseGenerator::KEY_UP;
     MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
-    MorseGenerator::genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-    MorseGenerator::wordCounter = 0;                             // reset word counter for maxSequence
-    MorseText::start();
+    MorseGenerator::setStart();
+    MorseText::start(MorseText::RANDOMS);
     MorseDisplay::displayTopLine();
 }
 

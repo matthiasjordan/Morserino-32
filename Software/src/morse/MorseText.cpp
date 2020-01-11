@@ -15,7 +15,6 @@
 #include <Arduino.h>
 #include "MorseText.h"
 #include "MorsePreferences.h"
-#include "MorseMachine.h"
 #include "koch.h"
 #include "english_words.h"
 #include "abbrev.h"
@@ -36,17 +35,24 @@ namespace internal
 
 const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
-boolean generateStartSequence;
-uint8_t repeatEach = 1;
+typedef struct
+{
+        boolean generateStartSequence;
+        uint8_t repeatEach = 1;
+        GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
+} Config;
+
+Config config;
+
 uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
-GEN_TYPE MorseText::generatorMode = RANDOMS;          // trainer: what symbol (groups) are we going to send?            0 -  5
 
-void MorseText::start()
+void MorseText::start(GEN_TYPE genType)
 {
-    repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+    config.repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+    config.generateStartSequence = true;
+    config.generatorMode = genType;
     MorseText::proceed();
-    generateStartSequence = true;
 }
 
 String MorseText::getCurrentWord()
@@ -56,7 +62,7 @@ String MorseText::getCurrentWord()
 
 void MorseText::proceed()
 {
-    repetitionsLeft = repeatEach;
+    repetitionsLeft = config.repeatEach;
     lastGeneratedWord = "";
 }
 
@@ -64,13 +70,13 @@ String MorseText::generateWord()
 {
     String result = "";
 
-    if (generateStartSequence == true)
+    if (config.generateStartSequence == true)
     {                                 /// do the initial sequence in trainer mode, too
         result = "vvvA";
-        generateStartSequence = false;
+        config.generateStartSequence = false;
         repetitionsLeft = 0;
     }
-    else if ((repeatEach == MorsePreferences::REPEAT_FOREVER) || --repetitionsLeft)
+    else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || --repetitionsLeft)
     {
         result = lastGeneratedWord;
     }
@@ -88,7 +94,7 @@ String internal::fetchRandomWord()
 {
     String word = "";
 
-    switch (MorseText::generatorMode)
+    switch (config.generatorMode)
     {
         case RANDOMS:
         {
