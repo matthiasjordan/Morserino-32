@@ -49,10 +49,14 @@ String lastGeneratedWord = "";
 
 void MorseText::start(GEN_TYPE genType)
 {
-    config.repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+    MorseText::onPreferencesChanged();
     config.generateStartSequence = true;
     config.generatorMode = genType;
     MorseText::proceed();
+}
+
+void MorseText::onPreferencesChanged() {
+    config.repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
 }
 
 String MorseText::getCurrentWord()
@@ -69,6 +73,10 @@ void MorseText::proceed()
 String MorseText::generateWord()
 {
     String result = "";
+
+    if (repetitionsLeft == 0) {
+        MorseText::proceed();
+    }
 
     if (config.generateStartSequence == true)
     {                                 /// do the initial sequence in trainer mode, too

@@ -178,7 +178,6 @@ void MorseGenerator::setStart()
     clearText = "";
     genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
     wordCounter = 0;                             // reset word counter for maxSequence
-    MorseText::start(MorseText::RANDOMS);
 }
 
 void MorseGenerator::startTrainer()
@@ -206,7 +205,7 @@ void MorseGenerator::generateCW()
         return;
     }
 
-    Serial.println("genCW() 1 cw: " + CWword + " t: " + clearText + " gs: " + String(generatorState));
+//    Serial.println("genCW() 1 cw: " + CWword + " t: " + clearText + " gs: " + String(generatorState));
 
     switch (generatorState)
     {                                             // CW generator state machine - key is up or down
@@ -216,7 +215,7 @@ void MorseGenerator::generateCW()
 
             if (CWword.length() == 0)
             {                                               // fetch a new word if we have an empty word
-                Serial.println("genCW() 2");
+                Serial.println("genCW() 2 max: " + String(MorsePreferences::prefs.maxSequence) + " wc: " + String(wordCounter));
                 if (generatorConfig.printSpaceAfterWord)
                 {
                     MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
@@ -224,34 +223,41 @@ void MorseGenerator::generateCW()
 
                 String newWord = "";
 
-                if (MorseGenerator::wordCounter == (MorsePreferences::prefs.maxSequence - 1))
+                uint8_t max = MorsePreferences::prefs.maxSequence;
+                if (max && MorseGenerator::wordCounter == (max - 1))
                 {
-                    // penultimate word;
+                    // last word;
                     newWord = "+";
                     MorseEchoTrainer::onLastWord();
+                    Serial.println("penultimate word");
                 }
-                else if (MorseGenerator::wordCounter == MorsePreferences::prefs.maxSequence)
+                else if (max && MorseGenerator::wordCounter >= max)
                 {
-                    // final word
+                    // stop
                     MorseGenerator::stopFlag = true;
-                    MorseGenerator::wordCounter = 1;
+                    MorseGenerator::wordCounter = 0;
 //                    MorseEchoTrainer::echoStop = false;
+                    Serial.println("stop");
                 }
                 else
                 {
-                    String newWord = internal::fetchNewWord();
-                    MorseGenerator::clearText = newWord;
-                    MorseGenerator::CWword = internal::textToCWword(newWord);
-                    MorseEchoTrainer::onGeneratorNewWord(newWord);
-                    MorseGenerator::wordCounter += 1;
-                    Serial.println("genCW() fetch cw: " + CWword + " t: " + clearText + " wc: " + String(wordCounter));
+//                    String newWord = internal::fetchNewWord();
+                    newWord = "a" + String(wordCounter);
+                    Serial.println("new word " + newWord);
                 }
+
+                MorseGenerator::clearText = newWord;
+                MorseGenerator::CWword = internal::textToCWword(newWord);
+                MorseEchoTrainer::onGeneratorNewWord(newWord);
+                Serial.println("genCW() fetch cw: " + CWword + " t: " + clearText + " wc: " + String(wordCounter));
 
                 if (CWword.length() == 0)
                 {
                     // we really should have something here - unless in trx mode; in this case return
                     return;
                 }
+
+                MorseGenerator::wordCounter += 1;
 
                 if (generatorConfig.printLFAfterWord)
                 {
@@ -262,7 +268,7 @@ void MorseGenerator::generateCW()
             // retrieve next element from CWword; if 0, we were at end of character
             char c = CWword[0];
             CWword.remove(0, 1);
-            Serial.println("genCW() 3 cw: " + CWword + " t: " + clearText + " gs: " + String(generatorState));
+//            Serial.println("genCW() 3 cw: " + CWword + " t: " + clearText + " gs: " + String(generatorState));
 
             if ((c == '0'))
             {                      // a character just had been finished
@@ -271,27 +277,28 @@ void MorseGenerator::generateCW()
                     MorseLoRa::cwForLora(0);
                 }
             }
-            else {
-            genTimer = millis() + internal::getCharTiming(&generatorConfig, c);
-
-            if (generatorConfig.sendCWToLoRa)
+            else
             {
-                // send the element to LoRa
-                c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
-            }
+                genTimer = millis() + internal::getCharTiming(&generatorConfig, c);
 
-            /// if Koch learn character we show dit or dah
-            if (generatorConfig.printDitDah)
-            {
-                MorseDisplay::printToScroll(REGULAR, c == '1' ? "." : "-");
-            }
+                if (generatorConfig.sendCWToLoRa)
+                {
+                    // send the element to LoRa
+                    c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
+                }
 
-            if (generatorConfig.key && !stopFlag)         // we finished maxSequence and so do start output (otherwise we get a short click)
-            {
-                keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), MorseSound::notes[MorsePreferences::prefs.sidetoneFreq],
-                        MorsePreferences::prefs.sidetoneVolume);
-            }
-            generatorState = KEY_DOWN;                              // next state = key down = dit or dah
+                /// if Koch learn character we show dit or dah
+                if (generatorConfig.printDitDah)
+                {
+                    MorseDisplay::printToScroll(REGULAR, c == '1' ? "." : "-");
+                }
+
+                if (generatorConfig.key && !stopFlag)     // we finished maxSequence and so do start output (otherwise we get a short click)
+                {
+                    keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), MorseSound::notes[MorsePreferences::prefs.sidetoneFreq],
+                            MorsePreferences::prefs.sidetoneVolume);
+                }
+                generatorState = KEY_DOWN;                              // next state = key down = dit or dah
             }
             break;
         }

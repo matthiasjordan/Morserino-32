@@ -24,6 +24,7 @@
 #include "MorseRotaryEncoder.h"
 #include "MorseGenerator.h"
 #include "MorseSound.h"
+#include "MorseText.h"
 
 using namespace MorsePreferencesMenu;
 
@@ -767,6 +768,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                 case MorsePreferences::posWordDoubler:
                     MorsePreferences::prefs.wordDoubler = !MorsePreferences::prefs.wordDoubler;
                     internal::displayWordDoubler();
+                    MorseText::onPreferencesChanged();
                     break;
                 case MorsePreferences::posRandomFile:
                     if (MorsePreferences::prefs.randomFile)
