@@ -18,6 +18,8 @@ namespace MorseEchoTrainer
     extern String echoTrainerWord;
     extern boolean echoStop;                         // for maxSequence
     extern boolean active;                           // flag for trainer mode
+    extern int repeats;
+
 
     boolean menuExec(String mode);
     void startEcho();
@@ -29,6 +31,8 @@ namespace MorseEchoTrainer
     void setState(echoStates newState);
     echoStates getState();
     void changeSpeed(int t);
+    unsigned long onGeneratorWordEnd();
+    void onGeneratorNewWord(String newWord);
 
 }
 

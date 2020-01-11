@@ -117,7 +117,6 @@ unsigned char MorseGenerator::generatorState; // should be MORSE_TYPE instead of
 unsigned long MorseGenerator::genTimer;                         // timer used for generating morse code in trainer mode
 
 String MorseGenerator::clearText = "";
-int MorseGenerator::repeats = 0;
 uint8_t MorseGenerator::wordCounter = 0;                          // for maxSequence
 
 int rxDitLength = 0;                    // set new value for length of dits and dahs and other timings
@@ -232,7 +231,7 @@ void MorseGenerator::generateCW()
                 String newWord = internal::fetchNewWord();
                 MorseGenerator::clearText = newWord;
                 MorseGenerator::CWword = internal::generateCWword(newWord);
-                MorseEchoTrainer::echoTrainerWord = newWord;
+                MorseEchoTrainer::onGeneratorNewWord(newWord);
 
                 if (CWword.length() == 0)
                 {
@@ -299,34 +298,11 @@ void MorseGenerator::generateCW()
 
                 internal::dispGeneratedChar();
 
-                if (MorseMachine::isMode(MorseMachine::echoTrainer))
+                unsigned long delta = MorseEchoTrainer::onGeneratorWordEnd();
+
+                if (delta != -1)
                 {
-                    switch (MorseEchoTrainer::getState())
-                    {
-                        case MorseEchoTrainer::START_ECHO:
-                            MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
-                            genTimer = millis() + MorseKeyer::interCharacterSpace
-                                    + (MorsePreferences::prefs.promptPause * MorseKeyer::interWordSpace);
-                            break;
-                        case MorseEchoTrainer::REPEAT_WORD:
-                            // fall through
-                        case MorseEchoTrainer::SEND_WORD:
-                            if (MorseEchoTrainer::echoStop)
-                                break;
-                            else
-                            {
-                                MorseEchoTrainer::setState(MorseEchoTrainer::GET_ANSWER);
-                                if (MorsePreferences::prefs.echoDisplay != CODE_ONLY)
-                                {
-                                    MorseDisplay::printToScroll(REGULAR, " ");
-                                    MorseDisplay::printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
-                                }
-                                ++repeats;
-                                genTimer = millis() + MorsePreferences::prefs.responsePause * MorseKeyer::interWordSpace;
-                            }
-                        default:
-                            break;
-                    }
+                     genTimer = millis() + delta;
                 }
                 else
                 {
@@ -379,6 +355,7 @@ unsigned long internal::getCharTiming(MorseGenerator::Config *generatorConfig, c
         }
         default:
         {
+            delta = 0;
             Serial.println("This should not be reached (getCharTiming)");
         }
     }
@@ -407,6 +384,7 @@ unsigned long internal::getIntercharSpace(MorseGenerator::Config *generatorConfi
         }
         default:
         {
+            delta = 0;
             Serial.println("This should not be reached (getCharTiming)");
         }
     }
@@ -435,6 +413,7 @@ unsigned long internal::getInterwordSpace(MorseGenerator::Config *generatorConfi
         }
         default:
         {
+            delta = 0;
             Serial.println("This should not be reached (getCharTiming)");
         }
     }
@@ -463,6 +442,7 @@ unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorCo
         }
         default:
         {
+            delta = 0;
             Serial.println("This should not be reached (getCharTiming)");
         }
     }
@@ -609,7 +589,6 @@ String fetchNewWord_LoRa()
 
 String randomGenerate()
 {
-    MorseGenerator::repeats = 0;
     String result = "";
     if ((MorsePreferences::prefs.maxSequence != 0) && (generatorMode != KOCH_LEARN))
     {
@@ -678,7 +657,7 @@ String internal::fetchNewWord()
             {
                 case MorseEchoTrainer::REPEAT_WORD:
                 {
-                    if (MorsePreferences::prefs.echoRepeats == 7 || MorseGenerator::repeats <= MorsePreferences::prefs.echoRepeats)
+                    if (MorsePreferences::prefs.echoRepeats == 7 || MorseEchoTrainer::repeats <= MorsePreferences::prefs.echoRepeats)
                         result = MorseEchoTrainer::echoTrainerWord;
                     else
                     {

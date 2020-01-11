@@ -28,6 +28,7 @@ echoStates echoTrainerState = START_ECHO;
 boolean MorseEchoTrainer::echoStop = false;                         // for maxSequence
 boolean MorseEchoTrainer::active = false;                           // flag for trainer mode
 String MorseEchoTrainer::echoTrainerWord;
+int MorseEchoTrainer::repeats = 0;
 
 boolean MorseEchoTrainer::menuExec(String mode)
 {
@@ -41,7 +42,6 @@ boolean MorseEchoTrainer::menuExec(String mode)
 
 void MorseEchoTrainer::startEcho()
 {
-
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setup();
     MorseEchoTrainer::echoStop = false;
@@ -132,4 +132,65 @@ void MorseEchoTrainer::changeSpeed(int t)
     MorseKeyer::updateTimings();
     MorseDisplay::displayCWspeed();                     // update display of CW speed
     MorsePreferences::charCounter = 0;                                    // reset character counter
+}
+
+
+
+
+/**
+ * @return: -1: NOOB,
+ */
+unsigned long MorseEchoTrainer::onGeneratorWordEnd()
+{
+
+    if (!MorseMachine::isMode(MorseMachine::echoTrainer))
+    {
+        return -1;
+    }
+
+    unsigned long delta = 0;
+
+    switch (MorseEchoTrainer::getState())
+    {
+        case MorseEchoTrainer::START_ECHO:
+        {
+            MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
+            delta = MorseKeyer::interCharacterSpace + (MorsePreferences::prefs.promptPause * MorseKeyer::interWordSpace);
+            break;
+        }
+        case MorseEchoTrainer::REPEAT_WORD:
+            // fall through
+        case MorseEchoTrainer::SEND_WORD:
+        {
+            if (MorseEchoTrainer::echoStop)
+            {
+                break;
+            }
+            else
+            {
+                MorseEchoTrainer::setState(MorseEchoTrainer::GET_ANSWER);
+                if (MorsePreferences::prefs.echoDisplay != CODE_ONLY)
+                {
+                    MorseDisplay::printToScroll(REGULAR, " ");
+                    MorseDisplay::printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
+                }
+                ++MorseEchoTrainer::repeats;
+                delta = MorsePreferences::prefs.responsePause * MorseKeyer::interWordSpace;
+            }
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+
+    return delta;
+
+}
+
+
+void MorseEchoTrainer::onGeneratorNewWord(String newWord) {
+    MorseEchoTrainer::repeats = 0;
+    MorseEchoTrainer::echoTrainerWord = newWord;
 }
