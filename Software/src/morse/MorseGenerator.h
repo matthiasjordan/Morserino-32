@@ -27,6 +27,7 @@ namespace MorseGenerator
             boolean printSpaceAfterWord;
             boolean printLFAfterWord;
             boolean printDitDah;
+            boolean printChar;
             Timing timing;
             boolean key;
     } Config;
