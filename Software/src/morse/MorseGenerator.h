@@ -5,11 +5,6 @@
 
 namespace MorseGenerator
 {
-
-    enum GEN_TYPE
-    {
-        NA, RANDOMS, ABBREVS, WORDS, CALLS, MIXED, PLAYER, KOCH_MIXED, KOCH_LEARN
-    };
     // the things we can generate in generator mode
 
     enum MORSE_TYPE
@@ -46,8 +41,6 @@ namespace MorseGenerator
 
     extern int repeats;
     extern uint8_t wordCounter;                          // for maxSequence
-
-    extern GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
 
     extern uint8_t effectiveTrainerDisplay;
 

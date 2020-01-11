@@ -33,6 +33,8 @@ namespace MorseEchoTrainer
     void changeSpeed(int t);
     unsigned long onGeneratorWordEnd();
     void onGeneratorNewWord(String newWord);
+    void onFetchNewWord();
+    void onLastWord();
 
 }
 

@@ -23,10 +23,9 @@
 #include "MorseSound.h"
 #include "MorseEchoTrainer.h"
 #include "decoder.h"
-#include "koch.h"
 #include "MorsePlayerFile.h"
-#include "english_words.h"
-#include "abbrev.h"
+#include "MorseText.h"
+#include "MorseMenu.h"
 
 using namespace MorseGenerator;
 
@@ -107,7 +106,6 @@ const byte pool[][2] = {
         {B11110000, 4}   // ch   53  H
 };
 
-boolean generateStartSequence = true;                        // to indicate that we send vvvA next
 String MorseGenerator::CWword = "";
 
 AutoStopModes MorseGenerator::autoStop = off;
@@ -124,26 +122,18 @@ int rxDahLength = 0;
 int rxInterCharacterSpace = 0;
 int rxInterWordSpace = 0;
 
-GEN_TYPE MorseGenerator::generatorMode = RANDOMS;          // trainer: what symbol (groups) are we going to send?            0 -  5
 uint8_t MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 boolean MorseGenerator::stopFlag = false;                         // for maxSequence
-boolean MorseGenerator::firstTime = true;                         /// for word doubler mode
 
 MorseGenerator::Config generatorConfig;
 
 namespace internal
 {
     String fetchNewWord();
-    String fetchRandomWord();
     void dispGeneratedChar();
     void setStart();
 
-    String getRandomChars(int maxLength, int option);
-    String getRandomCall(int maxLength);
-    String getRandomWord(int maxLength);
-    String getRandomAbbrev(int maxLength);
-    String generateCWword(String symbols);
-    String getRandomCWChars(int option, int maxLength);
+    String textToCWword(String symbols);
 
     unsigned long getCharTiming(MorseGenerator::Config *generatorConfig, char c);
     unsigned long getIntercharSpace(MorseGenerator::Config *generatorConfig);
@@ -172,11 +162,6 @@ boolean MorseGenerator::menuExec(String mode)
     return true;
 }
 
-void MorseGenerator::setNextWordvvvA()
-{
-    generateStartSequence = true;
-}
-
 void MorseGenerator::setSendCWToLoRa(boolean mode)
 {
     generatorConfig.sendCWToLoRa = mode;
@@ -184,7 +169,7 @@ void MorseGenerator::setSendCWToLoRa(boolean mode)
 
 void internal::setStart()
 {
-    MorseGenerator::setNextWordvvvA();
+    MorseText::start();
     CWword = "";
     clearText = "";
 }
@@ -192,7 +177,6 @@ void internal::setStart()
 void MorseGenerator::startTrainer()
 {
     internal::setStart();
-    MorseGenerator::firstTime = true;
     MorseMachine::morseState = MorseMachine::morseGenerator;
     MorseGenerator::setup();
     MorseDisplay::clear();
@@ -228,10 +212,29 @@ void MorseGenerator::generateCW()
                     MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
                 }
 
-                String newWord = internal::fetchNewWord();
-                MorseGenerator::clearText = newWord;
-                MorseGenerator::CWword = internal::generateCWword(newWord);
-                MorseEchoTrainer::onGeneratorNewWord(newWord);
+                String newWord = "";
+
+                if (MorseGenerator::wordCounter == (MorsePreferences::prefs.maxSequence - 1))
+                {
+                    // penultimate word;
+                    newWord = "+";
+                    MorseEchoTrainer::onLastWord();
+                }
+                else if (MorseGenerator::wordCounter == MorsePreferences::prefs.maxSequence)
+                {
+                    // final word
+                    MorseGenerator::stopFlag = true;
+                    MorseGenerator::wordCounter = 1;
+//                    MorseEchoTrainer::echoStop = false;
+                }
+                else
+                {
+                    String newWord = internal::fetchNewWord();
+                    MorseGenerator::clearText = newWord;
+                    MorseGenerator::CWword = internal::textToCWword(newWord);
+                    MorseEchoTrainer::onGeneratorNewWord(newWord);
+                    MorseGenerator::wordCounter += 1;
+                }
 
                 if (CWword.length() == 0)
                 {
@@ -302,7 +305,7 @@ void MorseGenerator::generateCW()
 
                 if (delta != -1)
                 {
-                     genTimer = millis() + delta;
+                    genTimer = millis() + delta;
                 }
                 else
                 {
@@ -449,89 +452,6 @@ unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorCo
     return delta;
 }
 
-String internal::fetchRandomWord()
-{
-    String word = "";
-
-    switch (MorseGenerator::generatorMode)
-    {
-        case RANDOMS:
-        {
-            word = internal::getRandomChars(MorsePreferences::prefs.randomLength, MorsePreferences::prefs.randomOption);
-            break;
-        }
-        case CALLS:
-        {
-            word = internal::getRandomCall(MorsePreferences::prefs.callLength);
-            break;
-        }
-        case ABBREVS:
-        {
-            word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-            break;
-        }
-        case WORDS:
-        {
-            word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-            break;
-        }
-        case KOCH_LEARN:
-        {
-            word = Koch::getChar(MorsePreferences::prefs.kochFilter);
-            break;
-        }
-        case MIXED:
-        {
-            switch (random(4))
-            {
-                case 0:
-                    word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-                    break;
-                case 1:
-                    word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-                    break;
-                case 2:
-                    word = internal::getRandomCall(MorsePreferences::prefs.callLength);
-                    break;
-                case 3:
-                    word = internal::getRandomChars(1, OPT_PUNCTPRO); // just a single pro-sign or interpunct
-                    break;
-            }
-            break;
-        }
-        case KOCH_MIXED:
-        {
-            switch (random(3))
-            {
-                case 0:
-                    word = internal::getRandomWord(MorsePreferences::prefs.wordLength);
-                    break;
-                case 1:
-                    word = internal::getRandomAbbrev(MorsePreferences::prefs.abbrevLength);
-                    break;
-                case 2:
-                    word = internal::getRandomChars(MorsePreferences::prefs.randomLength, OPT_KOCH); // Koch option!
-                    break;
-            }
-            break;
-        }
-        case PLAYER:
-        {
-            if (MorsePreferences::prefs.randomFile)
-            {
-                MorsePlayerFile::skipWords(random(MorsePreferences::prefs.randomFile + 1));
-            }
-            word = MorsePlayerFile::getWord();
-            break;
-        }
-        case NA:
-        {
-            break;
-        }
-    } // end switch (generatorMode)
-    return word;
-}
-
 String fetchNewWordFromLoRa()
 {
     String word;
@@ -572,7 +492,6 @@ String fetchNewWord_LoRa()
     // we check the rxBuffer and see if we received something
     MorseDisplay::updateSMeter(0); // at end of word we set S-meter to 0 until we receive something again
     //Serial.print("end of word - S0? ");
-    generateStartSequence = false;
     ////// from here: retrieve next CWword from buffer!
     String word;
     if (MorseLoRa::loRaBuReady())
@@ -587,107 +506,30 @@ String fetchNewWord_LoRa()
     return word;
 }
 
-String randomGenerate()
-{
-    String result = "";
-    if ((MorsePreferences::prefs.maxSequence != 0) && (generatorMode != KOCH_LEARN))
-    {
-        if (MorseMachine::isMode(MorseMachine::echoTrainer) || ((MorseMachine::isMode(MorseMachine::morseGenerator)) && !effectiveAutoStop))
-        {
-            ++MorseGenerator::wordCounter;
-            int limit = 1 + MorsePreferences::prefs.maxSequence;
-            if (MorseGenerator::wordCounter == limit)
-            {
-                result = "+";
-                MorseEchoTrainer::echoStop = true;
-                if (MorseEchoTrainer::isState(MorseEchoTrainer::REPEAT_WORD))
-                {
-                    MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
-                }
-            }
-            else if (MorseGenerator::wordCounter == (limit + 1))
-            {
-                MorseGenerator::stopFlag = true;
-                MorseEchoTrainer::echoStop = false;
-                MorseGenerator::wordCounter = 1;
-            }
-        }
-    }
-    if (result != "+")
-    {
-        result = internal::fetchRandomWord();
-    }
-    MorseGenerator::firstTime = false;
-    return result;
-}
-
 String internal::fetchNewWord()
 {
     String result = "";
 //Serial.println("startFirst: " + String((startFirst ? "true" : "false")));
-//Serial.println("firstTime: " + String((firstTime ? "true" : "false")));
     if (MorseMachine::isMode(MorseMachine::loraTrx))
     {
         result = fetchNewWord_LoRa();
     } // end if loraTrx
     else
     {
-        if (MorseGenerator::generatorMode == KOCH_LEARN)
+        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
         {
-            generateStartSequence = false;
             MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
         }
 
-        if (generateStartSequence == true)
-        {                                 /// do the initial sequence in trainer mode, too
-            result = "vvvA";
-            generateStartSequence = false;
-        }
-        else if (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.wordDoubler == true
-                && MorseGenerator::firstTime == false)
+        if (MorseMachine::isMode(MorseMachine::echoTrainer))
         {
-            result = MorseEchoTrainer::echoTrainerWord;
-            MorseGenerator::firstTime = true;
+            MorseEchoTrainer::onFetchNewWord();
         }
-        else if (MorseMachine::isMode(MorseMachine::echoTrainer))
-        {
-            Decoder::interWordTimerOff();
-            //Serial.println("echoTrainerState: " + String(echoTrainerState));
-            switch (MorseEchoTrainer::getState())
-            {
-                case MorseEchoTrainer::REPEAT_WORD:
-                {
-                    if (MorsePreferences::prefs.echoRepeats == 7 || MorseEchoTrainer::repeats <= MorsePreferences::prefs.echoRepeats)
-                        result = MorseEchoTrainer::echoTrainerWord;
-                    else
-                    {
-                        result = MorseEchoTrainer::echoTrainerWord;
-                        if (MorseGenerator::generatorMode != KOCH_LEARN)
-                        {
-                            MorseDisplay::printToScroll(INVERSE_REGULAR, MorseDisplay::cleanUpProSigns(result)); //// clean up first!
-                            MorseDisplay::printToScroll(REGULAR, " ");
-                        }
-                        result = randomGenerate();
-                    }
-                    break;
-                }
-                case MorseEchoTrainer::SEND_WORD:
-                {
-                    result = randomGenerate();
-                    break;
-                }
-                default:
-                    break;
-            }   /// end special cases for echo Trainer
-        }
-        else
-        {
-            result = randomGenerate();
-        }       /// end if else - we either already had something in trainer mode, or we got a new word
 
-    } /// else (= not in loraTrx mode)
+        MorseText::generateWord();
+    }
     return result;
-} // end of fetchNewWord()
+}
 
 void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
 {
@@ -749,7 +591,7 @@ void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
 /////// generate CW representations from its input string
 /////// CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
-String internal::generateCWword(String symbols)
+String internal::textToCWword(String symbols)
 {
     int pointer;
     byte bitMask, NoE;
@@ -788,7 +630,7 @@ void internal::dispGeneratedChar()
     static String charString;
     charString.reserve(10);
 
-    if (MorseGenerator::generatorMode == KOCH_LEARN || MorseMachine::isMode(MorseMachine::loraTrx)
+    if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
             || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorseGenerator::effectiveTrainerDisplay == DISPLAY_BY_CHAR)
             || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY))
     //&& echoTrainerState != SEND_WORD
@@ -797,190 +639,17 @@ void internal::dispGeneratedChar()
     {       /// we need to output the character on the display now
         charString = MorseGenerator::clearText.charAt(0);                   /// store first char of clearText in charString
         MorseGenerator::clearText.remove(0, 1);                              /// and remove it from clearText
-        if (MorseGenerator::generatorMode == KOCH_LEARN)
+        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
         {
             MorseDisplay::printToScroll(REGULAR, "");                      // clear the buffer first
         }
         MorseDisplay::printToScroll(MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR,
                 MorseDisplay::cleanUpProSigns(charString));
-        if (MorseGenerator::generatorMode == KOCH_LEARN)
+        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
             MorseDisplay::printToScroll(REGULAR, " ");                      // output a space
     }   //// end display_by_char
 
     MorsePreferences::fireCharSeen(true);
-}
-
-String internal::getRandomCWChars(int option, int maxLength)
-{
-    int s = 0, e = 50;
-    switch (option)
-    {
-        case OPT_NUM:
-        case OPT_NUMPUNCT:
-        case OPT_NUMPUNCTPRO:
-            s = 26;
-            break;
-        case OPT_PUNCT:
-        case OPT_PUNCTPRO:
-            s = 36;
-            break;
-        case OPT_PRO:
-            s = 44;
-            break;
-        default:
-            s = 0;
-            break;
-    }
-    switch (option)
-    {
-        case OPT_ALPHA:
-            e = 26;
-            break;
-        case OPT_ALNUM:
-        case OPT_NUM:
-            e = 36;
-            break;
-        case OPT_ALNUMPUNCT:
-        case OPT_NUMPUNCT:
-        case OPT_PUNCT:
-            e = 45;
-            break;
-        default:
-            e = 50;
-            break;
-    }
-    String result = "";
-    for (int i = 0; i < maxLength; ++i)
-    {
-        result += CWchars.charAt(random(s, e));
-    }
-
-    return result;
-}
-
-// we use substrings as char pool for trainer mode
-// SANK will be replaced by <as>, <ka>, <kn> and <sk>
-// Options:
-//    0: a9?<> = CWchars; all of them; same as Koch 45+
-//    1: a = CWchars.substring(0,26);
-//    2: 9 = CWchars.substring(26,36);
-//    3: ? = CWchars.substring(36,45);
-//    4: <> = CWchars.substring(44,50);
-//    5: a9 = CWchars.substring(0,36);
-//    6: 9? = CWchars.substring(26,45);
-//    7: ?<> = CWchars.substring(36,50);
-//    8: a9? = CWchars.substring(0,45);
-//    9: 9?<> = CWchars.substring(26,50);
-
-//  {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO}
-
-String internal::getRandomChars(int maxLength, int option)
-{             /// random char string, eg. group of 5, 9 differing character pools; maxLength = 1-6
-    String result;
-
-    if (maxLength > 6)
-    {                                        // we use a random length!
-        maxLength = random(2, maxLength - 3);                     // maxLength is max 10, so random upper limit is 7, means max 6 chars...
-    }
-
-    if (Koch::isKochActive())
-    {
-        result = Koch::getRandomChars(maxLength);
-    }
-    else
-    {
-        result = internal::getRandomCWChars(option, maxLength);
-    }
-    return result;
-}
-
-String internal::getRandomCall(int maxLength)
-{            // random call-sign like pattern, maxLength = 3 - 6, 0 returns any length
-    const byte prefixType[] = {1, 0, 1, 2, 3, 1};         // 0 = a, 1 = aa, 2 = a9, 3 = 9a
-    byte prefix;
-    String call = "";
-    unsigned int l = 0;
-    //int s, e;
-
-    if (maxLength == 1 || maxLength == 2)
-        maxLength = 3;
-    if (maxLength > 6)
-        maxLength = 6;
-
-    if (maxLength == 3)
-        prefix = 0;
-    else
-        prefix = prefixType[random(0, 6)];           // what type of prefix?
-    switch (prefix)
-    {
-        case 1:
-            call += CWchars.charAt(random(0, 26));
-            ++l;
-        case 0:
-            call += CWchars.charAt(random(0, 26));
-            ++l;
-            break;
-        case 2:
-            call += CWchars.charAt(random(0, 26));
-            call += CWchars.charAt(random(26, 36));
-            l = 2;
-            break;
-        case 3:
-            call += CWchars.charAt(random(26, 36));
-            call += CWchars.charAt(random(0, 26));
-            l = 2;
-            break;
-    } // we have a prefix by now; l is its length
-      // now generate a number
-    call += CWchars.charAt(random(26, 36));
-    ++l;
-    // generate a suffix, 1 2 or 3 chars long - we re-use prefix for the suffix length
-    if (maxLength == 3)
-        prefix = 1;
-    else if (maxLength == 0)
-    {
-        prefix = random(1, 4);
-        prefix = (prefix == 2 ? prefix : random(1, 4)); // increase the likelihood for suffixes of length 2
-    }
-    else
-    {
-        //prefix = random(1,_min(maxLength-l+1, 4));     // suffix not longer than 3 chars!
-        prefix = _min(maxLength - l, 3);                 // we try to always give the desired length, but never more than 3 suffix chars
-    }
-    while (prefix--)
-    {
-        call += CWchars.charAt(random(0, 26));
-        ++l;
-    } // now we have the suffix as well
-      // are we /p or /m? - we do this only in rare cases - 1 out of 9, and only when maxLength = 0, or maxLength-l >= 2
-    if (maxLength == 0) //|| maxLength - l >= 2)
-        if (!random(0, 8))
-        {
-            call += "/";
-            call += (random(0, 2) ? "m" : "p");
-        }
-    // we have a complete call sign!
-    return call;
-}
-
-String internal::getRandomWord(int maxLength)
-{        //// give me a random English word, max maxLength chars long (1-5) - 0 returns any length
-    if (maxLength > 5)
-        maxLength = 0;
-    if (Koch::isKochActive())
-        return Koch::getRandomWord();
-    else
-        return EnglishWords::getRandomWord(maxLength);
-}
-
-String internal::getRandomAbbrev(int maxLength)
-{        //// give me a random CW abbreviation , max maxLength chars long (1-5) - 0 returns any length
-    if (maxLength > 5)
-        maxLength = 0;
-    if (Koch::isKochActive())
-        return Koch::getRandomAbbrev();
-    else
-        return Abbrev::getRandomAbbrev(maxLength);
 }
 
 void MorseGenerator::setupHeadCopying()

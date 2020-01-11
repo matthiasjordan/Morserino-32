@@ -426,7 +426,7 @@ void internal::displayLoraSyncW()
 
 void internal::displayEchoRepeats()
 {
-    if (MorsePreferences::prefs.echoRepeats < 7)
+    if (MorsePreferences::prefs.echoRepeats < MorsePreferences::REPEAT_FOREVER)
     {
         MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%i      ", MorsePreferences::prefs.echoRepeats);
     }

@@ -20,6 +20,9 @@
 #include "MorseGenerator.h"
 #include "MorsePlayerFile.h"
 #include "MorseMachine.h"
+#include "MorseMenu.h"
+#include "decoder.h"
+#include "MorseText.h"
 
 using namespace MorseEchoTrainer;
 
@@ -47,7 +50,7 @@ void MorseEchoTrainer::startEcho()
     MorseEchoTrainer::echoStop = false;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0,
-            MorseGenerator::generatorMode == MorseGenerator::KOCH_LEARN ? "New Character:" : "Echo Trainer:");
+            MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
     MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
     delay(1250);
@@ -107,7 +110,7 @@ void MorseEchoTrainer::echoTrainerEval()
     else
     {
         echoTrainerState = REPEAT_WORD;
-        if (MorseGenerator::generatorMode != MorseGenerator::KOCH_LEARN || echoResponse != "")
+        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || echoResponse != "")
         {
             MorseDisplay::printToScroll(BOLD, "ERR");
             if (MorsePreferences::prefs.echoConf)
@@ -133,9 +136,6 @@ void MorseEchoTrainer::changeSpeed(int t)
     MorseDisplay::displayCWspeed();                     // update display of CW speed
     MorsePreferences::charCounter = 0;                                    // reset character counter
 }
-
-
-
 
 /**
  * @return: -1: NOOB,
@@ -189,8 +189,37 @@ unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 
 }
 
-
-void MorseEchoTrainer::onGeneratorNewWord(String newWord) {
+void MorseEchoTrainer::onGeneratorNewWord(String newWord)
+{
     MorseEchoTrainer::repeats = 0;
     MorseEchoTrainer::echoTrainerWord = newWord;
+}
+
+void MorseEchoTrainer::onFetchNewWord()
+{
+    Decoder::interWordTimerOff();
+
+    if (MorseEchoTrainer::getState() == MorseEchoTrainer::REPEAT_WORD)
+    {
+        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
+        {
+            if (MorsePreferences::prefs.echoRepeats != MorsePreferences::REPEAT_FOREVER
+                    && MorseEchoTrainer::repeats > MorsePreferences::prefs.echoRepeats)
+            {
+                String result = MorseText::getCurrentWord();
+                MorseDisplay::printToScroll(INVERSE_REGULAR, MorseDisplay::cleanUpProSigns(result)); //// clean up first!
+                MorseDisplay::printToScroll(REGULAR, " ");
+            }
+        }
+    }
+}
+
+
+void MorseEchoTrainer::onLastWord() {
+    MorseEchoTrainer::echoStop = true;
+    if (MorseEchoTrainer::isState(MorseEchoTrainer::REPEAT_WORD))
+    {
+        MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
+    }
+
 }

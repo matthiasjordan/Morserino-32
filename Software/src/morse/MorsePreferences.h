@@ -94,7 +94,7 @@ namespace MorsePreferences
             uint8_t curtisBDotTiming = 75;           // keyer: timing for enhanced Curtis mode: dit                    0 - 100
             uint8_t interWordSpace = 7;        // trainer: normal interword spacing in lengths of dit,           6 - 45 ; default = norm = 7
 
-            uint8_t echoRepeats = 3;        // how often will echo trainer repeat an erroniously entered word? 0 - 7, 7=forever, default = 3
+            uint8_t echoRepeats = 3;        // how often will echo trainer repeat an erroneously entered word? 0 - REPEAT_FOREVER, 7=forever, default = 3
             uint8_t echoDisplay = 1;                  //  1 = CODE_ONLY 2 = DISP_ONLY 3 = CODE_AND_DISP
             uint8_t kochFilter = 5;                   // constrain output to characters learned according to Koch's method 2 - 45
             boolean wordDoubler = false;              // in CW trainer mode only, repeat each word
@@ -136,6 +136,8 @@ namespace MorsePreferences
             ////// end of variables stored in preferences
 
     };
+
+    const uint8_t REPEAT_FOREVER = 7;
 
     /// variables for managing snapshots
     extern uint8_t memories[8];
