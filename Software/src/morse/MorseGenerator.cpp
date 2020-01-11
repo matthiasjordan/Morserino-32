@@ -145,6 +145,12 @@ namespace internal
     String getRandomAbbrev(int maxLength);
     String generateCWword(String symbols);
     String getRandomCWChars(int option, int maxLength);
+
+    unsigned long getCharTiming(MorseGenerator::Config *generatorConfig, char c);
+    unsigned long getIntercharSpace(MorseGenerator::Config *generatorConfig);
+    unsigned long getInterwordSpace(MorseGenerator::Config *generatorConfig);
+    unsigned long getInterelementSpace(MorseGenerator::Config *generatorConfig);
+
 }
 
 void MorseGenerator::setup()
@@ -252,24 +258,7 @@ void MorseGenerator::generateCW()
                 }
             }
 
-            switch (generatorConfig.timing)
-            {
-                case quick:
-                {
-                    genTimer = millis() + 2;      // very short timing
-                    break;
-                }
-                case tx:
-                {
-                    genTimer = millis() + (c == '1' ? MorseKeyer::ditLength : MorseKeyer::dahLength);
-                    break;
-                }
-                case rx:
-                {
-                    genTimer = millis() + (c == '1' ? rxDitLength : rxDahLength);
-                    break;
-                }
-            }
+            genTimer = millis() + internal::getCharTiming(&generatorConfig, c);
 
             if (generatorConfig.sendCWToLoRa)
             {
@@ -302,8 +291,9 @@ void MorseGenerator::generateCW()
             }
 
             if (CWword.length() == 0)
-            {                                 // we just ended the the word, ...  //// intercept here in Echo Trainer mode
-                //             // display last character - consider echo mode!
+            {
+                // we just ended the the word
+
                 if (MorseMachine::isMode(MorseMachine::morseGenerator))
                     autoStop = effectiveAutoStop ? stop1 : off;
 
@@ -340,7 +330,7 @@ void MorseGenerator::generateCW()
                 }
                 else
                 {
-                    genTimer = millis() + (MorseMachine::isMode(MorseMachine::loraTrx) ? rxInterWordSpace : MorseKeyer::interWordSpace); // we need a pause for interWordSpace
+                    genTimer = millis() + internal::getInterwordSpace(&generatorConfig);
                     if (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == 1)
                     {                                   // in generator mode and we want to send with LoRa
                         MorseLoRa::cwForLora(0);
@@ -352,27 +342,131 @@ void MorseGenerator::generateCW()
                 }
             }
             else if (CWword[0] == '0')
-            {                                                                        // we are at end of character
-//              // display last character
-//              // genTimer small if in echo mode and no code!
+            {
+                // we are at end of character
                 internal::dispGeneratedChar();
-
-                if (generatorConfig.timing == quick) {
-                    genTimer = millis() + 1;
-                }
-                else {
-                    genTimer = millis()
-                            + (MorseMachine::isMode(MorseMachine::loraTrx) ? rxInterCharacterSpace : MorseKeyer::interCharacterSpace); // pause = intercharacter space
-                }
+                genTimer = millis() + internal::getIntercharSpace(&generatorConfig);
             }
             else
             {                                                                                         // we are in the middle of a character
-                genTimer = millis() + (MorseMachine::isMode(MorseMachine::loraTrx) ? rxDitLength : MorseKeyer::ditLength); // pause = interelement space
+                genTimer = millis() + internal::getInterelementSpace(&generatorConfig);
             }
             generatorState = KEY_UP;                               // next state = key up = pause
             break;
         }
     }   /// end switch (generatorState)
+}
+
+unsigned long internal::getCharTiming(MorseGenerator::Config *generatorConfig, char c)
+{
+    long delta;
+    switch (generatorConfig->timing)
+    {
+        case quick:
+        {
+            delta = 2;      // very short timing
+            break;
+        }
+        case tx:
+        {
+            delta = (c == '1' ? MorseKeyer::ditLength : MorseKeyer::dahLength);
+            break;
+        }
+        case rx:
+        {
+            delta = (c == '1' ? rxDitLength : rxDahLength);
+            break;
+        }
+        default:
+        {
+            Serial.println("This should not be reached (getCharTiming)");
+        }
+    }
+    return delta;
+}
+
+unsigned long internal::getIntercharSpace(MorseGenerator::Config *generatorConfig)
+{
+    long delta;
+    switch (generatorConfig->timing)
+    {
+        case quick:
+        {
+            delta = 1;      // very short timing
+            break;
+        }
+        case tx:
+        {
+            delta = MorseKeyer::interCharacterSpace;
+            break;
+        }
+        case rx:
+        {
+            delta = rxInterCharacterSpace;
+            break;
+        }
+        default:
+        {
+            Serial.println("This should not be reached (getCharTiming)");
+        }
+    }
+    return delta;
+}
+
+unsigned long internal::getInterwordSpace(MorseGenerator::Config *generatorConfig)
+{
+    long delta;
+    switch (generatorConfig->timing)
+    {
+        case quick:
+        {
+            delta = 2;      // very short timing
+            break;
+        }
+        case tx:
+        {
+            delta = MorseKeyer::interWordSpace;
+            break;
+        }
+        case rx:
+        {
+            delta = rxInterWordSpace;
+            break;
+        }
+        default:
+        {
+            Serial.println("This should not be reached (getCharTiming)");
+        }
+    }
+    return delta;
+}
+
+unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorConfig)
+{
+    long delta;
+    switch (generatorConfig->timing)
+    {
+        case quick:
+        {
+            delta = 2;      // very short timing
+            break;
+        }
+        case tx:
+        {
+            delta = MorseKeyer::ditLength;
+            break;
+        }
+        case rx:
+        {
+            delta = rxDitLength;
+            break;
+        }
+        default:
+        {
+            Serial.println("This should not be reached (getCharTiming)");
+        }
+    }
+    return delta;
 }
 
 String internal::fetchRandomWord()
