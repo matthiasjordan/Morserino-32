@@ -16,7 +16,7 @@ namespace MorseText {
     void proceed();
     String getCurrentWord();
     String generateWord();
-
+    void setNextWordIsEndSequence();
 }
 
 

@@ -46,6 +46,7 @@ Config config;
 
 uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
+boolean nextWordIsEndSequence;
 
 void MorseText::start(GEN_TYPE genType)
 {
@@ -55,7 +56,13 @@ void MorseText::start(GEN_TYPE genType)
     MorseText::proceed();
 }
 
-void MorseText::onPreferencesChanged() {
+void MorseText::setNextWordIsEndSequence()
+{
+    nextWordIsEndSequence = true;
+}
+
+void MorseText::onPreferencesChanged()
+{
     config.repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
 }
 
@@ -74,7 +81,8 @@ String MorseText::generateWord()
 {
     String result = "";
 
-    if (repetitionsLeft == 0) {
+    if (repetitionsLeft == 0)
+    {
         MorseText::proceed();
     }
 
@@ -84,9 +92,16 @@ String MorseText::generateWord()
         config.generateStartSequence = false;
         repetitionsLeft = 0;
     }
-    else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || --repetitionsLeft)
+    else if (nextWordIsEndSequence) {
+        result = "+";
+        nextWordIsEndSequence = false;
+    }
+    else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || repetitionsLeft)
     {
         result = lastGeneratedWord;
+        if (repetitionsLeft > 0) {
+            repetitionsLeft-= 1;
+        }
     }
     else
     {

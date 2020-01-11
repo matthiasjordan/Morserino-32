@@ -158,9 +158,9 @@ boolean MorseGenerator::menuExec(String mode)
     }
 
     generatorConfig.key = true;
-    generatorConfig.printDitDah = true;
+    generatorConfig.printDitDah = false;
     generatorConfig.printChar = false;
-    generatorConfig.printLFAfterWord = true;
+    generatorConfig.printLFAfterWord = false;
     generatorConfig.printSpaceAfterWord = true;
     generatorConfig.timing = Timing::tx;
     MorseGenerator::startTrainer();
@@ -227,7 +227,7 @@ void MorseGenerator::generateCW()
                 if (max && MorseGenerator::wordCounter == (max - 1))
                 {
                     // last word;
-                    newWord = "+";
+                    MorseText::setNextWordIsEndSequence();
                     MorseEchoTrainer::onLastWord();
                     Serial.println("penultimate word");
                 }
@@ -239,17 +239,18 @@ void MorseGenerator::generateCW()
 //                    MorseEchoTrainer::echoStop = false;
                     Serial.println("stop");
                 }
-                else
-                {
-//                    String newWord = internal::fetchNewWord();
-                    newWord = "a" + String(wordCounter);
-                    Serial.println("new word " + newWord);
-                }
 
-                MorseGenerator::clearText = newWord;
-                MorseGenerator::CWword = internal::textToCWword(newWord);
-                MorseEchoTrainer::onGeneratorNewWord(newWord);
-                Serial.println("genCW() fetch cw: " + CWword + " t: " + clearText + " wc: " + String(wordCounter));
+                if (!MorseGenerator::stopFlag)
+                {
+                    newWord = internal::fetchNewWord();
+//                    newWord = "a" + String(wordCounter);
+                    Serial.println("new word " + newWord);
+
+                    MorseGenerator::clearText = newWord;
+                    MorseGenerator::CWword = internal::textToCWword(newWord);
+                    MorseEchoTrainer::onGeneratorNewWord(newWord);
+                    Serial.println("genCW() fetch cw: " + CWword + " t: " + clearText + " wc: " + String(wordCounter));
+                }
 
                 if (CWword.length() == 0)
                 {

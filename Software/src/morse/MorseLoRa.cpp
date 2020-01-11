@@ -100,7 +100,7 @@ boolean MorseLoRa::menuExec(String mode)
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
         MorseKeyer::clearPaddleLatches();
         MorseKeyer::keyTx = false;
-        MorseGenerator::clearText = "";
+        MorseGenerator::setStart();
         MorseLoRa::receive();
     }
     return true;
