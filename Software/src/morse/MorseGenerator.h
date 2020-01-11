@@ -23,6 +23,19 @@ namespace MorseGenerator
         off, stop1, stop2
     };
 
+    enum Timing {
+        quick, tx, rx
+    };
+
+    typedef struct generator_config {
+            boolean sendCWToLoRa;
+            boolean printSpaceAfterWord;
+            boolean printLFAfterWord;
+            boolean printDitDah;
+            Timing timing;
+            boolean key;
+    } Config;
+
     extern AutoStopModes autoStop;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char

@@ -130,9 +130,7 @@ uint8_t MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.traine
 boolean MorseGenerator::stopFlag = false;                         // for maxSequence
 boolean MorseGenerator::firstTime = true;                         /// for word doubler mode
 
-boolean sendCWToLoRa;
-boolean printSpaceAfterWord;
-boolean printLFAfterWord;
+MorseGenerator::Config generatorConfig;
 
 namespace internal
 {
@@ -174,11 +172,10 @@ void MorseGenerator::setNextWordvvvA()
     generateStartSequence = true;
 }
 
-
-void MorseGenerator::setSendCWToLoRa(boolean mode) {
-    sendCWToLoRa = mode;
+void MorseGenerator::setSendCWToLoRa(boolean mode)
+{
+    generatorConfig.sendCWToLoRa = mode;
 }
-
 
 void internal::setStart()
 {
@@ -221,7 +218,7 @@ void MorseGenerator::generateCW()
 
             if (CWword.length() == 0)
             {                                               // fetch a new word if we have an empty word
-                if (printSpaceAfterWord)
+                if (generatorConfig.printSpaceAfterWord)
                 {
                     MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
                 }
@@ -237,7 +234,7 @@ void MorseGenerator::generateCW()
                     return;
                 }
 
-                if (printLFAfterWord)
+                if (generatorConfig.printLFAfterWord)
                 {
                     MorseDisplay::printToScroll(REGULAR, "\n");
                 }
@@ -249,43 +246,44 @@ void MorseGenerator::generateCW()
 
             if (c == '0' || !CWword.length())
             {                      // a character just had been finished
-                if (sendCWToLoRa)
+                if (generatorConfig.sendCWToLoRa)
                 {
                     MorseLoRa::cwForLora(0);
                 }
             }
 
-            //// insert code here for outputting only on display, and not as morse characters - for echo trainer
-            //// genTimer vy short (1ms?)
-            //// no keyOut()
-            if (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay == DISP_ONLY)
+            switch (generatorConfig.timing)
             {
-                genTimer = millis() + 2;      // very short timing
-            }
-            else if (!MorseMachine::isMode(MorseMachine::loraTrx))
-            {
-                genTimer = millis() + (c == '1' ? MorseKeyer::ditLength : MorseKeyer::dahLength); // start a dit or a dah, acording to the next element
-            }
-            else
-            {
-                genTimer = millis() + (c == '1' ? rxDitLength : rxDahLength);
+                case quick:
+                {
+                    genTimer = millis() + 2;      // very short timing
+                    break;
+                }
+                case tx:
+                {
+                    genTimer = millis() + (c == '1' ? MorseKeyer::ditLength : MorseKeyer::dahLength);
+                    break;
+                }
+                case rx:
+                {
+                    genTimer = millis() + (c == '1' ? rxDitLength : rxDahLength);
+                    break;
+                }
             }
 
-            if (sendCWToLoRa)
+            if (generatorConfig.sendCWToLoRa)
             {
                 // send the element to LoRa
                 c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
             }
 
             /// if Koch learn character we show dit or dah
-            if (generatorMode == KOCH_LEARN)
+            if (generatorConfig.printDitDah)
             {
                 MorseDisplay::printToScroll(REGULAR, c == '1' ? "." : "-");
             }
 
-            boolean silentEcho = (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay == DISP_ONLY); // echo mode with no audible prompt
-
-            if (!silentEcho && !stopFlag)                 // we finished maxSequence and so do start output (otherwise we get a short click)
+            if (generatorConfig.key && !stopFlag)         // we finished maxSequence and so do start output (otherwise we get a short click)
             {
                 keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), MorseSound::notes[MorsePreferences::prefs.sidetoneFreq],
                         MorsePreferences::prefs.sidetoneVolume);
@@ -298,13 +296,19 @@ void MorseGenerator::generateCW()
         {
             //// otherwise we continue here; stop keying,  and determine the length of the following pause: inter Element, interCharacter or InterWord?
 
-            keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
+            if (generatorConfig.key)
+            {
+                keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
+            }
+
             if (CWword.length() == 0)
             {                                 // we just ended the the word, ...  //// intercept here in Echo Trainer mode
                 //             // display last character - consider echo mode!
                 if (MorseMachine::isMode(MorseMachine::morseGenerator))
                     autoStop = effectiveAutoStop ? stop1 : off;
+
                 internal::dispGeneratedChar();
+
                 if (MorseMachine::isMode(MorseMachine::echoTrainer))
                 {
                     switch (MorseEchoTrainer::getState())
@@ -352,11 +356,14 @@ void MorseGenerator::generateCW()
 //              // display last character
 //              // genTimer small if in echo mode and no code!
                 internal::dispGeneratedChar();
-                if (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay == DISP_ONLY)
+
+                if (generatorConfig.timing == quick) {
                     genTimer = millis() + 1;
-                else
+                }
+                else {
                     genTimer = millis()
                             + (MorseMachine::isMode(MorseMachine::loraTrx) ? rxInterCharacterSpace : MorseKeyer::interCharacterSpace); // pause = intercharacter space
+                }
             }
             else
             {                                                                                         // we are in the middle of a character
