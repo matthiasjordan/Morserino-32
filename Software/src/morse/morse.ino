@@ -232,41 +232,14 @@ void loop()
             if (MorseEchoTrainer::active)
                 MorseGenerator::generateCW();
             break;
-        case MorseMachine::echoTrainer:                             ///// check stopFlag triggered by maxSequence
-            if (MorseGenerator::stopFlag)
+        case MorseMachine::echoTrainer:
+        {
+            if (MorseEchoTrainer::loop())
             {
-                MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
-                MorseGenerator::keyOut(false, true, 0, 0);
-                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+                return;
             }
-            if (!MorseEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
-            {                       // touching a paddle starts  the generation of code
-                // for debouncing:
-                while (MorseKeyer::checkPaddles())
-                    ;                                                           // wait until paddles are released
-                MorseEchoTrainer::active = !MorseEchoTrainer::active;
-
-                MorseMenu::cleanStartSettings();
-            } /// end touch to start
-            if (MorseEchoTrainer::active)
-                switch (MorseEchoTrainer::getState())
-                {
-                    case MorseEchoTrainer::START_ECHO:
-                    case MorseEchoTrainer::SEND_WORD:
-                    case MorseEchoTrainer::REPEAT_WORD:
-                        MorseEchoTrainer::echoResponse = "";
-                        MorseGenerator::generateCW();
-                        break;
-                    case MorseEchoTrainer::EVAL_ANSWER:
-                        MorseEchoTrainer::echoTrainerEval();
-                        break;
-                    case MorseEchoTrainer::COMPLETE_ANSWER:
-                    case MorseEchoTrainer::GET_ANSWER:
-                        if (MorseKeyer::doPaddleIambic())
-                            return;                             // we are busy keying and so need a very tight loop !
-                        break;
-                }
             break;
+        }
         case MorseMachine::morseDecoder:
             Decoder::doDecodeShow();
             break;

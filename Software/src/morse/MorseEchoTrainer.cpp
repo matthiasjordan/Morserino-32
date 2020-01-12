@@ -49,8 +49,7 @@ void MorseEchoTrainer::startEcho()
     MorseGenerator::setup();
     MorseEchoTrainer::echoStop = false;
     MorseDisplay::clear();
-    MorseDisplay::printOnScroll(0, REGULAR, 0,
-            MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
+    MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
     MorseDisplay::printOnScroll(2, REGULAR, 0, "Press paddle ");
     delay(1250);
@@ -214,12 +213,56 @@ void MorseEchoTrainer::onFetchNewWord()
     }
 }
 
-
-void MorseEchoTrainer::onLastWord() {
+void MorseEchoTrainer::onLastWord()
+{
     MorseEchoTrainer::echoStop = true;
     if (MorseEchoTrainer::isState(MorseEchoTrainer::REPEAT_WORD))
     {
         MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
     }
 
+}
+
+boolean MorseEchoTrainer::loop()
+{
+
+    ///// check stopFlag triggered by maxSequence
+    if (MorseGenerator::stopFlag)
+    {
+        MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
+        MorseGenerator::keyOut(false, true, 0, 0);
+        MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+    }
+    if (!MorseEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
+    {                       // touching a paddle starts  the generation of code
+        // for debouncing:
+        while (MorseKeyer::checkPaddles())
+        {
+            ;                                                           // wait until paddles are released
+        }
+        MorseEchoTrainer::active = !MorseEchoTrainer::active;
+
+        MorseMenu::cleanStartSettings();
+    } /// end touch to start
+    if (MorseEchoTrainer::active)
+    {
+        switch (MorseEchoTrainer::getState())
+        {
+            case MorseEchoTrainer::START_ECHO:
+            case MorseEchoTrainer::SEND_WORD:
+            case MorseEchoTrainer::REPEAT_WORD:
+                MorseEchoTrainer::echoResponse = "";
+                MorseGenerator::generateCW();
+                break;
+            case MorseEchoTrainer::EVAL_ANSWER:
+                MorseEchoTrainer::echoTrainerEval();
+                break;
+            case MorseEchoTrainer::COMPLETE_ANSWER:
+            case MorseEchoTrainer::GET_ANSWER:
+                if (MorseKeyer::doPaddleIambic())
+                    return true;                             // we are busy keying and so need a very tight loop !
+                break;
+        }
+    }
+    return false;
 }
