@@ -73,42 +73,43 @@ String MorseText::getCurrentWord()
 
 void MorseText::proceed()
 {
-    repetitionsLeft = config.repeatEach;
-    lastGeneratedWord = "";
+    repetitionsLeft = 0;
 }
 
 String MorseText::generateWord()
 {
     String result = "";
 
-    if (repetitionsLeft == 0)
-    {
-        MorseText::proceed();
-    }
-
     if (config.generateStartSequence == true)
     {                                 /// do the initial sequence in trainer mode, too
         result = "vvvA";
         config.generateStartSequence = false;
         repetitionsLeft = 0;
+        Serial.println("genWord(): generating 1 start sequence");
     }
     else if (nextWordIsEndSequence) {
         result = "+";
         nextWordIsEndSequence = false;
+        Serial.println("genWord(): generating end sequence");
     }
     else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || repetitionsLeft)
     {
+        Serial.println("genWord(): repeating last word - reps left: " + String(repetitionsLeft));
         result = lastGeneratedWord;
         if (repetitionsLeft > 0) {
             repetitionsLeft-= 1;
+            Serial.println("genWord(): decreased reps left - now: " + String(repetitionsLeft));
         }
     }
     else
     {
+        Serial.println("genWord(): generating new word");
+        repetitionsLeft = config.repeatEach - 1;
         result = internal::fetchRandomWord();
     }       /// end if else - we either already had something in trainer mode, or we got a new word
 
     lastGeneratedWord = result;
+    Serial.println("genWord(): returning " + result);
     return result;
 
 }
