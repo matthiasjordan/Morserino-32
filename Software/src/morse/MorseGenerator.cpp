@@ -157,12 +157,6 @@ boolean MorseGenerator::menuExec(String mode)
         MorsePlayerFile::openAndSkip();
     }
 
-    generatorConfig.key = true;
-    generatorConfig.printDitDah = false;
-    generatorConfig.printChar = false;
-    generatorConfig.printLFAfterWord = false;
-    generatorConfig.printSpaceAfterWord = true;
-    generatorConfig.timing = Timing::tx;
     MorseGenerator::startTrainer();
     return true;
 }
@@ -174,10 +168,31 @@ void MorseGenerator::setSendCWToLoRa(boolean mode)
 
 void MorseGenerator::setStart()
 {
+    MorseGenerator::Config generatorConfig;
+    generatorConfig.key = true;
+    generatorConfig.printDitDah = false;
+    generatorConfig.printChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
+            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorseGenerator::effectiveTrainerDisplay == DISPLAY_BY_CHAR)
+            || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY);
+
+    generatorConfig.printLFAfterWord = false;
+    generatorConfig.printSpaceAfterWord = true;
+    generatorConfig.printSpaceAfterChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
+    generatorConfig.timing = Timing::tx;
+    generatorConfig.clearBufferBeforPrintChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
+    generatorConfig.printCharStyle = MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR;
+    generatorConfig.printChar = true;
+    MorseGenerator::setStart(&generatorConfig);
+
+}
+
+void MorseGenerator::setStart(MorseGenerator::Config *config)
+{
     CWword = "";
     clearText = "";
     genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
     wordCounter = 0;                             // reset word counter for maxSequence
+    generatorConfig = *config;
 }
 
 void MorseGenerator::startTrainer()
@@ -309,21 +324,24 @@ void MorseGenerator::generateCW()
 
             if (generatorConfig.key)
             {
+                Serial.println("Generator: KEY_DOWN keyOut false");
                 keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
             }
 
-            if (CWword.length() == 0)
+            Serial.println("Generator: KEY_DOWN CWword: " + CWword);
+
+            if (CWword.length() == 1)
             {
+                Serial.println("Generator: KEY_DOWN Word end");
                 // we just ended the the word
 
 //                if (MorseMachine::isMode(MorseMachine::morseGenerator))
 //                    autoStop = effectiveAutoStop ? stop1 : off;
 
-                if (generatorConfig.printChar)
-                {
-                    internal::dispGeneratedChar();
-                }
+                Serial.println("Generator: KEY_DOWN Word end print char?");
+                internal::dispGeneratedChar();
 
+                Serial.println("Generator: KEY_DOWN Word end call MET::onGenWordEnd");
                 unsigned long delta = MorseEchoTrainer::onGeneratorWordEnd();
 
                 if (delta != -1)
@@ -654,27 +672,28 @@ String internal::textToCWword(String symbols)
 
 void internal::dispGeneratedChar()
 {
-    static String charString;
-    charString.reserve(10);
+    String charString = String(clearText.charAt(0));
+    clearText.remove(0, 1);
 
-    if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
-            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorseGenerator::effectiveTrainerDisplay == DISPLAY_BY_CHAR)
-            || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY))
-    //&& echoTrainerState != SEND_WORD
-    //&& echoTrainerState != REPEAT_WORD))
+//    charString.reserve(10);
 
+    if (generatorConfig.printChar)
     {       /// we need to output the character on the display now
-        charString = MorseGenerator::clearText.charAt(0);                   /// store first char of clearText in charString
-        MorseGenerator::clearText.remove(0, 1);                              /// and remove it from clearText
-        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
+        Serial.println("Generator: dispGenChar " + charString);
+        if (generatorConfig.clearBufferBeforPrintChar)
         {
             MorseDisplay::printToScroll(REGULAR, "");                      // clear the buffer first
         }
-        MorseDisplay::printToScroll(MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR,
-                MorseDisplay::cleanUpProSigns(charString));
-        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
+        MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseDisplay::cleanUpProSigns(charString));
+        if (generatorConfig.printSpaceAfterChar)
+        {
             MorseDisplay::printToScroll(REGULAR, " ");                      // output a space
-    }   //// end display_by_char
+        }
+    }
+    else
+    {
+        Serial.println("Generator: dispGenChar no printChar");
+    }
 
     MorsePreferences::fireCharSeen(true);
 }

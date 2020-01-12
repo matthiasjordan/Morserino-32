@@ -47,6 +47,16 @@ void MorseEchoTrainer::startEcho()
 {
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setup();
+
+    MorseGenerator::Config generatorConfig;
+    generatorConfig.key = true;
+    generatorConfig.printDitDah = false;
+    generatorConfig.printChar = true;
+    generatorConfig.printLFAfterWord = true;
+    generatorConfig.printSpaceAfterWord = true;
+    generatorConfig.timing = MorseGenerator::tx;
+    MorseGenerator::setStart(&generatorConfig);
+
     MorseEchoTrainer::echoStop = false;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
@@ -142,6 +152,8 @@ void MorseEchoTrainer::changeSpeed(int t)
 unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 {
 
+    Serial.println("MET::onGenWordEnd");
+
     if (!MorseMachine::isMode(MorseMachine::echoTrainer))
     {
         return -1;
@@ -225,16 +237,18 @@ void MorseEchoTrainer::onLastWord()
 
 boolean MorseEchoTrainer::loop()
 {
-
+//Serial.println("MorseEchoTrainer loop() 1");
     ///// check stopFlag triggered by maxSequence
     if (MorseGenerator::stopFlag)
     {
+        Serial.println("MorseEchoTrainer loop() 2 stopFlag");
         MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
         MorseGenerator::keyOut(false, true, 0, 0);
         MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
     }
     if (!MorseEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
     {                       // touching a paddle starts  the generation of code
+        Serial.println("MorseEchoTrainer loop() 3 paddle hit");
         // for debouncing:
         while (MorseKeyer::checkPaddles())
         {
@@ -246,19 +260,23 @@ boolean MorseEchoTrainer::loop()
     } /// end touch to start
     if (MorseEchoTrainer::active)
     {
+//        Serial.println("MorseEchoTrainer loop() 4 active");
         switch (MorseEchoTrainer::getState())
         {
             case MorseEchoTrainer::START_ECHO:
             case MorseEchoTrainer::SEND_WORD:
             case MorseEchoTrainer::REPEAT_WORD:
+//                Serial.println("MorseEchoTrainer loop() 5 send");
                 MorseEchoTrainer::echoResponse = "";
                 MorseGenerator::generateCW();
                 break;
             case MorseEchoTrainer::EVAL_ANSWER:
+                Serial.println("MorseEchoTrainer loop() 6 eval");
                 MorseEchoTrainer::echoTrainerEval();
                 break;
             case MorseEchoTrainer::COMPLETE_ANSWER:
             case MorseEchoTrainer::GET_ANSWER:
+                Serial.println("MorseEchoTrainer loop() 7 get answer");
                 if (MorseKeyer::doPaddleIambic())
                     return true;                             // we are busy keying and so need a very tight loop !
                 break;

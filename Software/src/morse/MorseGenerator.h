@@ -30,6 +30,9 @@ namespace MorseGenerator
             boolean printChar;
             Timing timing;
             boolean key;
+            boolean clearBufferBeforPrintChar;
+            boolean printSpaceAfterChar;
+            FONT_ATTRIB printCharStyle;
     } Config;
 
     extern AutoStopModes autoStop;
@@ -51,6 +54,7 @@ namespace MorseGenerator
 
     void setup();
     void setStart();
+    void setStart(MorseGenerator::Config *config);
     boolean menuExec(String mode);
     void startTrainer();
     void generateCW();
