@@ -608,12 +608,18 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         MorseUI::modeButton.Update();
         switch (MorseUI::modeButton.clicks)
         {
-            case -1: //delay(200);
+            case -1: {//delay(200);
+                MorseText::onPreferencesChanged();
+                MorseEchoTrainer::onPreferencesChanged();
                 return true;
                 break;
-            case 1: //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
+            }
+            case 1: { //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
                 MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
+                MorseText::onPreferencesChanged();
+                MorseEchoTrainer::onPreferencesChanged();
                 return false;
+            }
         }
         if (pos == MorsePreferences::posSnapRecall)
         {         // here we can delete a memory....
@@ -867,8 +873,6 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         }      // end if(encoderPos)
         MorseSystem::checkShutDown(false);         // check for time out
     }    // end while(true)
-    MorseText::onPreferencesChanged();
-    MorseEchoTrainer::onPreferencesChanged();
 }   // end of function
 
 ////// setup preferences ///////

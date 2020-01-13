@@ -27,7 +27,7 @@
 using namespace MorseEchoTrainer;
 
 String MorseEchoTrainer::echoResponse = "";
-echoStates echoTrainerState = START_ECHO;
+echoStates echoTrainerState;
 boolean MorseEchoTrainer::echoStop = false;                         // for maxSequence
 boolean MorseEchoTrainer::active = false;                           // flag for trainer mode
 String MorseEchoTrainer::echoTrainerWord;
@@ -73,6 +73,12 @@ void MorseEchoTrainer::startEcho()
     MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
     MorseKeyer::keyTx = false;
     MorseEchoTrainer::onPreferencesChanged();
+
+    if (morseTextConfig.generateStartSequence) {
+        echoTrainerState = START_ECHO;
+    } else {
+        echoTrainerState = SEND_WORD;
+    }
 }
 
 void MorseEchoTrainer::onPreferencesChanged() {
@@ -165,7 +171,7 @@ void MorseEchoTrainer::changeSpeed(int t)
 unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 {
 
-    Serial.println("MET::onGenWordEnd");
+    Serial.println("MET::onGenWordEnd MET::s: " + String(MorseEchoTrainer::getState()));
 
     if (!MorseMachine::isMode(MorseMachine::echoTrainer))
     {

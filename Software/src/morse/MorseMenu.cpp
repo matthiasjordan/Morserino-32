@@ -368,7 +368,7 @@ boolean internal::menuExec()
 
 void MorseMenu::cleanStartSettings()
 {
-    MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
+//    MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
     MorseGenerator::generatorState = MorseGenerator::KEY_UP;
     MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
