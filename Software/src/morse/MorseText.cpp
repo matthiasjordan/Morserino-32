@@ -35,14 +35,8 @@ namespace internal
 
 const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
-typedef struct
-{
-        boolean generateStartSequence;
-        uint8_t repeatEach = 1;
-        GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
-} Config;
 
-Config config;
+MorseText::Config config;
 
 uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
@@ -50,15 +44,29 @@ boolean nextWordIsEndSequence;
 
 void MorseText::start(GEN_TYPE genType)
 {
-    MorseText::onPreferencesChanged();
+    MorseText::Config config;
     config.generateStartSequence = true;
     config.generatorMode = genType;
+    MorseText::start(&config);
+    MorseText::onPreferencesChanged();
+}
+
+void MorseText::start(MorseText::Config *cfg)
+{
+    config.generateStartSequence = cfg->generateStartSequence;
+    config.generatorMode = cfg->generatorMode;
+    config.repeatEach = cfg->repeatEach;
     MorseText::proceed();
 }
 
 void MorseText::setNextWordIsEndSequence()
 {
     nextWordIsEndSequence = true;
+}
+
+void MorseText::setRepeatEach(uint8_t n) {
+    Serial.println("MorseText::setRepEach " + String(n));
+    config.repeatEach = n;
 }
 
 void MorseText::onPreferencesChanged()

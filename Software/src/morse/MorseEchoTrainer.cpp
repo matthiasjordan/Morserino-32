@@ -57,6 +57,11 @@ void MorseEchoTrainer::startEcho()
     generatorConfig.timing = MorseGenerator::tx;
     MorseGenerator::setStart(&generatorConfig);
 
+    MorseText::Config morseTextConfig;
+    morseTextConfig.generateStartSequence = false;
+    morseTextConfig.generatorMode = MorseText::RANDOMS;
+    MorseText::start(&morseTextConfig);
+
     MorseEchoTrainer::echoStop = false;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
@@ -67,7 +72,14 @@ void MorseEchoTrainer::startEcho()
     MorseDisplay::displayTopLine();
     MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
     MorseKeyer::keyTx = false;
+    MorseEchoTrainer::onPreferencesChanged();
 }
+
+void MorseEchoTrainer::onPreferencesChanged() {
+    Serial.println("MorseET::oPC");
+    MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
+}
+
 
 boolean MorseEchoTrainer::isState(echoStates state)
 {
@@ -115,6 +127,7 @@ void MorseEchoTrainer::echoTrainerEval()
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
             changeSpeed(1);
+        MorseText::proceed();
     }
     else
     {

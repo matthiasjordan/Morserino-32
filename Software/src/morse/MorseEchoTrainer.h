@@ -24,6 +24,7 @@ namespace MorseEchoTrainer
     boolean menuExec(String mode);
     void startEcho();
     boolean loop();
+    void onPreferencesChanged();
 
     void echoTrainerEval();
 
