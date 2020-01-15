@@ -35,7 +35,6 @@ namespace internal
 
 const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
-
 MorseText::Config config;
 
 uint8_t repetitionsLeft = 0;
@@ -44,19 +43,19 @@ boolean nextWordIsEndSequence;
 
 void MorseText::start(GEN_TYPE genType)
 {
-    MorseText::Config config;
     config.generateStartSequence = true;
     config.generatorMode = genType;
-    MorseText::start(&config);
     MorseText::onPreferencesChanged();
 }
 
-void MorseText::start(MorseText::Config *cfg)
+void MorseText::setGenerateStartSequence(boolean newValue)
 {
-    config.generateStartSequence = cfg->generateStartSequence;
-    config.generatorMode = cfg->generatorMode;
-    config.repeatEach = cfg->repeatEach;
-    MorseText::proceed();
+    config.generateStartSequence = newValue;
+}
+
+void MorseText::setTextSource(GEN_TYPE genType)
+{
+    config.generatorMode = genType;
 }
 
 void MorseText::setNextWordIsEndSequence()
@@ -64,7 +63,8 @@ void MorseText::setNextWordIsEndSequence()
     nextWordIsEndSequence = true;
 }
 
-void MorseText::setRepeatEach(uint8_t n) {
+void MorseText::setRepeatEach(uint8_t n)
+{
     Serial.println("MorseText::setRepEach " + String(n));
     config.repeatEach = n;
 }
@@ -95,7 +95,8 @@ String MorseText::generateWord()
         repetitionsLeft = 0;
         Serial.println("genWord(): generating 1 start sequence");
     }
-    else if (nextWordIsEndSequence) {
+    else if (nextWordIsEndSequence)
+    {
         result = "+";
         nextWordIsEndSequence = false;
         Serial.println("genWord(): generating end sequence");
@@ -104,8 +105,9 @@ String MorseText::generateWord()
     {
         Serial.println("genWord(): repeating last word - reps left: " + String(repetitionsLeft));
         result = lastGeneratedWord;
-        if (repetitionsLeft > 0) {
-            repetitionsLeft-= 1;
+        if (repetitionsLeft > 0)
+        {
+            repetitionsLeft -= 1;
             Serial.println("genWord(): decreased reps left - now: " + String(repetitionsLeft));
         }
     }

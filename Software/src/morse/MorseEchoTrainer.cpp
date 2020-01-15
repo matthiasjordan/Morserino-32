@@ -57,10 +57,7 @@ void MorseEchoTrainer::startEcho()
     generatorConfig.timing = MorseGenerator::tx;
     MorseGenerator::setStart(&generatorConfig);
 
-    MorseText::Config morseTextConfig;
-    morseTextConfig.generateStartSequence = false;
-    morseTextConfig.generatorMode = MorseText::RANDOMS;
-    MorseText::start(&morseTextConfig);
+    MorseText::proceed();
 
     MorseEchoTrainer::echoStop = false;
     MorseDisplay::clear();
@@ -74,7 +71,9 @@ void MorseEchoTrainer::startEcho()
     MorseKeyer::keyTx = false;
     MorseEchoTrainer::onPreferencesChanged();
 
-    if (morseTextConfig.generateStartSequence) {
+    boolean generateStartSequence = false;
+    MorseText::setGenerateStartSequence(generateStartSequence);
+    if (generateStartSequence) {
         echoTrainerState = START_ECHO;
     } else {
         echoTrainerState = SEND_WORD;

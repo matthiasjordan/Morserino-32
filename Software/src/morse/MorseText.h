@@ -18,7 +18,11 @@ namespace MorseText {
 
     void start(GEN_TYPE genType);
     void start(MorseText::Config *config);
+
+    void setTextSource(GEN_TYPE genType);
+    void setGenerateStartSequence(boolean newValue);
     void setRepeatEach(uint8_t n);
+
     void onPreferencesChanged();
     void proceed();
     String getCurrentWord();
