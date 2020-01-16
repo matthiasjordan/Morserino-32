@@ -43,18 +43,20 @@ boolean MorseEchoTrainer::menuExec(String mode)
     return true;
 }
 
+
 void MorseEchoTrainer::startEcho()
 {
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setup();
 
     MorseGenerator::Config generatorConfig;
-    generatorConfig.key = true;
+    Serial.println("MorseEchoTrainer start edis " + String(MorsePreferences::prefs.echoDisplay));
+    generatorConfig.key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
     generatorConfig.printDitDah = false;
-    generatorConfig.printChar = true;
+    generatorConfig.printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
     generatorConfig.printLFAfterWord = true;
     generatorConfig.printSpaceAfterWord = true;
-    generatorConfig.timing = MorseGenerator::tx;
+    generatorConfig.timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
     MorseGenerator::setStart(&generatorConfig);
 
     MorseText::proceed();

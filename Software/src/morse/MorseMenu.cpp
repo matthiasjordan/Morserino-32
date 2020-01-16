@@ -372,7 +372,7 @@ void MorseMenu::cleanStartSettings()
     MorseGenerator::generatorState = MorseGenerator::KEY_UP;
     MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
-    MorseGenerator::setStart();
+//    MorseGenerator::setStart();
     MorseDisplay::displayTopLine();
 }
 

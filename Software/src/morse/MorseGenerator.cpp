@@ -168,6 +168,7 @@ void MorseGenerator::setSendCWToLoRa(boolean mode)
 
 void MorseGenerator::setStart()
 {
+    Serial.println("MG:sS() 1");
     MorseGenerator::Config generatorConfig;
     generatorConfig.key = true;
     generatorConfig.printDitDah = false;
@@ -188,6 +189,7 @@ void MorseGenerator::setStart()
 
 void MorseGenerator::setStart(MorseGenerator::Config *config)
 {
+    Serial.println("MG:sS() 2");
     CWword = "";
     clearText = "";
     genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
