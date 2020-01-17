@@ -264,7 +264,6 @@ void MorseGenerator::generateCW()
 
                     MorseGenerator::clearText = newWord;
                     MorseGenerator::CWword = internal::textToCWword(newWord);
-                    MorseEchoTrainer::onGeneratorNewWord(newWord);
                     Serial.println("genCW() fetch cw: " + CWword + " t: " + clearText + " wc: " + String(wordCounter));
                 }
 

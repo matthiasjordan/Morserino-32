@@ -33,6 +33,8 @@ boolean MorseEchoTrainer::active = false;                           // flag for 
 String MorseEchoTrainer::echoTrainerWord;
 int MorseEchoTrainer::repeats = 0;
 
+MorseEchoTrainer::Config metConfig;
+
 boolean MorseEchoTrainer::menuExec(String mode)
 {
     if (mode == "player")
@@ -42,7 +44,6 @@ boolean MorseEchoTrainer::menuExec(String mode)
     MorseEchoTrainer::startEcho();
     return true;
 }
-
 
 void MorseEchoTrainer::startEcho()
 {
@@ -63,17 +64,25 @@ void MorseEchoTrainer::startEcho()
     MorseKeyer::keyTx = false;
     MorseEchoTrainer::onPreferencesChanged();
 
-    boolean generateStartSequence = false;
-    MorseText::setGenerateStartSequence(generateStartSequence);
-    if (generateStartSequence) {
+    metConfig.showFailedWord = !MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
+    metConfig.generateStartSequence = false;
+    MorseText::setGenerateStartSequence(metConfig.generateStartSequence);
+    if (metConfig.generateStartSequence)
+    {
         echoTrainerState = START_ECHO;
-    } else {
+    }
+    else
+    {
         echoTrainerState = SEND_WORD;
     }
 }
 
-void MorseEchoTrainer::onPreferencesChanged() {
+void MorseEchoTrainer::onPreferencesChanged()
+{
     Serial.println("MorseET::oPC");
+
+    metConfig.showPrompt = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
+
     MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
 
     MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
@@ -85,7 +94,6 @@ void MorseEchoTrainer::onPreferencesChanged() {
     generatorConfig->printSpaceAfterWord = true;
     generatorConfig->timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
 }
-
 
 boolean MorseEchoTrainer::isState(echoStates state)
 {
@@ -137,12 +145,15 @@ void MorseEchoTrainer::echoTrainerEval()
     }
     else
     {
+        Serial.println("MET::eTE() 5 " + echoResponse);
         echoTrainerState = REPEAT_WORD;
-        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || echoResponse != "")
+        if (!MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || echoResponse != "")
         {
+            Serial.println("MET::eTE() 6");
             MorseDisplay::printToScroll(BOLD, "ERR");
             if (MorsePreferences::prefs.echoConf)
             {
+                Serial.println("MET::eTE() 7");
                 MorseSound::pwmTone(311, MorsePreferences::prefs.sidetoneVolume, false);
                 delay(193);
                 MorseSound::pwmNoTone();
@@ -199,7 +210,7 @@ unsigned long MorseEchoTrainer::onGeneratorWordEnd()
             else
             {
                 MorseEchoTrainer::setState(MorseEchoTrainer::GET_ANSWER);
-                if (MorsePreferences::prefs.echoDisplay != CODE_ONLY)
+                if (metConfig.showPrompt)
                 {
                     MorseDisplay::printToScroll(REGULAR, " ");
                     MorseDisplay::printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
@@ -221,6 +232,7 @@ unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 
 void MorseEchoTrainer::onGeneratorNewWord(String newWord)
 {
+    Serial.println("MET::onGNW");
     MorseEchoTrainer::repeats = 0;
     MorseEchoTrainer::echoTrainerWord = newWord;
 }
@@ -229,13 +241,17 @@ void MorseEchoTrainer::onFetchNewWord()
 {
     Decoder::interWordTimerOff();
 
+    Serial.println("MET::oFNW() 1 - " + String(MorseEchoTrainer::getState()));
     if (MorseEchoTrainer::getState() == MorseEchoTrainer::REPEAT_WORD)
     {
-        if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
+        Serial.println("MET::oFNW() 2 " + String(MorseEchoTrainer::repeats));
+        if (MorsePreferences::prefs.echoRepeats != MorsePreferences::REPEAT_FOREVER
+                && MorseEchoTrainer::repeats >= MorsePreferences::prefs.echoRepeats)
         {
-            if (MorsePreferences::prefs.echoRepeats != MorsePreferences::REPEAT_FOREVER
-                    && MorseEchoTrainer::repeats > MorsePreferences::prefs.echoRepeats)
+            Serial.println("MET::oFNW() 3");
+            if (metConfig.showFailedWord)
             {
+                Serial.println("MET::oFNW() 4");
                 String result = MorseText::getCurrentWord();
                 MorseDisplay::printToScroll(INVERSE_REGULAR, MorseDisplay::cleanUpProSigns(result)); //// clean up first!
                 MorseDisplay::printToScroll(REGULAR, " ");
@@ -295,7 +311,7 @@ boolean MorseEchoTrainer::loop()
                 break;
             case MorseEchoTrainer::COMPLETE_ANSWER:
             case MorseEchoTrainer::GET_ANSWER:
-                Serial.println("MorseEchoTrainer loop() 7 get answer");
+//                Serial.println("MorseEchoTrainer loop() 7 get answer");
                 if (MorseKeyer::doPaddleIambic())
                     return true;                             // we are busy keying and so need a very tight loop !
                 break;

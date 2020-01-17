@@ -42,20 +42,29 @@ void Koch::setup()
 
 boolean Koch::menuExec(String mode)
 {
+    MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
+
     if (mode == "learn")
     {
         MorseEchoTrainer::startEcho();
+        generatorConfig->printDitDah = true;
     }
     else if (mode == "trainer")
     {
         Koch::setKochActive(true);
         MorseGenerator::startTrainer();
+        generatorConfig->printDitDah = false;
     }
     else if (mode == "echo")
     {
         Koch::setKochActive(true);
         MorseEchoTrainer::startEcho();
+        generatorConfig->printDitDah = false;
     }
+
+    generatorConfig->printLFAfterWord = true;
+    generatorConfig->printSpaceAfterWord = true;
+
     return true;
 }
 

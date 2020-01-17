@@ -10,6 +10,13 @@ namespace MorseEchoTrainer
     ///// Variables for Echo Trainer Mode
     /////
 
+    typedef struct
+    {
+            boolean generateStartSequence;
+            boolean showPrompt;
+            boolean showFailedWord;
+    } Config;
+
     extern String echoResponse;
     enum echoStates
     {
@@ -19,7 +26,6 @@ namespace MorseEchoTrainer
     extern boolean echoStop;                         // for maxSequence
     extern boolean active;                           // flag for trainer mode
     extern int repeats;
-
 
     boolean menuExec(String mode);
     void startEcho();

@@ -19,6 +19,7 @@
 #include "english_words.h"
 #include "abbrev.h"
 #include "MorsePlayerFile.h"
+#include "MorseEchoTrainer.h"
 
 using namespace MorseText;
 
@@ -116,6 +117,7 @@ String MorseText::generateWord()
         Serial.println("genWord(): generating new word");
         repetitionsLeft = config.repeatEach - 1;
         result = internal::fetchRandomWord();
+        MorseEchoTrainer::onGeneratorNewWord(result);
     }       /// end if else - we either already had something in trainer mode, or we got a new word
 
     lastGeneratedWord = result;
