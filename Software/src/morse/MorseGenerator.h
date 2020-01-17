@@ -18,21 +18,23 @@ namespace MorseGenerator
         off, stop1, stop2
     };
 
-    enum Timing {
+    enum Timing
+    {
         quick, tx, rx
     };
 
-    typedef struct generator_config {
-            boolean sendCWToLoRa;
-            boolean printSpaceAfterWord;
-            boolean printLFAfterWord;
-            boolean printDitDah;
-            boolean printChar;
-            Timing timing;
-            boolean key;
-            boolean clearBufferBeforPrintChar;
-            boolean printSpaceAfterChar;
-            FONT_ATTRIB printCharStyle;
+    typedef struct generator_config
+    {
+        boolean sendCWToLoRa;
+        boolean printSpaceAfterWord;
+        boolean printLFAfterWord;
+        boolean printDitDah;
+        boolean printChar;
+        Timing timing;
+        boolean key;
+        boolean clearBufferBeforPrintChar;
+        boolean printSpaceAfterChar;
+        FONT_ATTRIB printCharStyle;
     } Config;
 
     extern AutoStopModes autoStop;
@@ -55,6 +57,7 @@ namespace MorseGenerator
     void setup();
     void setStart();
     void setStart(MorseGenerator::Config *config);
+    Config* getConfig();
     boolean menuExec(String mode);
     void startTrainer();
     void generateCW();

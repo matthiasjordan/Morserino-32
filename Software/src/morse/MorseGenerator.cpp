@@ -131,6 +131,8 @@ namespace internal
     String fetchNewWord();
     void dispGeneratedChar();
 
+    void setStart2();
+
     String textToCWword(String symbols);
 
     unsigned long getCharTiming(MorseGenerator::Config *generatorConfig, char c);
@@ -161,15 +163,14 @@ boolean MorseGenerator::menuExec(String mode)
     return true;
 }
 
-void MorseGenerator::setSendCWToLoRa(boolean mode)
+Config* MorseGenerator::getConfig()
 {
-    generatorConfig.sendCWToLoRa = mode;
+    return &generatorConfig;
 }
 
 void MorseGenerator::setStart()
 {
     Serial.println("MG:sS() 1");
-    MorseGenerator::Config generatorConfig;
     generatorConfig.key = true;
     generatorConfig.printDitDah = false;
     generatorConfig.printChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
@@ -183,18 +184,16 @@ void MorseGenerator::setStart()
     generatorConfig.clearBufferBeforPrintChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     generatorConfig.printCharStyle = MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR;
     generatorConfig.printChar = true;
-    MorseGenerator::setStart(&generatorConfig);
+    internal::setStart2();
 
 }
 
-void MorseGenerator::setStart(MorseGenerator::Config *config)
+void internal::setStart2()
 {
-    Serial.println("MG:sS() 2");
     CWword = "";
     clearText = "";
     genTimer = millis() - 1;  // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
     wordCounter = 0;                             // reset word counter for maxSequence
-    generatorConfig = *config;
 }
 
 void MorseGenerator::startTrainer()

@@ -49,16 +49,6 @@ void MorseEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setup();
 
-    MorseGenerator::Config generatorConfig;
-    Serial.println("MorseEchoTrainer start edis " + String(MorsePreferences::prefs.echoDisplay));
-    generatorConfig.key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
-    generatorConfig.printDitDah = false;
-    generatorConfig.printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
-    generatorConfig.printLFAfterWord = true;
-    generatorConfig.printSpaceAfterWord = true;
-    generatorConfig.timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
-    MorseGenerator::setStart(&generatorConfig);
-
     MorseText::proceed();
 
     MorseEchoTrainer::echoStop = false;
@@ -85,6 +75,15 @@ void MorseEchoTrainer::startEcho()
 void MorseEchoTrainer::onPreferencesChanged() {
     Serial.println("MorseET::oPC");
     MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
+
+    MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
+    Serial.println("MorseEchoTrainer start edis " + String(MorsePreferences::prefs.echoDisplay));
+    generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
+    generatorConfig->printDitDah = false;
+    generatorConfig->printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
+    generatorConfig->printLFAfterWord = true;
+    generatorConfig->printSpaceAfterWord = true;
+    generatorConfig->timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
 }
 
 
