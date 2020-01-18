@@ -102,6 +102,8 @@ boolean MorseLoRa::menuExec(String mode)
         MorseKeyer::keyTx = false;
         MorseGenerator::setStart();
         MorseLoRa::receive();
+
+        MorseGenerator::getConfig()->printChar = true;
     }
     return true;
 }

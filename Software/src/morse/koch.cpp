@@ -48,6 +48,9 @@ boolean Koch::menuExec(String mode)
     {
         MorseEchoTrainer::startEcho();
         generatorConfig->printDitDah = true;
+        generatorConfig->printChar = true;
+        generatorConfig->printSpaceAfterChar = true;
+        generatorConfig->clearBufferBeforPrintChar = true;
     }
     else if (mode == "trainer")
     {

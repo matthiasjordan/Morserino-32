@@ -158,6 +158,8 @@ boolean MorseGenerator::menuExec(String mode)
     }
 
     MorseGenerator::startTrainer();
+    generatorConfig.printChar = (generatorConfig.effectiveTrainerDisplay == DISPLAY_BY_CHAR);
+
     return true;
 }
 
@@ -249,10 +251,6 @@ void MorseGenerator::setStart()
     generatorConfig.printChar = true;
     generatorConfig.autoStop = false;
     generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
-
-    generatorConfig.printChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
-            || (MorseMachine::isMode(MorseMachine::morseGenerator) && generatorConfig.effectiveTrainerDisplay == DISPLAY_BY_CHAR)
-            || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY);
 
     internal::setStart2();
 }
