@@ -189,7 +189,7 @@ void MorseGenerator::loop() {
                 }
                 case MorseGenerator::stop2:
                 {
-                    MorseDisplay::printToScroll(REGULAR, " |\n"); // "\n"
+                    MorseDisplay::flushScroll();
                     MorseGenerator::autoStopState = MorseGenerator::off;
                     break;
                 }
