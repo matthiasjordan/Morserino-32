@@ -23,11 +23,15 @@ namespace MorseGenerator
         quick, tx, rx
     };
 
+    enum WordEndMethod {
+        shrug, LF, flush
+    };
+
     typedef struct generator_config
     {
         boolean sendCWToLoRa;
         boolean printSpaceAfterWord;
-        boolean printLFAfterWord;
+        WordEndMethod wordEndMethod;
         boolean printDitDah;
         boolean printChar;
         Timing timing;

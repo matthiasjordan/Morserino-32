@@ -163,7 +163,8 @@ boolean MorseGenerator::menuExec(String mode)
     return true;
 }
 
-void MorseGenerator::loop() {
+void MorseGenerator::loop()
+{
     boolean activeOld = MorseEchoTrainer::active;
 
     if ((MorseGenerator::autoStopState == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
@@ -225,12 +226,12 @@ void MorseGenerator::loop() {
             MorseDisplay::displayTopLine();
         }
     }
-    if (MorseEchoTrainer::active) {
+    if (MorseEchoTrainer::active)
+    {
         MorseGenerator::generateCW();
     }
 
 }
-
 
 Config* MorseGenerator::getConfig()
 {
@@ -242,19 +243,18 @@ void MorseGenerator::setStart()
     Serial.println("MG:sS() 1");
     generatorConfig.key = true;
     generatorConfig.printDitDah = false;
-    generatorConfig.printLFAfterWord = false;
+    generatorConfig.wordEndMethod = flush;
     generatorConfig.printSpaceAfterWord = true;
-    generatorConfig.printSpaceAfterChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
+    generatorConfig.printSpaceAfterChar = false;
     generatorConfig.timing = Timing::tx;
-    generatorConfig.clearBufferBeforPrintChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
-    generatorConfig.printCharStyle = MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR;
+    generatorConfig.clearBufferBeforPrintChar = false;
+    generatorConfig.printCharStyle = REGULAR;
     generatorConfig.printChar = true;
     generatorConfig.autoStop = false;
     generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
     internal::setStart2();
 }
-
 
 void internal::setStart2()
 {
@@ -343,9 +343,22 @@ void MorseGenerator::generateCW()
 
                 MorseGenerator::wordCounter += 1;
 
-                if (generatorConfig.printLFAfterWord)
+                switch (generatorConfig.wordEndMethod)
                 {
-                    MorseDisplay::printToScroll(REGULAR, "\n");
+                    case LF:
+                    {
+                        MorseDisplay::printToScroll(REGULAR, "\n");
+                        break;
+                    }
+                    case flush:
+                    {
+                        MorseDisplay::flushScroll();
+                        break;
+                    }
+                    case shrug:
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -377,7 +390,7 @@ void MorseGenerator::generateCW()
                     MorseDisplay::printToScroll(REGULAR, c == '1' ? "." : "-");
                 }
 
-                if (generatorConfig.key && !stopFlag)     // we finished maxSequence and so do start output (otherwise we get a short click)
+                if (generatorConfig.key && !stopFlag) // we finished maxSequence and so do start output (otherwise we get a short click)
                 {
                     keyOut(true, (!MorseMachine::isMode(MorseMachine::loraTrx)), MorseSound::notes[MorsePreferences::prefs.sidetoneFreq],
                             MorsePreferences::prefs.sidetoneVolume);
@@ -403,7 +416,8 @@ void MorseGenerator::generateCW()
                 Serial.println("Generator: KEY_DOWN Word end");
                 // we just ended the the word
 
-                if (MorseMachine::isMode(MorseMachine::morseGenerator)) {
+                if (MorseMachine::isMode(MorseMachine::morseGenerator))
+                {
                     autoStopState = generatorConfig.autoStop ? stop1 : off;
                 }
 
@@ -437,7 +451,7 @@ void MorseGenerator::generateCW()
                 genTimer = millis() + internal::getIntercharSpace(&generatorConfig);
             }
             else
-            {                                                                                         // we are in the middle of a character
+            {                                                                                     // we are in the middle of a character
                 genTimer = millis() + internal::getInterelementSpace(&generatorConfig);
             }
             generatorState = KEY_UP;                               // next state = key up = pause
@@ -717,7 +731,7 @@ String internal::textToCWword(String symbols)
     for (int i = 0; i < l; ++i)
     {
         char c = symbols.charAt(i);                                 // next char in string
-        pointer = CWchars.indexOf(c);                             // at which position is the character in CWchars?
+        pointer = CWchars.indexOf(c);                                 // at which position is the character in CWchars?
         if (pointer == -1)
         {
             return "111111110"; // <err>
@@ -727,7 +741,7 @@ String internal::textToCWword(String symbols)
         for (int j = 0; j < NoE; ++j)
         {
             result += (bitMask & B10000000 ? "2" : "1");     // get MSB and store it in string - 2 is dah, 1 is dit, 0 = inter-element space
-            bitMask = bitMask << 1;                               // shift bitmask 1 bit to the left
+            bitMask = bitMask << 1;     // shift bitmask 1 bit to the left
         } /// now we are at the end of one character, therefore we add enough space for inter-character
         result += "0";
     }     /// now we are at the end of the word, therefore we remove the final 0!

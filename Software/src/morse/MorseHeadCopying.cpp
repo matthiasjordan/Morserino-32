@@ -46,6 +46,6 @@ void internal::setupHeadCopying()
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
     genCon->autoStop = true;
     genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
-    genCon->printLFAfterWord = true;
+    genCon->wordEndMethod = MorseGenerator::LF;
 
 }

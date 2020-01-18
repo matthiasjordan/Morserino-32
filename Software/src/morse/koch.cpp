@@ -65,7 +65,7 @@ boolean Koch::menuExec(String mode)
         generatorConfig->printDitDah = false;
     }
 
-    generatorConfig->printLFAfterWord = true;
+    generatorConfig->wordEndMethod = MorseGenerator::LF;
     generatorConfig->printSpaceAfterWord = true;
 
     return true;

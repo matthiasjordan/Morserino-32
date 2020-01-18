@@ -103,7 +103,9 @@ boolean MorseLoRa::menuExec(String mode)
         MorseGenerator::setStart();
         MorseLoRa::receive();
 
-        MorseGenerator::getConfig()->printChar = true;
+        MorseGenerator::Config *genCon =  MorseGenerator::getConfig();
+        genCon->printChar = true;
+        genCon->printCharStyle = BOLD;
     }
     return true;
 }

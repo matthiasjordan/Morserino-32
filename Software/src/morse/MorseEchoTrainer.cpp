@@ -90,7 +90,7 @@ void MorseEchoTrainer::onPreferencesChanged()
     generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
     generatorConfig->printDitDah = false;
     generatorConfig->printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
-    generatorConfig->printLFAfterWord = true;
+    generatorConfig->wordEndMethod = MorseGenerator::LF;
     generatorConfig->printSpaceAfterWord = true;
     generatorConfig->timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
 }
