@@ -349,7 +349,6 @@ boolean internal::menuExec()
 {                                          // return true if we should  leave menu after execution, true if we should stay in menu
     //Serial.println("Executing menu item " + String(MorsePreferences::prefs.menuPtr));
 
-    MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
     MorseDisplay::getConfig()->autoFlush = true;
 
     Koch::setKochActive(false);

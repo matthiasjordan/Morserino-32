@@ -120,7 +120,6 @@ int rxDahLength = 0;
 int rxInterCharacterSpace = 0;
 int rxInterWordSpace = 0;
 
-uint8_t MorseGenerator::effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 boolean MorseGenerator::stopFlag = false;                         // for maxSequence
 
 MorseGenerator::Config generatorConfig;
@@ -188,7 +187,7 @@ void MorseGenerator::loop() {
                 }
                 case MorseGenerator::stop2:
                 {
-                    MorseDisplay::printToScroll(REGULAR, " \n"); // "\n"
+                    MorseDisplay::printToScroll(REGULAR, " |\n"); // "\n"
                     MorseGenerator::autoStopState = MorseGenerator::off;
                     break;
                 }
@@ -241,10 +240,6 @@ void MorseGenerator::setStart()
     Serial.println("MG:sS() 1");
     generatorConfig.key = true;
     generatorConfig.printDitDah = false;
-    generatorConfig.printChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
-            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorseGenerator::effectiveTrainerDisplay == DISPLAY_BY_CHAR)
-            || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY);
-
     generatorConfig.printLFAfterWord = false;
     generatorConfig.printSpaceAfterWord = true;
     generatorConfig.printSpaceAfterChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
@@ -253,9 +248,15 @@ void MorseGenerator::setStart()
     generatorConfig.printCharStyle = MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR;
     generatorConfig.printChar = true;
     generatorConfig.autoStop = false;
-    internal::setStart2();
+    generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
+    generatorConfig.printChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || MorseMachine::isMode(MorseMachine::loraTrx)
+            || (MorseMachine::isMode(MorseMachine::morseGenerator) && generatorConfig.effectiveTrainerDisplay == DISPLAY_BY_CHAR)
+            || (MorseMachine::isMode(MorseMachine::echoTrainer) && MorsePreferences::prefs.echoDisplay != CODE_ONLY);
+
+    internal::setStart2();
 }
+
 
 void internal::setStart2()
 {
@@ -762,14 +763,9 @@ void internal::dispGeneratedChar()
     }
     else
     {
-        Serial.println("Generator: dispGenChar no printChar");
+        Serial.println("Generator: dispGenChar no printChar - would have been " + charString);
     }
 
     MorsePreferences::fireCharSeen(true);
 }
 
-void MorseGenerator::setupHeadCopying()
-{
-    generatorConfig.autoStop = true;
-    effectiveTrainerDisplay = DISPLAY_BY_CHAR;
-}

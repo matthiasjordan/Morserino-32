@@ -36,6 +36,7 @@ namespace MorseGenerator
         boolean printSpaceAfterChar;
         FONT_ATTRIB printCharStyle;
         boolean autoStop; // If to stop after each word in generator modes
+        uint8_t effectiveTrainerDisplay;
     } Config;
 
     extern AutoStopState autoStopState;
