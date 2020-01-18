@@ -146,92 +146,36 @@ void loop()
 {
     int t;
 
-    boolean activeOld = MorseEchoTrainer::active;
     MorseKeyer::checkPaddles();
     switch (MorseMachine::getMode())
     {
-        case MorseMachine::morseKeyer:
+        case MorseMachine::morseKeyer: {
             if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             break;
-        case MorseMachine::loraTrx:
+        }
+        case MorseMachine::loraTrx: {
             if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             MorseGenerator::generateCW();
             break;
-        case MorseMachine::morseTrx:
+        }
+        case MorseMachine::morseTrx: {
             if (MorseKeyer::doPaddleIambic())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             Decoder::doDecodeShow();
             break;
-        case MorseMachine::morseGenerator:
-            if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
-            {                                    // touching a paddle starts and stops the generation of code
-                // for debouncing:
-                while (MorseKeyer::checkPaddles())
-                    ;                                                           // wait until paddles are released
-
-                if (MorseGenerator::effectiveAutoStop)
-                {
-                    MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
-                    switch (MorseGenerator::autoStop)
-                    {
-                        case MorseGenerator::off:
-                        {
-                            break;
-                            //
-                        }
-                        case MorseGenerator::stop1:
-                        {
-                            MorseGenerator::autoStop = MorseGenerator::stop2;
-                            break;
-                        }
-                        case MorseGenerator::stop2:
-                        {
-                            MorseDisplay::printToScroll(REGULAR, " \n"); // "\n"
-                            MorseGenerator::autoStop = MorseGenerator::off;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    MorseEchoTrainer::active = !MorseEchoTrainer::active;
-                    MorseGenerator::autoStop = MorseGenerator::off;
-                }
-
-                //delay(100);
-            } /// end squeeze
-
-            ///// check stopFlag triggered by maxSequence
-            if (MorseGenerator::stopFlag)
-            {
-                MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
-            }
-            if (activeOld != MorseEchoTrainer::active)
-            {
-                if (!MorseEchoTrainer::active)
-                {
-                    MorseGenerator::keyOut(false, true, 0, 0);
-                    MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                }
-                else
-                {
-                    //cleanStartSettings();        
-                    MorseGenerator::generatorState = MorseGenerator::KEY_UP;
-                    MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-                    MorseDisplay::displayTopLine();
-                }
-            }
-            if (MorseEchoTrainer::active)
-                MorseGenerator::generateCW();
+        }
+        case MorseMachine::morseGenerator: {
+            MorseGenerator::loop();
             break;
+        }
         case MorseMachine::echoTrainer:
         {
             if (MorseEchoTrainer::loop())
@@ -240,9 +184,10 @@ void loop()
             }
             break;
         }
-        case MorseMachine::morseDecoder:
+        case MorseMachine::morseDecoder: {
             Decoder::doDecodeShow();
             break;
+        }
         default:
             break;
 

@@ -163,6 +163,73 @@ boolean MorseGenerator::menuExec(String mode)
     return true;
 }
 
+void MorseGenerator::loop() {
+    boolean activeOld = MorseEchoTrainer::active;
+
+    if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
+    {                                    // touching a paddle starts and stops the generation of code
+        // for debouncing:
+        while (MorseKeyer::checkPaddles())
+            ;                                                           // wait until paddles are released
+
+        if (MorseGenerator::effectiveAutoStop)
+        {
+            MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
+            switch (MorseGenerator::autoStop)
+            {
+                case MorseGenerator::off:
+                {
+                    break;
+                    //
+                }
+                case MorseGenerator::stop1:
+                {
+                    MorseGenerator::autoStop = MorseGenerator::stop2;
+                    break;
+                }
+                case MorseGenerator::stop2:
+                {
+                    MorseDisplay::printToScroll(REGULAR, " \n"); // "\n"
+                    MorseGenerator::autoStop = MorseGenerator::off;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            MorseEchoTrainer::active = !MorseEchoTrainer::active;
+            MorseGenerator::autoStop = MorseGenerator::off;
+        }
+
+        //delay(100);
+    } /// end squeeze
+
+    ///// check stopFlag triggered by maxSequence
+    if (MorseGenerator::stopFlag)
+    {
+        MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
+    }
+    if (activeOld != MorseEchoTrainer::active)
+    {
+        if (!MorseEchoTrainer::active)
+        {
+            MorseGenerator::keyOut(false, true, 0, 0);
+            MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+        }
+        else
+        {
+            //cleanStartSettings();
+            MorseGenerator::generatorState = MorseGenerator::KEY_UP;
+            MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
+            MorseDisplay::displayTopLine();
+        }
+    }
+    if (MorseEchoTrainer::active)
+        MorseGenerator::generateCW();
+
+}
+
+
 Config* MorseGenerator::getConfig()
 {
     return &generatorConfig;
