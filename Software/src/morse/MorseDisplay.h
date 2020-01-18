@@ -10,11 +10,16 @@
 namespace MorseDisplay
 {
 
+    typedef struct display_config {
+            boolean autoFlush;
+    } Config;
+
     extern const int8_t maxPos;
     extern int8_t relPos;
     extern uint8_t bottomLine;
 
     void init();
+    Config* getConfig();
     void displayStartUp();
     void displayDisplay();
     void clearDisplay();

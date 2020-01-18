@@ -13,7 +13,7 @@ namespace MorseGenerator
     };
     //   State Machine Defines
 
-    enum AutoStopModes
+    enum AutoStopState
     {
         off, stop1, stop2
     };
@@ -35,9 +35,10 @@ namespace MorseGenerator
         boolean clearBufferBeforPrintChar;
         boolean printSpaceAfterChar;
         FONT_ATTRIB printCharStyle;
+        boolean autoStop; // If to stop after each word in generator modes
     } Config;
 
-    extern AutoStopModes autoStop;
+    extern AutoStopState autoStopState;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
     extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode
@@ -51,12 +52,10 @@ namespace MorseGenerator
     extern uint8_t effectiveTrainerDisplay;
 
     extern boolean stopFlag;                         // for maxSequence
-    extern boolean effectiveAutoStop;                 // If to stop after each word in generator modes
     extern boolean firstTime;                         /// for word doubler mode
 
     void setup();
     void setStart();
-    void setStart(MorseGenerator::Config *config);
     Config* getConfig();
     boolean menuExec(String mode);
     void loop();

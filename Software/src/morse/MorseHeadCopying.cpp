@@ -13,6 +13,9 @@ void MorseHeadCopying::setup()
 
 }
 
+autostop geht nicht
+
+
 boolean MorseHeadCopying::menuExec(String mode)
 {
     if (mode == "a")
@@ -27,7 +30,9 @@ boolean MorseHeadCopying::menuExec(String mode)
         MorsePlayerFile::openAndSkip();
     }
 
+    MorseDisplay::getConfig()->autoFlush = false;
     MorseGenerator::startTrainer();
 
+    MorseGenerator::getConfig()->printLFAfterWord = true;
     return true;
 }

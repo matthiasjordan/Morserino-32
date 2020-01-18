@@ -106,8 +106,7 @@ const byte pool[][2] = {
         {B11110000, 4}   // ch   53  H
 };
 
-AutoStopModes MorseGenerator::autoStop = off;
-boolean MorseGenerator::effectiveAutoStop = false;                 // If to stop after each word in generator modes
+AutoStopState MorseGenerator::autoStopState = off;
 
 unsigned char MorseGenerator::generatorState; // should be MORSE_TYPE instead of uns char
 unsigned long MorseGenerator::genTimer;                         // timer used for generating morse code in trainer mode
@@ -166,16 +165,16 @@ boolean MorseGenerator::menuExec(String mode)
 void MorseGenerator::loop() {
     boolean activeOld = MorseEchoTrainer::active;
 
-    if ((MorseGenerator::autoStop == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
+    if ((MorseGenerator::autoStopState == MorseGenerator::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
     {                                    // touching a paddle starts and stops the generation of code
         // for debouncing:
         while (MorseKeyer::checkPaddles())
             ;                                                           // wait until paddles are released
 
-        if (MorseGenerator::effectiveAutoStop)
+        if (generatorConfig.autoStop)
         {
-            MorseEchoTrainer::active = (MorseGenerator::autoStop == MorseGenerator::off);
-            switch (MorseGenerator::autoStop)
+            MorseEchoTrainer::active = (MorseGenerator::autoStopState == MorseGenerator::off);
+            switch (MorseGenerator::autoStopState)
             {
                 case MorseGenerator::off:
                 {
@@ -184,13 +183,13 @@ void MorseGenerator::loop() {
                 }
                 case MorseGenerator::stop1:
                 {
-                    MorseGenerator::autoStop = MorseGenerator::stop2;
+                    MorseGenerator::autoStopState = MorseGenerator::stop2;
                     break;
                 }
                 case MorseGenerator::stop2:
                 {
                     MorseDisplay::printToScroll(REGULAR, " \n"); // "\n"
-                    MorseGenerator::autoStop = MorseGenerator::off;
+                    MorseGenerator::autoStopState = MorseGenerator::off;
                     break;
                 }
             }
@@ -198,7 +197,7 @@ void MorseGenerator::loop() {
         else
         {
             MorseEchoTrainer::active = !MorseEchoTrainer::active;
-            MorseGenerator::autoStop = MorseGenerator::off;
+            MorseGenerator::autoStopState = MorseGenerator::off;
         }
 
         //delay(100);
@@ -209,6 +208,7 @@ void MorseGenerator::loop() {
     {
         MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
     }
+
     if (activeOld != MorseEchoTrainer::active)
     {
         if (!MorseEchoTrainer::active)
@@ -224,8 +224,9 @@ void MorseGenerator::loop() {
             MorseDisplay::displayTopLine();
         }
     }
-    if (MorseEchoTrainer::active)
+    if (MorseEchoTrainer::active) {
         MorseGenerator::generateCW();
+    }
 
 }
 
@@ -251,6 +252,7 @@ void MorseGenerator::setStart()
     generatorConfig.clearBufferBeforPrintChar = MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     generatorConfig.printCharStyle = MorseMachine::isMode(MorseMachine::loraTrx) ? BOLD : REGULAR;
     generatorConfig.printChar = true;
+    generatorConfig.autoStop = false;
     internal::setStart2();
 
 }
@@ -391,19 +393,20 @@ void MorseGenerator::generateCW()
 
             if (generatorConfig.key)
             {
-                Serial.println("Generator: KEY_DOWN keyOut false");
+//                Serial.println("Generator: KEY_DOWN keyOut false");
                 keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
             }
 
-            Serial.println("Generator: KEY_DOWN CWword: " + CWword);
+//            Serial.println("Generator: KEY_DOWN CWword: " + CWword);
 
             if (CWword.length() == 1)
             {
                 Serial.println("Generator: KEY_DOWN Word end");
                 // we just ended the the word
 
-//                if (MorseMachine::isMode(MorseMachine::morseGenerator))
-//                    autoStop = effectiveAutoStop ? stop1 : off;
+                if (MorseMachine::isMode(MorseMachine::morseGenerator)) {
+                    autoStopState = generatorConfig.autoStop ? stop1 : off;
+                }
 
                 Serial.println("Generator: KEY_DOWN Word end print char?");
                 internal::dispGeneratedChar();
@@ -767,6 +770,6 @@ void internal::dispGeneratedChar()
 
 void MorseGenerator::setupHeadCopying()
 {
-    effectiveAutoStop = true;
+    generatorConfig.autoStop = true;
     effectiveTrainerDisplay = DISPLAY_BY_CHAR;
 }
