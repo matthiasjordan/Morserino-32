@@ -99,14 +99,16 @@ String Koch::getChar(uint8_t maxKochLevel)
 
 String Koch::getRandomChars(int maxLength)
 {
+    Serial.println("Koch:gRC " + String(maxLength));
     String result;
     int endk = MorsePreferences::prefs.kochFilter;                        //              1   5    1    5    2    5    3    5    4    5    5
     for (int i = 0; i < maxLength; ++i)
     {
+        Serial.println("Koch:gRC " + String(maxLength) + " " + String(i));
         if (random(2))                                    // in Koch mode, we generate the last third of the chars learned  a bit more often
-            result = kochChars.charAt(random(2 * endk / 3, endk));
+            result += kochChars.charAt(random(2 * endk / 3, endk));
         else
-            result = kochChars.charAt(random(endk));
+            result += kochChars.charAt(random(endk));
     }
     return result;
 }

@@ -134,7 +134,9 @@ String internal::fetchRandomWord()
     {
         case RANDOMS:
         {
+            Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength));
             word = internal::getRandomChars(MorsePreferences::prefs.randomLength, MorsePreferences::prefs.randomOption);
+            Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength) + " -> " + word);
             break;
         }
         case CALLS:
@@ -206,6 +208,7 @@ String internal::fetchRandomWord()
             break;
         }
     } // end switch (generatorMode)
+    Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength) + " -> returning " + word);
     return word;
 }
 
