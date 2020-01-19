@@ -98,10 +98,10 @@ boolean MorseLoRa::menuExec(String mode)
         MorseDisplay::clear();
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+        MorseKeyer::setup();
         MorseKeyer::clearPaddleLatches();
         MorseKeyer::keyTx = false;
         MorseGenerator::setStart();
-        MorseLoRa::receive();
 
         MorseGenerator::Config *genCon =  MorseGenerator::getConfig();
         genCon->printChar = true;
@@ -110,6 +110,8 @@ boolean MorseLoRa::menuExec(String mode)
 //        genCon->wordEndMethod = MorseGenerator::flush;
 //        genCon->printSpaceAfterWord = true;
         MorseDisplay::getConfig()->autoFlush = true;
+
+        MorseLoRa::receive();
     }
     return true;
 }
