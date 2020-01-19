@@ -54,9 +54,11 @@ namespace MorseKeyer
 
     void updateTimings();
     void keyTransmitter();
+    void unkeyTransmitter();
     boolean doPaddleIambic();
     boolean checkPaddles();
     void clearPaddleLatches();
+    void onPreferencesChanged();
 
 }
 

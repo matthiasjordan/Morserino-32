@@ -169,6 +169,9 @@ void MorseGenerator::onPreferencesChanged()
 {
     Serial.println("MorseGen::oPC 1");
     internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
+
+    MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
+
 }
 
 void internal::handleEffectiveTrainerDisplay(uint8_t mode)
@@ -319,7 +322,6 @@ void MorseGenerator::startTrainer()
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
     MorseDisplay::clearScroll();      // clear the buffer
-    MorseKeyer::keyTx = true;
 }
 
 void MorseGenerator::generateCW()
@@ -752,7 +754,7 @@ void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
             {
                 MorseSound::pwmNoTone();
             }
-            digitalWrite(keyerPin, LOW);      // stop keying Tx
+            MorseKeyer::unkeyTransmitter();
         }
         else
         {                 // not from here

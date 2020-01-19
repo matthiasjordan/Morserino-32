@@ -58,7 +58,7 @@ const MenuItem menuItems[] = {
         {"", _dummy, {0, 0, 0, 0, 0}, MorseText::NA, MorsePreferences::allOptions, true, &internal::nothing, "", 0}, //
 
         {"CW Keyer", _keyer, {0, _goToSleep, _gen, _dummy, 0}, MorseText::NA, MorsePreferences::keyerOptions, true,
-                &MorseKeyer::menuExec, "a", 0}, //
+                &MorseKeyer::menuExec, "a", &MorseKeyer::onPreferencesChanged}, //
 
         {"CW Generator", _gen, {0, _keyer, _echo, _dummy, _genRand}, MorseText::NA, MorsePreferences::generatorOptions, true,
                 &internal::nothing, "", &MorseGenerator::onPreferencesChanged}, //

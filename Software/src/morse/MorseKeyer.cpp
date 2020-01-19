@@ -90,6 +90,13 @@ boolean MorseKeyer::menuExec(String mode)
     return true;
 }
 
+void MorseKeyer::onPreferencesChanged()
+{
+    unsigned char mode = MorsePreferences::prefs.keyTrainerMode;
+    MorseKeyer::keyTx = (mode == 1 || mode == 2);
+
+}
+
 void MorseKeyer::updateTimings()
 {
     ditLength = 1200 / MorsePreferences::prefs.wpm;                    // set new value for length of dits and dahs and other timings
@@ -116,6 +123,11 @@ void MorseKeyer::keyTransmitter()
         Serial.println("MorseKeyer::keyTrans() 4");
         digitalWrite(keyerPin, HIGH);           // turn the LED on, key transmitter, or whatever
     }
+}
+
+void MorseKeyer::unkeyTransmitter()
+{
+    digitalWrite(keyerPin, LOW);      // stop keying Tx
 }
 
 ///////////////////
