@@ -17,6 +17,7 @@ namespace internal
 namespace MorseHeadCopying
 {
     boolean active = false;
+    const MorseGenerator::WordEndMethod wordEndMethod = MorseGenerator::LF;
 }
 
 MorseHeadCopying::AutoStopState autoStopState;
@@ -25,6 +26,7 @@ void MorseHeadCopying::setup()
 {
 
 }
+
 
 boolean MorseHeadCopying::menuExec(String mode)
 {
@@ -66,7 +68,7 @@ void internal::setupHeadCopying()
 {
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
     genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
-    genCon->wordEndMethod = MorseGenerator::LF;
+    genCon->wordEndMethod = MorseHeadCopying::wordEndMethod;
 
 }
 
@@ -87,6 +89,10 @@ boolean MorseHeadCopying::loop()
             Serial.println("MG::loop() 3 replast");
             MorseText::setRepeatLast();
             MorseDisplay::clearScrollBuffer();
+            MorseGenerator::getConfig()->wordEndMethod = MorseGenerator::nothing;
+        }
+        else {
+            MorseGenerator::getConfig()->wordEndMethod = MorseHeadCopying::wordEndMethod;
         }
 
         // for debouncing:

@@ -19,7 +19,7 @@ namespace MorseGenerator
     };
 
     enum WordEndMethod {
-        shrug, LF, flush
+        space, LF, spaceAndFlush, nothing
     };
 
     typedef struct generator_config
