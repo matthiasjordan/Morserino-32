@@ -13,11 +13,6 @@ namespace MorseGenerator
     };
     //   State Machine Defines
 
-    enum AutoStopState
-    {
-        off, stop1, stop2
-    };
-
     enum Timing
     {
         quick, tx, rx
@@ -39,11 +34,8 @@ namespace MorseGenerator
         boolean clearBufferBeforPrintChar;
         boolean printSpaceAfterChar;
         FONT_ATTRIB printCharStyle;
-        boolean autoStop; // If to stop after each word in generator modes
         uint8_t effectiveTrainerDisplay;
     } Config;
-
-    extern AutoStopState autoStopState;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
     extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode

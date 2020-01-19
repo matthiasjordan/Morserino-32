@@ -9,7 +9,7 @@ namespace MorseMachine
     /// the states the morserino can be in - selected in top level menu
     enum morserinoMode
     {
-        morseKeyer, loraTrx, morseTrx, morseGenerator, echoTrainer, morseDecoder, shutDown, measureNF, invalid
+        morseKeyer, loraTrx, morseTrx, morseGenerator, echoTrainer, headCopying, morseDecoder, shutDown, measureNF, invalid
     };
 
     // define modes for state machine of the various modi the encoder can be in

@@ -6,9 +6,18 @@
 
 namespace MorseHeadCopying {
 
+    enum AutoStopState
+    {
+        off, stop1, stop2
+    };
+
+
     void setup();
     boolean menuExec(String mode);
     void setupHeadCopying();
+    boolean loop();
+    void onGeneratorWordEnd();
+
 }
 
 

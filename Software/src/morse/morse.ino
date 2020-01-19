@@ -61,6 +61,7 @@
 #include "decoder.h"
 #include "MorseMenu.h"
 #include "MorseEchoTrainer.h"
+#include "MorseHeadCopying.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
@@ -179,6 +180,14 @@ void loop()
         case MorseMachine::echoTrainer:
         {
             if (MorseEchoTrainer::loop())
+            {
+                return;
+            }
+            break;
+        }
+        case MorseMachine::headCopying:
+        {
+            if (MorseHeadCopying::loop())
             {
                 return;
             }

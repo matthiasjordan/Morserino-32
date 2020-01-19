@@ -41,6 +41,7 @@ MorseText::Config config;
 uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
 boolean nextWordIsEndSequence;
+boolean repeatLast;
 
 void MorseText::start(GEN_TYPE genType)
 {
@@ -68,6 +69,11 @@ void MorseText::setRepeatEach(uint8_t n)
 {
     Serial.println("MorseText::setRepEach " + String(n));
     config.repeatEach = n;
+}
+
+void MorseText::setRepeatLast()
+{
+repeatLast = true;
 }
 
 void MorseText::onPreferencesChanged()
@@ -101,6 +107,10 @@ String MorseText::generateWord()
         result = "+";
         nextWordIsEndSequence = false;
         Serial.println("genWord(): generating end sequence");
+    }
+    else if (repeatLast) {
+        repeatLast = false;
+        result = lastGeneratedWord;
     }
     else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || repetitionsLeft)
     {

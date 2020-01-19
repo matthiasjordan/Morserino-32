@@ -1,8 +1,8 @@
 #ifndef MORSETEXT_H_
 #define MORSETEXT_H_
 
-
-namespace MorseText {
+namespace MorseText
+{
 
     enum GEN_TYPE
     {
@@ -28,7 +28,7 @@ namespace MorseText {
     String getCurrentWord();
     String generateWord();
     void setNextWordIsEndSequence();
+    void setRepeatLast();
 }
-
 
 #endif /* MORSETEXT_H_ */
