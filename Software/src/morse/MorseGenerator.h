@@ -30,7 +30,7 @@ namespace MorseGenerator
     typedef struct generator_config
     {
         boolean sendCWToLoRa;
-        boolean printSpaceAfterWord;
+//        boolean printSpaceAfterWord;
         WordEndMethod wordEndMethod;
         boolean printDitDah;
         boolean printChar;

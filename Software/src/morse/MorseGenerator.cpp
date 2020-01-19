@@ -284,7 +284,7 @@ void MorseGenerator::setStart()
     generatorConfig.key = true;
     generatorConfig.printDitDah = false;
     generatorConfig.wordEndMethod = flush;
-    generatorConfig.printSpaceAfterWord = true;
+//    generatorConfig.printSpaceAfterWord = true;
     generatorConfig.printSpaceAfterChar = false;
     generatorConfig.timing = Timing::tx;
     generatorConfig.clearBufferBeforPrintChar = false;
@@ -342,10 +342,6 @@ void MorseGenerator::generateCW()
             if (CWword.length() == 0)
             {                                               // fetch a new word if we have an empty word
                 Serial.println("genCW() 2 max: " + String(MorsePreferences::prefs.maxSequence) + " wc: " + String(wordCounter));
-                if (generatorConfig.printSpaceAfterWord)
-                {
-                    MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
-                }
 
                 String newWord = "";
 
@@ -379,11 +375,17 @@ void MorseGenerator::generateCW()
 
                 if (CWword.length() == 0)
                 {
+                    Serial.println("MorseGenerator::genrateCW() return because cwword empty");
                     // we really should have something here - unless in trx mode; in this case return
                     return;
                 }
 
                 MorseGenerator::wordCounter += 1;
+
+//                if (generatorConfig.printSpaceAfterWord)
+//                {
+//                    MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+//                }
 
                 switch (generatorConfig.wordEndMethod)
                 {
@@ -396,11 +398,13 @@ void MorseGenerator::generateCW()
                     case flush:
                     {
                         Serial.println("Generator: wordendmeth flush");
+                        MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
                         MorseDisplay::flushScroll();
                         break;
                     }
                     case shrug:
                     {
+                        MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
                         Serial.println("Generator: wordendmeth shrug");
                         break;
                     }
