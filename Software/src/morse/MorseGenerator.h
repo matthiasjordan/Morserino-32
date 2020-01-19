@@ -54,7 +54,7 @@ namespace MorseGenerator
     extern int repeats;
     extern uint8_t wordCounter;                          // for maxSequence
 
-    extern uint8_t effectiveTrainerDisplay;
+//    extern uint8_t effectiveTrainerDisplay;
 
     extern boolean stopFlag;                         // for maxSequence
     extern boolean firstTime;                         /// for word doubler mode
@@ -68,7 +68,7 @@ namespace MorseGenerator
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
     void setupHeadCopying();
-
+    void onPreferencesChanged();
     void setNextWordvvvA(); // to indicate that we want vvvA
     void setSendCWToLoRa(boolean mode);
 

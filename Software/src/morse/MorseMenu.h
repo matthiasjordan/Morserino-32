@@ -2,6 +2,7 @@
 #define MORSEMENU_H_
 
 #include "MorsePreferences.h"
+#include "MorseText.h"
 
 namespace MorseMenu
 {
@@ -57,12 +58,25 @@ namespace MorseMenu
         _goToSleep
     };
 
+    typedef struct menuItem_t
+    {
+            String text;
+            menuNo no;
+            uint8_t nav[5];
+            MorseText::GEN_TYPE generatorMode;
+            MorsePreferences::prefPos *options;
+            boolean remember;
+            boolean (*menufx)(String);
+            String menufxParam;
+            void (*onPreferencesChanged)(); // listener for preferences changed
+    } MenuItem;
+
     void setup();
     void menu_();
     void cleanStartSettings();
 
     boolean isCurrentMenuItem(menuNo test);
-
+    const MenuItem* getCurrentMenuItem();
 }
 
 #endif /* MORSEMENU_H_ */

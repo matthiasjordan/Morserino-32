@@ -138,6 +138,8 @@ namespace internal
     unsigned long getInterwordSpace(MorseGenerator::Config *generatorConfig);
     unsigned long getInterelementSpace(MorseGenerator::Config *generatorConfig);
 
+    void handleEffectiveTrainerDisplay(uint8_t mode);
+
 }
 
 void MorseGenerator::setup()
@@ -158,9 +160,47 @@ boolean MorseGenerator::menuExec(String mode)
     }
 
     MorseGenerator::startTrainer();
-    generatorConfig.printChar = (generatorConfig.effectiveTrainerDisplay == DISPLAY_BY_CHAR);
+    MorseGenerator::onPreferencesChanged();
 
     return true;
+}
+
+void MorseGenerator::onPreferencesChanged()
+{
+    Serial.println("MorseGen::oPC 1");
+    internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
+}
+
+void internal::handleEffectiveTrainerDisplay(uint8_t mode)
+{
+    Serial.println("MorseGen::i::oPC 1");
+    switch (mode)
+    {
+        case DISPLAY_BY_CHAR:
+        {
+            Serial.println("MorseGen::oPC 1 c");
+            generatorConfig.printChar = true;
+            generatorConfig.wordEndMethod = shrug;
+            MorseDisplay::getConfig()->autoFlush = true;
+            break;
+        }
+        case DISPLAY_BY_WORD:
+        {
+            Serial.println("MorseGen::oPC 1 w");
+            generatorConfig.printChar = true;
+            generatorConfig.wordEndMethod = flush;
+            MorseDisplay::getConfig()->autoFlush = false;
+            break;
+        }
+        case NO_DISPLAY:
+        {
+            Serial.println("MorseGen::oPC 1 n");
+            generatorConfig.printChar = false;
+            generatorConfig.wordEndMethod = shrug;
+            MorseDisplay::getConfig()->autoFlush = false;
+            break;
+        }
+    }
 }
 
 void MorseGenerator::loop()
@@ -251,7 +291,9 @@ void MorseGenerator::setStart()
     generatorConfig.printCharStyle = REGULAR;
     generatorConfig.printChar = true;
     generatorConfig.autoStop = false;
-    generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
+//    generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
+
+    internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
 
     internal::setStart2();
 }
@@ -347,16 +389,19 @@ void MorseGenerator::generateCW()
                 {
                     case LF:
                     {
+                        Serial.println("Generator: wordendmeth LF");
                         MorseDisplay::printToScroll(REGULAR, "\n");
                         break;
                     }
                     case flush:
                     {
+                        Serial.println("Generator: wordendmeth flush");
                         MorseDisplay::flushScroll();
                         break;
                     }
                     case shrug:
                     {
+                        Serial.println("Generator: wordendmeth shrug");
                         break;
                     }
                 }

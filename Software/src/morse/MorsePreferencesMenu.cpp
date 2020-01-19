@@ -26,6 +26,7 @@
 #include "MorseSound.h"
 #include "MorseText.h"
 #include "MorseEchoTrainer.h"
+#include "MorseMenu.h"
 
 using namespace MorsePreferencesMenu;
 
@@ -609,15 +610,29 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         switch (MorseUI::modeButton.clicks)
         {
             case -1: {//delay(200);
+                Serial.println("Click -1");
+                const MorseMenu::MenuItem* mi = MorseMenu::getCurrentMenuItem();
+                if (mi->onPreferencesChanged != 0) {
+                    Serial.println("Calling pref changed listener");
+                    mi->onPreferencesChanged();
+                }
                 MorseText::onPreferencesChanged();
-                MorseEchoTrainer::onPreferencesChanged();
+//                MorseEchoTrainer::onPreferencesChanged();
+//                MorseGenerator::onPreferencesChanged();
                 return true;
                 break;
             }
             case 1: { //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
+                Serial.println("Click 1 - save");
                 MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
+                const MorseMenu::MenuItem* mi = MorseMenu::getCurrentMenuItem();
+                if (mi->onPreferencesChanged != 0) {
+                    Serial.println("Calling pref changed listener");
+                    mi->onPreferencesChanged();
+                }
                 MorseText::onPreferencesChanged();
-                MorseEchoTrainer::onPreferencesChanged();
+//                MorseEchoTrainer::onPreferencesChanged();
+//                MorseGenerator::onPreferencesChanged();
                 return false;
             }
         }
