@@ -8,7 +8,7 @@ namespace MorseHeadCopying {
 
     void setup();
     boolean menuExec(String mode);
-
+    void setupHeadCopying();
 }
 
 

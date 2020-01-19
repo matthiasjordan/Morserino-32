@@ -8,26 +8,44 @@
 
 using namespace MorseHeadCopying;
 
+namespace internal {
+    void setupHeadCopying();
+
+}
+
+
 void MorseHeadCopying::setup()
 {
 
 }
 
+
+
 boolean MorseHeadCopying::menuExec(String mode)
 {
+    MorseGenerator::startTrainer();
+    internal::setupHeadCopying();
+
     if (mode == "a")
     {
-        MorseGenerator::setupHeadCopying();
 //        MorsePreferences::currentOptions = MorsePreferences::headOptions;
     }
     else if (mode == "player")
     {
-        MorseGenerator::setupHeadCopying();
 //        MorsePreferences::currentOptions = MorsePreferences::headOptions;
         MorsePlayerFile::openAndSkip();
     }
 
-    MorseGenerator::startTrainer();
+    MorseDisplay::getConfig()->autoFlush = false;
 
     return true;
+}
+
+void internal::setupHeadCopying()
+{
+    MorseGenerator::Config *genCon = MorseGenerator::getConfig();
+    genCon->autoStop = true;
+    genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
+    genCon->wordEndMethod = MorseGenerator::LF;
+
 }

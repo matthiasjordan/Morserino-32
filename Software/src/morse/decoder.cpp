@@ -220,6 +220,8 @@ void Decoder::startDecoder()
     MorseDisplay::displayCWspeed();
     MorseDisplay::displayVolume();
 
+    MorseKeyer::setup();
+
     /// set up variables for Goertzel Morse Decoder
     Decoder::setupGoertzel();
     Decoder::filteredState = Decoder::filteredStateBefore = false;
@@ -294,14 +296,18 @@ boolean internal::checkTone()
 ///// check straight key first before you check audio in.... (unless we are in transceiver mode)
 ///// straight key is connected to external paddle connector (tip), i.e. the same as the left pin (dit normally)
 
+//    Serial.println("Decoder::checkTone() 1");
+
     if (straightKey())
     {
+        Serial.println("Decoder::checkTone() 2");
         realstate = true;
         //Serial.println("Straight Key!");
         //keyTx = true;
     }
     else
     {
+//        Serial.println("Decoder::checkTone() 3");
         realstate = false;
         //keyTx = false;
         for (int index = 0; index < Decoder::goertzel_n; index++)
@@ -360,11 +366,16 @@ boolean internal::checkTone()
         }
     }
     realstatebefore = realstate;
+    Serial.println("Decoder::checkTone() 10");
 
-    if (Decoder::filteredState == Decoder::filteredStateBefore)
+
+    if (Decoder::filteredState == Decoder::filteredStateBefore) {
+        Serial.println("Decoder::checkTone() 11");
         return false;                                 // no change detected in filteredState
+    }
     else
     {
+        Serial.println("Decoder::checkTone() 12");
         Decoder::filteredStateBefore = Decoder::filteredState;
         return true;                                // change detected in filteredState
     }
@@ -375,6 +386,7 @@ void internal::doDecode()
     float lacktime;
     int wpm;
 
+//    Serial.println("Decoder::doDecode() 1");
     switch (decoderState)
     {
         case INTERELEMENT_:

@@ -23,11 +23,14 @@
 #include "MorsePreferences.h"
 #include "MorseSystem.h"
 #include "MorseMachine.h"
-#include "MorseGenerator.h"
+//#include "MorseGenerator.h"
 #include "MorseKeyer.h"
 #include "decoder.h"
 
 using namespace MorseDisplay;
+
+
+MorseDisplay::Config displayConfig;
 
 ////////////////////////////// New scrolling display
 
@@ -108,6 +111,10 @@ void MorseDisplay::displayStartUp()
         MorseDisplay::displayBatteryStatus(volt);
     }
     delay(3000);
+}
+
+MorseDisplay::Config* MorseDisplay::getConfig() {
+    return &displayConfig;
 }
 
 void MorseDisplay::clear()
@@ -203,7 +210,7 @@ FONT_ATTRIB printToScroll_lastStyle = REGULAR;
 
 void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
 {
-    // Serial.printf("printToScroll(%s)\n", text.c_str());
+    Serial.printf("printToScroll(%s)\n", text.c_str());
 
     String SP = " ";
     String SL = "/";
@@ -219,15 +226,15 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     printToScroll_buffer += text;
     printToScroll_lastStyle = style;
 
-    boolean linebreak = text.endsWith("\n");
-    boolean isHeadCopyMode = MorseGenerator::effectiveAutoStop;
-    boolean printToScroll_autoflush = !(MorseMachine::isMode(MorseMachine::morseGenerator) && isHeadCopyMode);
+    boolean linebreak = (text.indexOf("\n") != -1);
+//    boolean isHeadCopyMode = MorseGenerator::effectiveAutoStop;
+//    boolean printToScroll_autoflush = !(MorseMachine::isMode(MorseMachine::morseGenerator) && isHeadCopyMode);
 
     //Serial.println("AUTO: " + String(printToScroll_autoflush));
     //((Serial.println("morseState: " + String(morseState));
-    if (printToScroll_autoflush || linebreak)
+    if (displayConfig.autoFlush || linebreak)
     {
-        //Serial.print("auto/line " + printToScroll_autoflush + SP + linebreak + SP);
+        Serial.println("auto/line " + String(displayConfig.autoFlush) + SP + linebreak + SP);
         flushScroll();
     }
 }
