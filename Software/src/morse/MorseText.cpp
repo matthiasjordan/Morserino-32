@@ -317,7 +317,9 @@ String internal::getRandomCall(int maxLength)
     {
         case 1:
             call += CWchars.charAt(random(0, 26));
-            ++l;
+            call += CWchars.charAt(random(0, 26));
+            l += 2;
+            break;
         case 0:
             call += CWchars.charAt(random(0, 26));
             ++l;
