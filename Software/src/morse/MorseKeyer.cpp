@@ -62,9 +62,10 @@ void MorseKeyer::setup()
 
 boolean MorseKeyer::menuExec(String mode)
 {
+    MorseKeyer::setup();
+
     if (mode == "a")
     {
-        MorseKeyer::setup();
 //        MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
         MorseMachine::morseState = MorseMachine::morseKeyer;
         MorseDisplay::clear();
@@ -102,14 +103,19 @@ void MorseKeyer::updateTimings()
 
 void MorseKeyer::keyTransmitter()
 {
-    if (MorsePreferences::prefs.keyTrainerMode == 0 || MorseMachine::isMode(MorseMachine::echoTrainer)
-            || MorseMachine::isMode(MorseMachine::loraTrx))
-        return;                              // we never key Tx under these conditions
-    if (MorsePreferences::prefs.keyTrainerMode == 1 && MorseMachine::isMode(MorseMachine::morseGenerator))
-        return;                              // we key only in keyer mode; in all other case we key TX
-    if (MorseKeyer::keyTx == false)
-        return;                              // do not key when input is from tone decoder
-    digitalWrite(keyerPin, HIGH);           // turn the LED on, key transmitter, or whatever
+//    Serial.println("MorseKeyer::keyTrans() 1");
+//    if (MorsePreferences::prefs.keyTrainerMode == 0 || MorseMachine::isMode(MorseMachine::echoTrainer)
+//            || MorseMachine::isMode(MorseMachine::loraTrx))
+//        return;                              // we never key Tx under these conditions
+//    Serial.println("MorseKeyer::keyTrans() 2");
+//    if (MorsePreferences::prefs.keyTrainerMode == 1 && MorseMachine::isMode(MorseMachine::morseGenerator))
+//        return;                              // we key only in keyer mode; in all other case we key TX
+//    Serial.println("MorseKeyer::keyTrans() 3");
+    if (MorseKeyer::keyTx == true)
+    {
+        Serial.println("MorseKeyer::keyTrans() 4");
+        digitalWrite(keyerPin, HIGH);           // turn the LED on, key transmitter, or whatever
+    }
 }
 
 ///////////////////
