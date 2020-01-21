@@ -90,6 +90,11 @@ boolean MorseKeyer::menuExec(String mode)
     return true;
 }
 
+boolean MorseKeyer::loop()
+{
+    return MorseKeyer::doPaddleIambic();
+}
+
 void MorseKeyer::onPreferencesChanged()
 {
     unsigned char mode = MorsePreferences::prefs.keyTrainerMode;

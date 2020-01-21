@@ -55,7 +55,7 @@ namespace MorseGenerator
     void setStart();
     Config* getConfig();
     boolean menuExec(String mode);
-    void loop();
+    boolean loop();
     void startTrainer();
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);

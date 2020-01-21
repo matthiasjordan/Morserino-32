@@ -103,7 +103,7 @@ boolean MorseLoRa::menuExec(String mode)
         MorseKeyer::keyTx = false;
         MorseGenerator::setStart();
 
-        MorseGenerator::Config *genCon =  MorseGenerator::getConfig();
+        MorseGenerator::Config *genCon = MorseGenerator::getConfig();
         genCon->printChar = true;
         genCon->printCharStyle = BOLD;
         genCon->printSpaceAfterChar = false;
@@ -114,6 +114,16 @@ boolean MorseLoRa::menuExec(String mode)
         MorseLoRa::receive();
     }
     return true;
+}
+
+boolean MorseLoRa::loop()
+{
+    if (MorseKeyer::doPaddleIambic())
+    {
+        return true;                                                        // we are busy keying and so need a very tight loop !
+    }
+    MorseGenerator::generateCW();
+    return false;
 }
 
 void MorseLoRa::idle()

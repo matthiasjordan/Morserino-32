@@ -210,7 +210,7 @@ void internal::handleEffectiveTrainerDisplay(uint8_t mode)
     }
 }
 
-void MorseGenerator::loop()
+boolean MorseGenerator::loop()
 {
     boolean activeOld = MorseGenerator::active;
 
@@ -251,6 +251,7 @@ void MorseGenerator::loop()
         MorseGenerator::generateCW();
     }
 
+    return false;
 }
 
 Config* MorseGenerator::getConfig()

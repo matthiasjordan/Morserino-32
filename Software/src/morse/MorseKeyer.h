@@ -51,6 +51,7 @@ namespace MorseKeyer
                                       // we use this to decide if Tx should be keyed or not
     void setup();
     boolean menuExec(String mode);
+    boolean loop();
 
     void updateTimings();
     void keyTransmitter();

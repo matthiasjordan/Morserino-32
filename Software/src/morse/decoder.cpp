@@ -208,6 +208,11 @@ boolean Decoder::menuExec(String mode)
     return true;
 }
 
+boolean Decoder::loop() {
+    Decoder::doDecodeShow();
+    return false;
+}
+
 void Decoder::startDecoder()
 {
     Decoder::speedChanged = true;

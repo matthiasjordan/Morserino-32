@@ -62,6 +62,7 @@
 #include "MorseMenu.h"
 #include "MorseEchoTrainer.h"
 #include "MorseHeadCopying.h"
+#include "MorseTrx.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
@@ -150,31 +151,36 @@ void loop()
     MorseKeyer::checkPaddles();
     switch (MorseMachine::getMode())
     {
-        case MorseMachine::morseKeyer: {
-            if (MorseKeyer::doPaddleIambic())
+        case MorseMachine::morseKeyer:
+        {
+            if (MorseKeyer::loop())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
             break;
         }
-        case MorseMachine::loraTrx: {
-            if (MorseKeyer::doPaddleIambic())
+        case MorseMachine::loraTrx:
+        {
+            if (MorseLoRa::loop())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
-            MorseGenerator::generateCW();
             break;
         }
-        case MorseMachine::morseTrx: {
-            if (MorseKeyer::doPaddleIambic())
+        case MorseMachine::morseTrx:
+        {
+            if (MorseTrx::loop())
             {
                 return;                                                        // we are busy keying and so need a very tight loop !
             }
-            Decoder::doDecodeShow();
             break;
         }
-        case MorseMachine::morseGenerator: {
-            MorseGenerator::loop();
+        case MorseMachine::morseGenerator:
+        {
+            if (MorseGenerator::loop())
+            {
+                return;
+            }
             break;
         }
         case MorseMachine::echoTrainer:
@@ -193,8 +199,12 @@ void loop()
             }
             break;
         }
-        case MorseMachine::morseDecoder: {
-            Decoder::doDecodeShow();
+        case MorseMachine::morseDecoder:
+        {
+            if (Decoder::loop())
+            {
+                return;
+            }
             break;
         }
         default:

@@ -8,6 +8,7 @@ namespace MorseLoRa
     void setup();
     boolean menuExec(String mode);
     void idle();
+    boolean loop();
 
     void cwForLora(int element);
     void sendWithLora();

@@ -47,6 +47,8 @@ namespace Decoder
     extern int goertzel_n;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
 
     boolean menuExec(String mode);
+    boolean loop();
+
     void startDecoder();
     void doDecodeShow();
     void setupGoertzel();
