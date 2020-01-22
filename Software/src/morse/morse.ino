@@ -149,69 +149,83 @@ void loop()
     int t;
 
     MorseKeyer::checkPaddles();
-    switch (MorseMachine::getMode())
+
+    MorseMode* m = MorseMenu::getCurrentMenuItem()->mode;
+
+    if (m != 0)
     {
-        case MorseMachine::morseKeyer:
+        Serial.println("main running alternative loop()");
+        if (m->loop())
         {
-            if (MorseKeyer::loop())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            break;
+            return;
         }
-        case MorseMachine::loraTrx:
-        {
-            if (MorseLoRa::loop())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            break;
-        }
-        case MorseMachine::morseTrx:
-        {
-            if (MorseTrx::loop())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            break;
-        }
-        case MorseMachine::morseGenerator:
-        {
-            if (MorseGenerator::loop())
-            {
-                return;
-            }
-            break;
-        }
-        case MorseMachine::echoTrainer:
-        {
-            if (MorseEchoTrainer::loop())
-            {
-                return;
-            }
-            break;
-        }
-        case MorseMachine::headCopying:
-        {
-            if (MorseHeadCopying::loop())
-            {
-                return;
-            }
-            break;
-        }
-        case MorseMachine::morseDecoder:
-        {
-            if (Decoder::loop())
-            {
-                return;
-            }
-            break;
-        }
-        default:
-            break;
+    }
+    else
+    {
 
-    } // end switch and code depending on state of metaMorserino
+        switch (MorseMachine::getMode())
+        {
+            case MorseMachine::morseKeyer:
+            {
+                if (MorseKeyer::loop())
+                {
+                    return;                                                        // we are busy keying and so need a very tight loop !
+                }
+                break;
+            }
+            case MorseMachine::loraTrx:
+            {
+                if (MorseLoRa::loop())
+                {
+                    return;                                                        // we are busy keying and so need a very tight loop !
+                }
+                break;
+            }
+            case MorseMachine::morseTrx:
+            {
+                if (morseModeTrx.loop())
+                {
+                    return;                                                        // we are busy keying and so need a very tight loop !
+                }
+                break;
+            }
+            case MorseMachine::morseGenerator:
+            {
+                if (MorseGenerator::loop())
+                {
+                    return;
+                }
+                break;
+            }
+            case MorseMachine::echoTrainer:
+            {
+                if (MorseEchoTrainer::loop())
+                {
+                    return;
+                }
+                break;
+            }
+            case MorseMachine::headCopying:
+            {
+                if (MorseHeadCopying::loop())
+                {
+                    return;
+                }
+                break;
+            }
+            case MorseMachine::morseDecoder:
+            {
+                if (Decoder::loop())
+                {
+                    return;
+                }
+                break;
+            }
+            default:
+                break;
 
+        } // end switch and code depending on state of metaMorserino
+    }
     // if we have time check for button presses
 
     MorseUI::modeButton.Update();
