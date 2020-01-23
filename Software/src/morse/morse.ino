@@ -62,7 +62,7 @@
 #include "MorseMenu.h"
 #include "MorseEchoTrainer.h"
 #include "MorseHeadCopying.h"
-#include "MorseTrx.h"
+#include "MorseModeTrx.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines

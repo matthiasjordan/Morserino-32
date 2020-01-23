@@ -31,8 +31,8 @@
 #include "MorsePlayerFile.h"
 #include "MorseWifi.h"
 #include "MorseHeadCopying.h"
+#include "MorseModeTrx.h"
 #include "MorseText.h"
-#include "MorseTrx.h"
 
 using namespace MorseMenu;
 

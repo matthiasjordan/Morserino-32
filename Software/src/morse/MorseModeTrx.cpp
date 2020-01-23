@@ -1,4 +1,5 @@
-#include "MorseTrx.h"
+#include "MorseModeTrx.h"
+
 #include "MorseKeyer.h"
 #include "decoder.h"
 #include "MorseMachine.h"

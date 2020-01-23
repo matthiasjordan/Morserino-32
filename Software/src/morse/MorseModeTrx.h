@@ -1,5 +1,5 @@
-#ifndef MORSETRX_H_
-#define MORSETRX_H_
+#ifndef MORSEMODETRX_H_
+#define MORSEMODETRX_H_
 
 #include <Arduino.h>
 #include "MorseMode.h"
@@ -15,5 +15,4 @@ class MorseModeTrx: public MorseMode
 
 extern MorseModeTrx morseModeTrx;
 
-
-#endif /* MORSETRX_H_ */
+#endif /* MORSEMODETRX_H_ */
