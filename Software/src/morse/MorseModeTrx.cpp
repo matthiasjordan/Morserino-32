@@ -7,10 +7,10 @@
 
 MorseModeTrx morseModeTrx;
 
-void MorseModeTrx::setup()
-{
-
-}
+//void MorseModeTrx::setup()
+//{
+//
+//}
 
 boolean MorseModeTrx::menuExec(String mode)
 {

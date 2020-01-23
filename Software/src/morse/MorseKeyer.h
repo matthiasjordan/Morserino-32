@@ -47,11 +47,8 @@ namespace MorseKeyer
     extern unsigned int interWordSpace;   // need to be properly initialised!
     extern unsigned int effWpm;                                // calculated effective speed in WpM
 
-    extern boolean keyTx;             // when state is set by manual key or touch paddle, then true!
-                                      // we use this to decide if Tx should be keyed or not
+    extern boolean keyTx;             // we use this to decide if Tx should be keyed or not
     void setup();
-    boolean menuExec(String mode);
-    boolean loop();
 
     void updateTimings();
     void keyTransmitter();
@@ -59,8 +56,6 @@ namespace MorseKeyer
     boolean doPaddleIambic();
     boolean checkPaddles();
     void clearPaddleLatches();
-    void onPreferencesChanged();
-
 }
 
 #endif /* MORSEKEYER_H_ */

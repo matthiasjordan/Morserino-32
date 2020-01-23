@@ -32,6 +32,7 @@
 #include "MorseWifi.h"
 #include "MorseHeadCopying.h"
 #include "MorseModeTrx.h"
+#include "MorseModeKeyer.h"
 #include "MorseText.h"
 
 using namespace MorseMenu;
@@ -59,7 +60,7 @@ const MenuItem menuItems[] = {
         {"", _dummy, {0, 0, 0, 0, 0}, MorseText::NA, MorsePreferences::allOptions, true, &internal::nothing, "", 0, 0}, //
 
         {"CW Keyer", _keyer, {0, _goToSleep, _gen, _dummy, 0}, MorseText::NA, MorsePreferences::keyerOptions, true,
-                &MorseKeyer::menuExec, "a", &MorseKeyer::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeKeyer}, //
 
         {"CW Generator", _gen, {0, _keyer, _echo, _dummy, _genRand}, MorseText::NA, MorsePreferences::generatorOptions, true,
                 &internal::nothing, "", &MorseGenerator::onPreferencesChanged, 0}, //
@@ -139,7 +140,7 @@ const MenuItem menuItems[] = {
         {"LoRa Trx", _trxLora, {1, _trxIcw, _trxIcw, _trx, 0}, MorseText::NA, MorsePreferences::loraTrxOptions, true,
                 &MorseLoRa::menuExec, "trx", 0, 0}, //
         {"iCW/Ext Trx", _trxIcw, {1, _trxLora, _trxLora, _trx, 0}, MorseText::NA, MorsePreferences::extTrxOptions, true,
-                &MorseKeyer::menuExec, "trx", 0, &morseModeTrx}, //
+                0, "trx", 0, &morseModeTrx}, //
 
         {"CW Decoder", _decode, {0, _trx, _wifi, _dummy, 0}, MorseText::NA, MorsePreferences::decoderOptions, true, &Decoder::menuExec,
                 "a", 0, 0}, //

@@ -63,6 +63,7 @@
 #include "MorseEchoTrainer.h"
 #include "MorseHeadCopying.h"
 #include "MorseModeTrx.h"
+#include "MorseModeKeyer.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
@@ -167,7 +168,7 @@ void loop()
         {
             case MorseMachine::morseKeyer:
             {
-                if (MorseKeyer::loop())
+                if (morseModeKeyer.loop())
                 {
                     return;                                                        // we are busy keying and so need a very tight loop !
                 }

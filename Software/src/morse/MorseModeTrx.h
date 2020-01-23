@@ -7,7 +7,7 @@
 class MorseModeTrx: public MorseMode
 {
     public:
-        void setup();
+//        void setup();
         boolean menuExec(String mode);
         void onPreferencesChanged();
         boolean loop();

@@ -16,7 +16,7 @@ class MorseMode
         MorseMode();
         virtual ~MorseMode() = default;
 
-        virtual void setup() = 0;
+//        virtual void setup() = 0;
         virtual boolean menuExec(String mode) = 0;
         virtual void onPreferencesChanged() = 0;
         virtual boolean loop() = 0;
