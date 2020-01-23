@@ -6,9 +6,6 @@
 
 MorseModeTrx morseModeTrx;
 
-
-
-
 void MorseModeTrx::setup()
 {
 

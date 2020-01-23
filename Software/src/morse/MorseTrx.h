@@ -15,9 +15,5 @@ class MorseModeTrx: public MorseMode
 
 extern MorseModeTrx morseModeTrx;
 
-namespace MorseTrx
-{
-
-}
 
 #endif /* MORSETRX_H_ */
