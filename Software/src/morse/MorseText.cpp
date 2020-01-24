@@ -18,8 +18,8 @@
 #include "koch.h"
 #include "english_words.h"
 #include "abbrev.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorsePlayerFile.h"
-#include "MorseEchoTrainer.h"
 
 using namespace MorseText;
 
@@ -42,9 +42,12 @@ uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
 boolean nextWordIsEndSequence;
 boolean repeatLast;
+void (*MorseText::onGeneratorNewWord)(String);
+
 
 void MorseText::start(GEN_TYPE genType)
 {
+    onGeneratorNewWord = &voidFunction;
     config.generateStartSequence = true;
     config.generatorMode = genType;
     MorseText::onPreferencesChanged();
@@ -127,7 +130,7 @@ String MorseText::generateWord()
         Serial.println("genWord(): generating new word");
         repetitionsLeft = config.repeatEach - 1;
         result = internal::fetchRandomWord();
-        MorseEchoTrainer::onGeneratorNewWord(result);
+        MorseText::onGeneratorNewWord(result);
     }       /// end if else - we either already had something in trainer mode, or we got a new word
 
     lastGeneratedWord = result;

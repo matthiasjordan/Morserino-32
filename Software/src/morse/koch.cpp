@@ -17,7 +17,7 @@
 #include "abbrev.h"
 #include "english_words.h"
 #include "MorseGenerator.h"
-#include "MorseEchoTrainer.h"
+#include "MorseModeEchoTrainer.h"
 
 using namespace Koch;
 
@@ -46,7 +46,7 @@ boolean Koch::menuExec(String mode)
 
     if (mode == "learn")
     {
-        MorseEchoTrainer::startEcho();
+        morseModeEchoTrainer.startEcho();
         generatorConfig->printDitDah = true;
         generatorConfig->printChar = true;
         generatorConfig->printSpaceAfterChar = true;
@@ -61,7 +61,7 @@ boolean Koch::menuExec(String mode)
     else if (mode == "echo")
     {
         Koch::setKochActive(true);
-        MorseEchoTrainer::startEcho();
+        morseModeEchoTrainer.startEcho();
         generatorConfig->printDitDah = false;
     }
 

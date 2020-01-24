@@ -18,23 +18,28 @@ namespace MorseGenerator
         quick, tx, rx
     };
 
-    enum WordEndMethod {
+    enum WordEndMethod
+    {
         space, LF, spaceAndFlush, nothing
     };
 
     typedef struct generator_config
     {
-        boolean sendCWToLoRa;
+            boolean sendCWToLoRa;
 //        boolean printSpaceAfterWord;
-        WordEndMethod wordEndMethod;
-        boolean printDitDah;
-        boolean printChar;
-        Timing timing;
-        boolean key;
-        boolean clearBufferBeforPrintChar;
-        boolean printSpaceAfterChar;
-        FONT_ATTRIB printCharStyle;
-        uint8_t effectiveTrainerDisplay;
+            WordEndMethod wordEndMethod;
+            boolean printDitDah;
+            boolean printChar;
+            Timing timing;
+            boolean key;
+            boolean clearBufferBeforPrintChar;
+            boolean printSpaceAfterChar;
+            FONT_ATTRIB printCharStyle;
+            uint8_t effectiveTrainerDisplay;
+
+            void (*onFetchNewWord)(); // Called when the generator fetches a new word from MorseText
+            unsigned long (*onGeneratorWordEnd)(); // Called when the generator just sent the last character of the word
+            void (*onLastWord)(); // Called when the generator finished the last word
     } Config;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char

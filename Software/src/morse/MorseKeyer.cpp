@@ -18,8 +18,8 @@
 #include "MorseGenerator.h"
 #include "decoder.h"
 #include "MorseLoRa.h"
-#include "MorseEchoTrainer.h"
 #include "MorseDisplay.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorseSound.h"
 
 using namespace MorseKeyer;
@@ -33,7 +33,6 @@ namespace internal
     boolean doPaddleIambic(boolean dit, boolean dah);
     uint8_t readSensors(int left, int right);
     void initSensors();
-
 }
 
 unsigned char MorseKeyer::keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
@@ -53,11 +52,20 @@ unsigned int MorseKeyer::effWpm;                                // calculated ef
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;
 
+boolean (*MorseKeyer::onWordEnd)();
+void (*MorseKeyer::onWordEndDitDah)();
+void (*MorseKeyer::onWordEndNDitDah)();
+
+
+
 void MorseKeyer::setup()
 {
     // to calibrate sensors, we record the values in untouched state
     internal::initSensors();
     MorseKeyer::updateTimings();
+    onWordEnd = &booleanFunctionFalse;
+    onWordEndDitDah = &voidFunction;
+    onWordEndNDitDah = &voidFunction;
 }
 
 void MorseKeyer::updateTimings()
@@ -130,9 +138,8 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
                 }
                 MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
                 Decoder::interWordTimer = 4294967000;  // almost the biggest possible unsigned long number :-) - do not output extra spaces!
-                if (MorseEchoTrainer::isState(MorseEchoTrainer::COMPLETE_ANSWER))
-                {       // change the state of the trainer at end of word
-                    MorseEchoTrainer::setState(MorseEchoTrainer::EVAL_ANSWER);
+                if (MorseKeyer::onWordEnd())
+                {
                     return false;
                 }
             }
@@ -141,10 +148,7 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             if (dit || dah)
             {
                 internal::updatePaddleLatch(dit, dah);  // trigger the paddle latches
-                if (MorseMachine::isMode(MorseMachine::echoTrainer))
-                {      // change the state of the trainer at end of word
-                    MorseEchoTrainer::setState(MorseEchoTrainer::COMPLETE_ANSWER);
-                }
+                MorseKeyer::onWordEndDitDah();
                 Decoder::treeptr = 0;
                 if (dit)
                 {
@@ -159,9 +163,9 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             }
             else
             {
-                if (MorseEchoTrainer::isState(MorseEchoTrainer::GET_ANSWER) && millis() > MorseGenerator::genTimer)
+                if (millis() > MorseGenerator::genTimer)
                 {
-                    MorseEchoTrainer::setState(MorseEchoTrainer::EVAL_ANSWER);
+                    MorseKeyer::onWordEndNDitDah();
                 }
                 return false;           // we return false if there was no paddle press in IDLE STATE - Arduino can do other tasks for a bit
             }
@@ -474,3 +478,12 @@ void internal::initSensors()
     MorsePreferences::prefs.tRight = rUntouched - 9;
 }
 
+
+void MorseKeyer::changeSpeed(int t)
+{
+    MorsePreferences::prefs.wpm += t;
+    MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
+    MorseKeyer::updateTimings();
+    MorseDisplay::displayCWspeed();                     // update display of CW speed
+    MorsePreferences::charCounter = 0;                                    // reset character counter
+}

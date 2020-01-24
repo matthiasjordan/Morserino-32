@@ -12,7 +12,8 @@
  *  If not, see <https://www.gnu.org/licenses/>.
  *****************************************************************************************************************************/
 
-#include "MorseEchoTrainer.h"
+#include "MorseModeEchoTrainer.h"
+
 #include "MorsePreferences.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
@@ -24,35 +25,40 @@
 #include "decoder.h"
 #include "MorseText.h"
 
-using namespace MorseEchoTrainer;
+MorseModeEchoTrainer morseModeEchoTrainer;
 
-String MorseEchoTrainer::echoResponse = "";
-echoStates echoTrainerState;
-boolean MorseEchoTrainer::echoStop = false;                         // for maxSequence
-boolean MorseEchoTrainer::active = false;                           // flag for trainer mode
-String MorseEchoTrainer::echoTrainerWord;
-int MorseEchoTrainer::repeats = 0;
+//String MorseModeEchoTrainer::echoResponse = "";
+//MorseModeEchoTrainer::echoStates echoTrainerState;
+//boolean MorseModeEchoTrainer::echoStop = false;                         // for maxSequence
+//boolean MorseModeEchoTrainer::active = false;                           // flag for trainer mode
+//String MorseModeEchoTrainer::echoTrainerWord;
+//int MorseModeEchoTrainer::repeats = 0;
 
-MorseEchoTrainer::Config metConfig;
+MorseModeEchoTrainer::Config metConfig;
 
-boolean MorseEchoTrainer::menuExec(String mode)
+boolean MorseModeEchoTrainer::menuExec(String mode)
 {
     if (mode == "player")
     {
         MorsePlayerFile::openAndSkip();
     }
-    MorseEchoTrainer::startEcho();
+    MorseModeEchoTrainer::startEcho();
     return true;
 }
 
-void MorseEchoTrainer::startEcho()
+void MorseModeEchoTrainer::startEcho()
 {
     MorseMachine::morseState = MorseMachine::echoTrainer;
-    MorseGenerator::setup();
+    MorseGenerator::setStart();
+
+    Decoder::storeCharInResponse = [](String r)
+    {   morseModeEchoTrainer.storeCharInResponse(r);};
 
     MorseText::proceed();
+    MorseText::onGeneratorNewWord = [](String r)
+    {   morseModeEchoTrainer.onGeneratorNewWord(r);};
 
-    MorseEchoTrainer::echoStop = false;
+    MorseModeEchoTrainer::echoStop = false;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
@@ -62,7 +68,7 @@ void MorseEchoTrainer::startEcho()
     MorseDisplay::displayTopLine();
     MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
     MorseKeyer::keyTx = false;
-    MorseEchoTrainer::onPreferencesChanged();
+    MorseModeEchoTrainer::onPreferencesChanged();
 
     metConfig.showFailedWord = !MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     metConfig.generateStartSequence = false;
@@ -75,9 +81,53 @@ void MorseEchoTrainer::startEcho()
     {
         echoTrainerState = SEND_WORD;
     }
+    MorseModeEchoTrainer::active = false;
+
+    MorseKeyer::setup();
+    MorseKeyer::onWordEnd = []()
+    {
+        return morseModeEchoTrainer.onKeyerWordEnd();
+    };
+    MorseKeyer::onWordEndDitDah = []()
+    {
+        morseModeEchoTrainer.onKeyerWordEndDitDah();
+    };
+    MorseKeyer::onWordEndNDitDah = []()
+    {
+        morseModeEchoTrainer.onKeyerWordEndNDitDah();
+    };
 }
 
-void MorseEchoTrainer::onPreferencesChanged()
+boolean MorseModeEchoTrainer::onKeyerWordEnd()
+{
+    Serial.println("MMET::onKeyerWordEnd()");
+    if (MorseModeEchoTrainer::isState(MorseModeEchoTrainer::COMPLETE_ANSWER))
+    {       // change the state of the trainer at end of word
+        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::EVAL_ANSWER);
+        return false;
+    }
+    return true;
+}
+
+void MorseModeEchoTrainer::onKeyerWordEndDitDah()
+{
+    Serial.println("MMET::onKeyerWordEndDitDah()");
+    if (MorseMachine::isMode(MorseMachine::echoTrainer))
+    {      // change the state of the trainer at end of word
+        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::COMPLETE_ANSWER);
+    }
+}
+
+void MorseModeEchoTrainer::onKeyerWordEndNDitDah()
+{
+    Serial.println("MMET::onKeyerWordEndNDitDah()");
+    if (MorseModeEchoTrainer::isState(MorseModeEchoTrainer::GET_ANSWER))
+    {
+        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::EVAL_ANSWER);
+    }
+}
+
+void MorseModeEchoTrainer::onPreferencesChanged()
 {
     Serial.println("MorseET::oPC");
 
@@ -86,31 +136,44 @@ void MorseEchoTrainer::onPreferencesChanged()
     MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
 
     MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
-    Serial.println("MorseEchoTrainer start edis " + String(MorsePreferences::prefs.echoDisplay));
+    Serial.println("MorseModeEchoTrainer start edis " + String(MorsePreferences::prefs.echoDisplay));
     generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
     generatorConfig->printDitDah = false;
     generatorConfig->printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
     generatorConfig->wordEndMethod = MorseGenerator::LF;
 //    generatorConfig->printSpaceAfterWord = true;
     generatorConfig->timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
+
+    generatorConfig->onFetchNewWord = []()
+    {   morseModeEchoTrainer.onFetchNewWord();};
+    generatorConfig->onLastWord = []()
+    {   morseModeEchoTrainer.onLastWord();};
+    generatorConfig->onGeneratorWordEnd = []()
+    {   return morseModeEchoTrainer.onGeneratorWordEnd();};
 }
 
-boolean MorseEchoTrainer::isState(echoStates state)
+boolean MorseModeEchoTrainer::togglePause()
+{
+    active = !active;
+    return !active;
+}
+
+boolean MorseModeEchoTrainer::isState(echoStates state)
 {
     return echoTrainerState == state;
 }
 
-void MorseEchoTrainer::setState(echoStates newState)
+void MorseModeEchoTrainer::setState(echoStates newState)
 {
     echoTrainerState = newState;
 }
 
-echoStates MorseEchoTrainer::getState()
+MorseModeEchoTrainer::echoStates MorseModeEchoTrainer::getState()
 {
     return echoTrainerState;
 }
 
-void MorseEchoTrainer::storeCharInResponse(String symbol)
+void MorseModeEchoTrainer::storeCharInResponse(String symbol)
 {
     symbol.replace("<as>", "S");
     symbol.replace("<ka>", "A");
@@ -122,7 +185,7 @@ void MorseEchoTrainer::storeCharInResponse(String symbol)
 }
 
 ///////// evaluate the response in Echo Trainer Mode
-void MorseEchoTrainer::echoTrainerEval()
+void MorseModeEchoTrainer::echoTrainerEval()
 {
     delay(MorseKeyer::interCharacterSpace / 2);
     if (echoResponse == echoTrainerWord)
@@ -140,7 +203,9 @@ void MorseEchoTrainer::echoTrainerEval()
         }
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
-            changeSpeed(1);
+        {
+            MorseKeyer::changeSpeed(1);
+        }
         MorseText::proceed();
     }
     else
@@ -161,28 +226,21 @@ void MorseEchoTrainer::echoTrainerEval()
         }
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
-            changeSpeed(-1);
+        {
+            MorseKeyer::changeSpeed(-1);
+        }
     }
     echoResponse = "";
     MorseKeyer::clearPaddleLatches();
 }   // end of function
 
-void MorseEchoTrainer::changeSpeed(int t)
-{
-    MorsePreferences::prefs.wpm += t;
-    MorsePreferences::prefs.wpm = constrain(MorsePreferences::prefs.wpm, 5, 60);
-    MorseKeyer::updateTimings();
-    MorseDisplay::displayCWspeed();                     // update display of CW speed
-    MorsePreferences::charCounter = 0;                                    // reset character counter
-}
-
 /**
  * @return: -1: NOOB,
  */
-unsigned long MorseEchoTrainer::onGeneratorWordEnd()
+unsigned long MorseModeEchoTrainer::onGeneratorWordEnd()
 {
 
-    Serial.println("MET::onGenWordEnd MET::s: " + String(MorseEchoTrainer::getState()));
+    Serial.println("MET::onGenWordEnd MET::s: " + String(MorseModeEchoTrainer::getState()));
 
     if (!MorseMachine::isMode(MorseMachine::echoTrainer))
     {
@@ -191,31 +249,31 @@ unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 
     unsigned long delta = 0;
 
-    switch (MorseEchoTrainer::getState())
+    switch (MorseModeEchoTrainer::getState())
     {
-        case MorseEchoTrainer::START_ECHO:
+        case MorseModeEchoTrainer::START_ECHO:
         {
-            MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
+            MorseModeEchoTrainer::setState(MorseModeEchoTrainer::SEND_WORD);
             delta = MorseKeyer::interCharacterSpace + (MorsePreferences::prefs.promptPause * MorseKeyer::interWordSpace);
             break;
         }
-        case MorseEchoTrainer::REPEAT_WORD:
+        case MorseModeEchoTrainer::REPEAT_WORD:
             // fall through
-        case MorseEchoTrainer::SEND_WORD:
+        case MorseModeEchoTrainer::SEND_WORD:
         {
-            if (MorseEchoTrainer::echoStop)
+            if (MorseModeEchoTrainer::echoStop)
             {
                 break;
             }
             else
             {
-                MorseEchoTrainer::setState(MorseEchoTrainer::GET_ANSWER);
+                MorseModeEchoTrainer::setState(MorseModeEchoTrainer::GET_ANSWER);
                 if (metConfig.showPrompt)
                 {
                     MorseDisplay::printToScroll(REGULAR, " ");
                     MorseDisplay::printToScroll(INVERSE_REGULAR, ">");    /// add a blank after the word on the display
                 }
-                ++MorseEchoTrainer::repeats;
+                ++MorseModeEchoTrainer::repeats;
                 delta = MorsePreferences::prefs.responsePause * MorseKeyer::interWordSpace;
             }
             break;
@@ -230,23 +288,23 @@ unsigned long MorseEchoTrainer::onGeneratorWordEnd()
 
 }
 
-void MorseEchoTrainer::onGeneratorNewWord(String newWord)
+void MorseModeEchoTrainer::onGeneratorNewWord(String newWord)
 {
     Serial.println("MET::onGNW");
-    MorseEchoTrainer::repeats = 0;
-    MorseEchoTrainer::echoTrainerWord = newWord;
+    MorseModeEchoTrainer::repeats = 0;
+    MorseModeEchoTrainer::echoTrainerWord = newWord;
 }
 
-void MorseEchoTrainer::onFetchNewWord()
+void MorseModeEchoTrainer::onFetchNewWord()
 {
     Decoder::interWordTimerOff();
 
-    Serial.println("MET::oFNW() 1 - " + String(MorseEchoTrainer::getState()));
-    if (MorseEchoTrainer::getState() == MorseEchoTrainer::REPEAT_WORD)
+    Serial.println("MET::oFNW() 1 - " + String(MorseModeEchoTrainer::getState()));
+    if (MorseModeEchoTrainer::getState() == MorseModeEchoTrainer::REPEAT_WORD)
     {
-        Serial.println("MET::oFNW() 2 " + String(MorseEchoTrainer::repeats));
+        Serial.println("MET::oFNW() 2 " + String(MorseModeEchoTrainer::repeats));
         if (MorsePreferences::prefs.echoRepeats != MorsePreferences::REPEAT_FOREVER
-                && MorseEchoTrainer::repeats >= MorsePreferences::prefs.echoRepeats)
+                && MorseModeEchoTrainer::repeats >= MorsePreferences::prefs.echoRepeats)
         {
             Serial.println("MET::oFNW() 3");
             if (metConfig.showFailedWord)
@@ -260,58 +318,58 @@ void MorseEchoTrainer::onFetchNewWord()
     }
 }
 
-void MorseEchoTrainer::onLastWord()
+void MorseModeEchoTrainer::onLastWord()
 {
-    MorseEchoTrainer::echoStop = true;
-    if (MorseEchoTrainer::isState(MorseEchoTrainer::REPEAT_WORD))
+    MorseModeEchoTrainer::echoStop = true;
+    if (MorseModeEchoTrainer::isState(MorseModeEchoTrainer::REPEAT_WORD))
     {
-        MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
+        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::SEND_WORD);
     }
 
 }
 
-boolean MorseEchoTrainer::loop()
+boolean MorseModeEchoTrainer::loop()
 {
-//Serial.println("MorseEchoTrainer loop() 1");
+//Serial.println("MorseModeEchoTrainer loop() 1");
     ///// check stopFlag triggered by maxSequence
     if (MorseGenerator::stopFlag)
     {
-        Serial.println("MorseEchoTrainer loop() 2 stopFlag");
-        MorseEchoTrainer::active = MorseGenerator::stopFlag = false;
+        Serial.println("MorseModeEchoTrainer loop() 2 stopFlag");
+        MorseModeEchoTrainer::active = MorseGenerator::stopFlag = false;
         MorseGenerator::keyOut(false, true, 0, 0);
         MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
     }
-    if (!MorseEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
+    if (!MorseModeEchoTrainer::active && (MorseKeyer::leftKey || MorseKeyer::rightKey))
     {                       // touching a paddle starts  the generation of code
-        Serial.println("MorseEchoTrainer loop() 3 paddle hit");
+        Serial.println("MorseModeEchoTrainer loop() 3 paddle hit");
         // for debouncing:
         while (MorseKeyer::checkPaddles())
         {
             ;                                                           // wait until paddles are released
         }
-        MorseEchoTrainer::active = !MorseEchoTrainer::active;
+        MorseModeEchoTrainer::active = !MorseModeEchoTrainer::active;
 
         MorseMenu::cleanStartSettings();
     } /// end touch to start
-    if (MorseEchoTrainer::active)
+    if (MorseModeEchoTrainer::active)
     {
-//        Serial.println("MorseEchoTrainer loop() 4 active");
-        switch (MorseEchoTrainer::getState())
+//        Serial.println("MorseModeEchoTrainer loop() 4 active");
+        switch (MorseModeEchoTrainer::getState())
         {
-            case MorseEchoTrainer::START_ECHO:
-            case MorseEchoTrainer::SEND_WORD:
-            case MorseEchoTrainer::REPEAT_WORD:
-//                Serial.println("MorseEchoTrainer loop() 5 send");
-                MorseEchoTrainer::echoResponse = "";
+            case MorseModeEchoTrainer::START_ECHO:
+            case MorseModeEchoTrainer::SEND_WORD:
+            case MorseModeEchoTrainer::REPEAT_WORD:
+//                Serial.println("MorseModeEchoTrainer loop() 5 send");
+                MorseModeEchoTrainer::echoResponse = "";
                 MorseGenerator::generateCW();
                 break;
-            case MorseEchoTrainer::EVAL_ANSWER:
-                Serial.println("MorseEchoTrainer loop() 6 eval");
-                MorseEchoTrainer::echoTrainerEval();
+            case MorseModeEchoTrainer::EVAL_ANSWER:
+                Serial.println("MorseModeEchoTrainer loop() 6 eval");
+                MorseModeEchoTrainer::echoTrainerEval();
                 break;
-            case MorseEchoTrainer::COMPLETE_ANSWER:
-            case MorseEchoTrainer::GET_ANSWER:
-//                Serial.println("MorseEchoTrainer loop() 7 get answer");
+            case MorseModeEchoTrainer::COMPLETE_ANSWER:
+            case MorseModeEchoTrainer::GET_ANSWER:
+//                Serial.println("MorseModeEchoTrainer loop() 7 get answer");
                 if (MorseKeyer::doPaddleIambic())
                     return true;                             // we are busy keying and so need a very tight loop !
                 break;

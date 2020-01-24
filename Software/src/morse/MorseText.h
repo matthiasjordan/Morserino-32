@@ -16,6 +16,8 @@ namespace MorseText
             GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
     } Config;
 
+    extern void (*onGeneratorNewWord)(String);
+
     void start(GEN_TYPE genType);
     void start(MorseText::Config *config);
 

@@ -21,12 +21,12 @@
 #include "MorseLoRa.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
-#include "MorseEchoTrainer.h"
 #include "decoder.h"
 #include "MorsePlayerFile.h"
 #include "MorseText.h"
 #include "MorseMenu.h"
 #include "MorseHeadCopying.h"
+#include "MorseModeEchoTrainer.h"
 
 using namespace MorseGenerator;
 
@@ -271,6 +271,9 @@ void MorseGenerator::setStart()
     generatorConfig.clearBufferBeforPrintChar = false;
     generatorConfig.printCharStyle = REGULAR;
     generatorConfig.printChar = true;
+    generatorConfig.onFetchNewWord = &voidFunction;
+    generatorConfig.onGeneratorWordEnd = &uLongFunctionMinus1;
+    generatorConfig.onLastWord = &voidFunction;
 //    generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
     internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
@@ -329,7 +332,7 @@ void MorseGenerator::generateCW()
                 {
                     // last word;
                     MorseText::setNextWordIsEndSequence();
-                    MorseEchoTrainer::onLastWord();
+                    generatorConfig.onLastWord();
                     Serial.println("penultimate word");
                 }
                 else if (max && MorseGenerator::wordCounter >= max)
@@ -387,7 +390,8 @@ void MorseGenerator::generateCW()
                         Serial.println("Generator: wordendmeth shrug");
                         break;
                     }
-                    case nothing: {
+                    case nothing:
+                    {
                         Serial.println("Generator: wordendmeth nothing");
                         break;
                     }
@@ -454,7 +458,8 @@ void MorseGenerator::generateCW()
                 internal::dispGeneratedChar();
 
                 Serial.println("Generator: KEY_DOWN Word end call MET::onGenWordEnd");
-                unsigned long delta = MorseEchoTrainer::onGeneratorWordEnd();
+
+                unsigned long delta = generatorConfig.onGeneratorWordEnd();
 
                 if (delta != -1)
                 {
@@ -671,15 +676,12 @@ String internal::fetchNewWord()
     else
     {
         Serial.println("fetchNewWord mode: !lora");
+        generatorConfig.onFetchNewWord();
+
+        // TODO: move into onFetchNewWord()
         if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
         {
-            MorseEchoTrainer::setState(MorseEchoTrainer::SEND_WORD);
-        }
-
-        if (MorseMachine::isMode(MorseMachine::echoTrainer))
-        {
-            Serial.println("fetchNewWord met:ofnw");
-            MorseEchoTrainer::onFetchNewWord();
+            morseModeEchoTrainer.setState(MorseModeEchoTrainer::SEND_WORD);
         }
 
         result = MorseText::generateWord();

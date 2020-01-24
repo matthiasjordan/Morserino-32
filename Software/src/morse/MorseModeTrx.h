@@ -11,6 +11,7 @@ class MorseModeTrx: public MorseMode
         boolean menuExec(String mode);
         void onPreferencesChanged();
         boolean loop();
+        boolean togglePause();
 };
 
 extern MorseModeTrx morseModeTrx;

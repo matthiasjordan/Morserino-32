@@ -19,8 +19,8 @@
 #include "MorseGenerator.h"
 #include "decoder.h"
 #include "MorseLoRa.h"
-#include "MorseEchoTrainer.h"
 #include "MorseDisplay.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorseSound.h"
 
 //using namespace MorseKeyer;
@@ -109,3 +109,7 @@ void MorseModeKeyer::onPreferencesChanged()
     }
 }
 
+boolean MorseModeKeyer::togglePause()
+{
+    return false;
+}

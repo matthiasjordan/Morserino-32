@@ -25,12 +25,12 @@
 #include "MorseRotaryEncoder.h"
 #include "MorseGenerator.h"
 #include "MorseLoRa.h"
-#include "MorseEchoTrainer.h"
 #include "decoder.h"
 #include "MorseMachine.h"
 #include "MorsePlayerFile.h"
 #include "MorseWifi.h"
 #include "MorseHeadCopying.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
 #include "MorseText.h"
@@ -78,19 +78,19 @@ const MenuItem menuItems[] = {
                 &MorseGenerator::menuExec, "player", &MorseGenerator::onPreferencesChanged, 0}, //
 
         {"Echo Trainer", _echo, {0, _gen, _koch, _dummy, _echoRand}, MorseText::NA, MorsePreferences::echoTrainerOptions, true,
-                &internal::nothing, "", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                &internal::nothing, "", 0, 0}, //
         {"Random", _echoRand, {1, _echoPlayer, _echoAbb, _echo, 0}, MorseText::RANDOMS, MorsePreferences::echoTrainerOptions, true,
-                &MorseEchoTrainer::menuExec, "a", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeEchoTrainer}, //
         {"CW Abbrevs", _echoAbb, {1, _echoRand, _echoWords, _echo, 0}, MorseText::ABBREVS, MorsePreferences::echoTrainerOptions, true,
-                &MorseEchoTrainer::menuExec, "a", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeEchoTrainer}, //
         {"English Words", _echoWords, {1, _echoAbb, _echoCalls, _echo, 0}, MorseText::WORDS, MorsePreferences::echoTrainerOptions,
-                true, &MorseEchoTrainer::menuExec, "a", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                true, 0, "a", 0, &morseModeEchoTrainer}, //
         {"Call Signs", _echoCalls, {1, _echoWords, _echoMixed, _echo, 0}, MorseText::CALLS, MorsePreferences::echoTrainerOptions, true,
-                &MorseEchoTrainer::menuExec, "a", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeEchoTrainer}, //
         {"Mixed", _echoMixed, {1, _echoCalls, _echoPlayer, _echo, 0}, MorseText::MIXED, MorsePreferences::echoTrainerOptions, true,
-                &MorseEchoTrainer::menuExec, "a", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeEchoTrainer}, //
         {"File Player", _echoPlayer, {1, _echoMixed, _echoRand, _echo, 0}, MorseText::PLAYER, MorsePreferences::echoPlayerOptions,
-                true, &MorseEchoTrainer::menuExec, "player", &MorseEchoTrainer::onPreferencesChanged, 0}, //
+                true, 0, "player", 0, &morseModeEchoTrainer}, //
 
         {"Koch Trainer", _koch, {0, _echo, _head, _dummy, _kochSel}, MorseText::NA, MorsePreferences::kochEchoOptions, true,
                 &internal::nothing, "", 0, 0}, //
@@ -194,7 +194,6 @@ void MorseMenu::menu_()
     ///updateTimings(); // now done after reading preferences
     MorseLoRa::idle();
     //keyerState = IDLE_STATE;
-    MorseEchoTrainer::active = false;
     //startFirst = true;
     MorseMenu::cleanStartSettings();
     /*

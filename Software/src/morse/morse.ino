@@ -60,8 +60,8 @@
 #include "MorseKeyer.h"
 #include "decoder.h"
 #include "MorseMenu.h"
-#include "MorseEchoTrainer.h"
 #include "MorseHeadCopying.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
 
@@ -155,7 +155,7 @@ void loop()
 
     if (m != 0)
     {
-        Serial.println("main running alternative loop()");
+//        Serial.println("main running alternative loop()");
         if (m->loop())
         {
             return;
@@ -200,7 +200,7 @@ void loop()
             }
             case MorseMachine::echoTrainer:
             {
-                if (MorseEchoTrainer::loop())
+                if (morseModeEchoTrainer.loop())
                 {
                     return;
                 }
@@ -287,19 +287,14 @@ void loop()
             MorseMenu::menu_();
             return;
         case 1:
-            if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
-            {                                       //  start/stop in trainer modi, in others does nothing currently
-                MorseEchoTrainer::active = !MorseEchoTrainer::active;
-                if (!MorseEchoTrainer::active)
-                {
-                    MorseGenerator::keyOut(false, true, 0, 0);
-                    MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                }
-                else
-                {
-                    MorseMenu::cleanStartSettings();
-                }
-
+            if ((m != 0) && m->togglePause())
+            {
+                MorseGenerator::keyOut(false, true, 0, 0);
+                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+            }
+            else
+            {
+                MorseMenu::cleanStartSettings();
             }
             break;
         case 2:
@@ -322,7 +317,7 @@ void loop()
         switch (MorseMachine::encoderState)
         {
             case MorseMachine::speedSettingMode:
-                MorseEchoTrainer::changeSpeed(t);
+                MorseKeyer::changeSpeed(t);
                 break;
             case MorseMachine::volumeSettingMode:
                 MorsePreferences::prefs.sidetoneVolume += (t * 10) + 11;
@@ -350,4 +345,5 @@ void loop()
     MorseSystem::checkShutDown(false);         // check for time out
 
 }     /////////////////////// end of loop() /////////
+
 

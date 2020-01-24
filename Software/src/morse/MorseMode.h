@@ -16,10 +16,20 @@ class MorseMode
         MorseMode();
         virtual ~MorseMode() = default;
 
-//        virtual void setup() = 0;
         virtual boolean menuExec(String mode) = 0;
-        virtual void onPreferencesChanged() = 0;
         virtual boolean loop() = 0;
+
+        /**
+         * returns false, if the mode is paused now.
+         */
+        virtual boolean togglePause() = 0;
+
+        /**
+         * Called when the user changed the preferences.
+         */
+        virtual void onPreferencesChanged() = 0;
+
 };
+
 #endif /* MORSEMODE_H_ */
 

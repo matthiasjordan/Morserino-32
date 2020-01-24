@@ -27,6 +27,7 @@ namespace Decoder
 
     extern boolean filteredState;
     extern boolean filteredStateBefore;
+    extern void (*storeCharInResponse)(String);
 
     /// state machine for decoding CW
     enum DECODER_STATES

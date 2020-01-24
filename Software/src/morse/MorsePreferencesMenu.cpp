@@ -25,8 +25,8 @@
 #include "MorseGenerator.h"
 #include "MorseSound.h"
 #include "MorseText.h"
-#include "MorseEchoTrainer.h"
 #include "MorseMenu.h"
+#include "MorseModeEchoTrainer.h"
 
 using namespace MorsePreferencesMenu;
 

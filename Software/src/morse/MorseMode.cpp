@@ -9,8 +9,6 @@
 
 MorseMode::MorseMode()
 {
-    // TODO Auto-generated constructor stub
-
+    // Nothing
 }
-
 

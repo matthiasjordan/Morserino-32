@@ -19,7 +19,7 @@
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
 #include "MorseDisplay.h"
-#include "MorseEchoTrainer.h"
+#include "MorseModeEchoTrainer.h"
 #include "MorseSound.h"
 
 using namespace Decoder;
@@ -104,6 +104,8 @@ uint8_t wpmDecoded;
 
 boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
+void (*Decoder::storeCharInResponse)(String);
+
 
 DECODER_STATES Decoder::decoderState = LOW_;
 
@@ -215,6 +217,7 @@ boolean Decoder::loop() {
 
 void Decoder::startDecoder()
 {
+    Decoder::storeCharInResponse = 0;
     Decoder::speedChanged = true;
     delay(650);
     MorseDisplay::clear();
@@ -553,9 +556,8 @@ void Decoder::displayMorse()
     symbol = CWtree[treeptr].symb;
     //Serial.println("Symbol: " + symbol + " treeptr: " + String(treeptr));
     MorseDisplay::printToScroll(REGULAR, symbol);
-    if (MorseMachine::isMode(MorseMachine::echoTrainer))
-    {                /// store the character in the response string
-        MorseEchoTrainer::storeCharInResponse(symbol);
+    if (storeCharInResponse != 0) {
+        storeCharInResponse(symbol);
     }
     treeptr = 0;                                    // reset tree pointer
 }   /// end of displayMorse()

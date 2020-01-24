@@ -15,6 +15,7 @@ class MorseModeKeyer: public MorseMode
         boolean menuExec(String mode);
         void onPreferencesChanged();
         boolean loop();
+        boolean togglePause();
 };
 
 extern MorseModeKeyer morseModeKeyer;

@@ -583,3 +583,4 @@ void MorsePreferences::writeWifiInfo(String SSID, String passwd)
     pref.end();
 
 }
+

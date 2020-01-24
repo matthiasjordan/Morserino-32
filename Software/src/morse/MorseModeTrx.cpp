@@ -40,3 +40,7 @@ void MorseModeTrx::onPreferencesChanged()
     Serial.println("MorseModeTrx::onPrefsChanged()");
 }
 
+boolean MorseModeTrx::togglePause()
+{
+    return false;
+}
