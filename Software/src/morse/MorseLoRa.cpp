@@ -42,11 +42,11 @@ uint8_t loRaSerial;                 /// a 6 bit serial number, start with some r
 
 namespace internal
 {
-    void loraSystemSetup();
     void onReceive(int packetSize);
     void storePacket(int rssi, String packet);
     uint8_t loRaBuRead(uint8_t* buIndex);
     uint8_t loRaBuWrite(int rssi, String packet);
+    void loraSystemSetup();
 
 }
 
@@ -86,45 +86,6 @@ void MorseLoRa::setup()
 
 }
 
-boolean MorseLoRa::menuExec(String mode)
-{
-    if (mode == "trx")
-    {
-        MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
-        MorseMachine::morseState = MorseMachine::loraTrx;
-        MorseDisplay::clear();
-        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
-        delay(600);
-        MorseDisplay::clear();
-        MorseDisplay::displayTopLine();
-        MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-        MorseKeyer::setup();
-        MorseKeyer::clearPaddleLatches();
-        MorseKeyer::keyTx = false;
-        MorseGenerator::setStart();
-
-        MorseGenerator::Config *genCon = MorseGenerator::getConfig();
-        genCon->printChar = true;
-        genCon->printCharStyle = BOLD;
-        genCon->printSpaceAfterChar = false;
-//        genCon->wordEndMethod = MorseGenerator::flush;
-//        genCon->printSpaceAfterWord = true;
-        MorseDisplay::getConfig()->autoFlush = true;
-
-        MorseLoRa::receive();
-    }
-    return true;
-}
-
-boolean MorseLoRa::loop()
-{
-    if (MorseKeyer::doPaddleIambic())
-    {
-        return true;                                                        // we are busy keying and so need a very tight loop !
-    }
-    MorseGenerator::generateCW();
-    return false;
-}
 
 void MorseLoRa::idle()
 {

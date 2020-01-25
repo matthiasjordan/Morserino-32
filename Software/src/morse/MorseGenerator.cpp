@@ -678,7 +678,7 @@ String internal::fetchNewWord()
         Serial.println("fetchNewWord mode: !lora");
         generatorConfig.onFetchNewWord();
 
-        // TODO: move into onFetchNewWord()
+        // TODO: move into KochLearn.onFetchNewWord()
         if (MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn))
         {
             morseModeEchoTrainer.setState(MorseModeEchoTrainer::SEND_WORD);

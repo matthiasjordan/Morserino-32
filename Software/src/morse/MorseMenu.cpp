@@ -33,6 +33,7 @@
 #include "MorseModeEchoTrainer.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
+#include "MorseModeLoRa.h"
 #include "MorseText.h"
 
 using namespace MorseMenu;
@@ -138,7 +139,7 @@ const MenuItem menuItems[] = {
         {"Transceiver", _trx, {0, _head, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
                 &internal::nothing, "", 0, 0}, //
         {"LoRa Trx", _trxLora, {1, _trxIcw, _trxIcw, _trx, 0}, MorseText::NA, MorsePreferences::loraTrxOptions, true,
-                &MorseLoRa::menuExec, "trx", 0, 0}, //
+                0, "trx", 0, &morseModeLoRa}, //
         {"iCW/Ext Trx", _trxIcw, {1, _trxLora, _trxLora, _trx, 0}, MorseText::NA, MorsePreferences::extTrxOptions, true,
                 0, "trx", 0, &morseModeTrx}, //
 
