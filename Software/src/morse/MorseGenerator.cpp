@@ -612,33 +612,24 @@ unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorCo
 
 String fetchNewWordFromLoRa()
 {
-    String word;
-    int rssi, rxWpm;
-    uint8_t header = MorseLoRa::decodePacket(&rssi, &rxWpm, &MorseGenerator::CWword);
-    //Serial.println("Header: " + (String) header);
-    //Serial.println("CWword: " + (String) CWword);
-    //Serial.println("Speed: " + (String) rxWpm);
-    if ((header >> 6) != 1)
-    {
-        // invalid protocol version
-        word = "";
+    MorseLoRa::Packet packet = MorseLoRa::decodePacket();
+    Serial.println(packet.toString());
+    if (!packet.valid) {
+        return "";
     }
-    if ((rxWpm < 5) || (rxWpm > 60))
-    {
-        // invalid speed
-        word = "";
-    }
-    word = Decoder::CWwordToClearText(MorseGenerator::CWword);
+
     //Serial.println("clearText: " + (String) clearText);
     //Serial.println("RX Speed: " + (String)rxWpm);
     //Serial.println("RSSI: " + (String)rssi);
-    rxDitLength = 1200 / rxWpm; // set new value for length of dits and dahs and other timings
+    rxDitLength = 1200 / packet.rxWpm; // set new value for length of dits and dahs and other timings
     rxDahLength = 3 * rxDitLength; // calculate the other timing values
     rxInterCharacterSpace = 3 * rxDitLength;
     rxInterWordSpace = 7 * rxDitLength;
-    MorseDisplay::vprintOnStatusLine(true, 4, "%2ir", rxWpm);
+    MorseDisplay::vprintOnStatusLine(true, 4, "%2ir", packet.rxWpm);
     MorseDisplay::printOnStatusLine(true, 9, "s");
-    MorseDisplay::updateSMeter(rssi); // indicate signal strength of new packet
+    MorseDisplay::updateSMeter(packet.rssi); // indicate signal strength of new packet
+
+    String word = Decoder::CWwordToClearText(packet.payload);
     return word;
 }
 
