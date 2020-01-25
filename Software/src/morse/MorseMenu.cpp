@@ -29,8 +29,8 @@
 #include "MorseMachine.h"
 #include "MorsePlayerFile.h"
 #include "MorseWifi.h"
-#include "MorseHeadCopying.h"
 #include "MorseModeEchoTrainer.h"
+#include "MorseModeHeadCopying.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
 #include "MorseModeLoRa.h"
@@ -124,17 +124,17 @@ const MenuItem menuItems[] = {
         {"Head Copying", _head, {0, _koch, _trx, _dummy, _headRand}, MorseText::NA, MorsePreferences::headOptions, true,
                 &internal::nothing, "", 0, 0}, //
         {"Random", _headRand, {1, _headPlayer, _headAbb, _head, 0}, MorseText::RANDOMS, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "a", 0, 0}, //
+                0, "a", 0, &morseModeHeadCopying}, //
         {"CW Abbrevs", _headAbb, {1, _headRand, _headWords, _head, 0}, MorseText::ABBREVS, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "a", 0, 0}, //
+                0, "a", 0, &morseModeHeadCopying}, //
         {"English Words", _headWords, {1, _headAbb, _headCalls, _head, 0}, MorseText::WORDS, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "a", 0, 0}, //
+                0, "a", 0, &morseModeHeadCopying}, //
         {"Call Signs", _headCalls, {1, _headWords, _headMixed, _head, 0}, MorseText::CALLS, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "a", 0, 0}, //
+                0, "a", 0, &morseModeHeadCopying}, //
         {"Mixed", _headMixed, {1, _headCalls, _headPlayer, _head, 0}, MorseText::MIXED, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "a", 0, 0}, //
+                0, "a", 0, &morseModeHeadCopying}, //
         {"File Player", _headPlayer, {1, _headMixed, _headRand, _head, 0}, MorseText::PLAYER, MorsePreferences::headOptions, true,
-                &MorseHeadCopying::menuExec, "player", 0, 0}, //
+                0, "player", 0, &morseModeHeadCopying}, //
 
         {"Transceiver", _trx, {0, _head, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
                 &internal::nothing, "", 0, 0}, //

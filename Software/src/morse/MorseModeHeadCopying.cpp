@@ -1,37 +1,33 @@
-#include "MorseHeadCopying.h"
 #include "MorseGenerator.h"
 #include "MorseMachine.h"
 #include "MorseDisplay.h"
 #include "MorseKeyer.h"
 #include "MorseMenu.h"
+#include "MorseModeHeadCopying.h"
 #include "MorsePlayerFile.h"
 
-using namespace MorseHeadCopying;
 
-namespace internal
-{
-    void setupHeadCopying();
-    void startTrainer();
-}
+MorseModeHeadCopying morseModeHeadCopying;
 
-namespace MorseHeadCopying
-{
-    boolean active = false;
-    const MorseGenerator::WordEndMethod wordEndMethod = MorseGenerator::LF;
-}
 
-MorseHeadCopying::AutoStopState autoStopState;
 
-void MorseHeadCopying::setup()
+
+MorseModeHeadCopying::AutoStopState autoStopState;
+
+void MorseModeHeadCopying::setup()
 {
 
 }
 
 
-boolean MorseHeadCopying::menuExec(String mode)
+boolean MorseModeHeadCopying::menuExec(String mode)
 {
-    internal::startTrainer();
-    internal::setupHeadCopying();
+    startTrainer();
+
+    MorseGenerator::Config *genCon = MorseGenerator::getConfig();
+    genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
+    genCon->wordEndMethod = MorseModeHeadCopying::wordEndMethod;
+    genCon->onGeneratorWordEnd = [](){ return morseModeHeadCopying.onGeneratorWordEnd();};
 
     if (mode == "a")
     {
@@ -49,7 +45,7 @@ boolean MorseHeadCopying::menuExec(String mode)
     return true;
 }
 
-void internal::startTrainer()
+void MorseModeHeadCopying::startTrainer()
 {
     MorseGenerator::setStart();
     MorseMachine::morseState = MorseMachine::headCopying;
@@ -64,24 +60,18 @@ void internal::startTrainer()
     MorseDisplay::clearScroll();      // clear the buffer
 }
 
-void internal::setupHeadCopying()
-{
-    MorseGenerator::Config *genCon = MorseGenerator::getConfig();
-    genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
-    genCon->wordEndMethod = MorseHeadCopying::wordEndMethod;
 
-}
-
-void MorseHeadCopying::onGeneratorWordEnd()
+unsigned long MorseModeHeadCopying::onGeneratorWordEnd()
 {
     autoStopState = stop1;
+    return -1;
 }
 
-boolean MorseHeadCopying::loop()
+boolean MorseModeHeadCopying::loop()
 {
-    boolean activeOld = MorseHeadCopying::active;
+    boolean activeOld = MorseModeHeadCopying::active;
 
-    if ((autoStopState == MorseHeadCopying::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
+    if ((autoStopState == MorseModeHeadCopying::stop1) || MorseKeyer::leftKey || MorseKeyer::rightKey)
     {                                    // touching a paddle starts and stops the generation of code
 
         if (MorseKeyer::leftKey)
@@ -92,30 +82,30 @@ boolean MorseHeadCopying::loop()
             MorseGenerator::getConfig()->wordEndMethod = MorseGenerator::nothing;
         }
         else {
-            MorseGenerator::getConfig()->wordEndMethod = MorseHeadCopying::wordEndMethod;
+            MorseGenerator::getConfig()->wordEndMethod = MorseModeHeadCopying::wordEndMethod;
         }
 
         // for debouncing:
         while (MorseKeyer::checkPaddles())
             ;                                                           // wait until paddles are released
 
-        MorseHeadCopying::active = (autoStopState == MorseHeadCopying::off);
+        MorseModeHeadCopying::active = (autoStopState == MorseModeHeadCopying::off);
         switch (autoStopState)
         {
-            case MorseHeadCopying::off:
+            case MorseModeHeadCopying::off:
             {
                 break;
                 //
             }
-            case MorseHeadCopying::stop1:
+            case MorseModeHeadCopying::stop1:
             {
-                autoStopState = MorseHeadCopying::stop2;
+                autoStopState = MorseModeHeadCopying::stop2;
                 break;
             }
-            case MorseHeadCopying::stop2:
+            case MorseModeHeadCopying::stop2:
             {
                 MorseDisplay::flushScroll();
-                autoStopState = MorseHeadCopying::off;
+                autoStopState = MorseModeHeadCopying::off;
                 break;
             }
         }
@@ -126,12 +116,12 @@ boolean MorseHeadCopying::loop()
     ///// check stopFlag triggered by maxSequence
     if (MorseGenerator::stopFlag)
     {
-        MorseHeadCopying::active = MorseGenerator::stopFlag = false;
+        active = MorseGenerator::stopFlag = false;
     }
 
-    if (activeOld != MorseHeadCopying::active)
+    if (activeOld != active)
     {
-        if (!MorseHeadCopying::active)
+        if (!active)
         {
             MorseGenerator::keyOut(false, true, 0, 0);
             MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
@@ -144,10 +134,19 @@ boolean MorseHeadCopying::loop()
             MorseDisplay::displayTopLine();
         }
     }
-    if (MorseHeadCopying::active)
+    if (active)
     {
         MorseGenerator::generateCW();
     }
 
+    return false;
+}
+
+
+void MorseModeHeadCopying::onPreferencesChanged() {
+
+}
+
+boolean MorseModeHeadCopying::togglePause() {
     return false;
 }

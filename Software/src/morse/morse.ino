@@ -60,8 +60,8 @@
 #include "MorseKeyer.h"
 #include "decoder.h"
 #include "MorseMenu.h"
-#include "MorseHeadCopying.h"
 #include "MorseModeEchoTrainer.h"
+#include "MorseModeHeadCopying.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
 
@@ -169,14 +169,6 @@ void loop()
             case MorseMachine::morseGenerator:
             {
                 if (MorseGenerator::loop())
-                {
-                    return;
-                }
-                break;
-            }
-            case MorseMachine::headCopying:
-            {
-                if (MorseHeadCopying::loop())
                 {
                     return;
                 }

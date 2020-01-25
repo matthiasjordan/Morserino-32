@@ -25,8 +25,8 @@
 #include "MorsePlayerFile.h"
 #include "MorseText.h"
 #include "MorseMenu.h"
-#include "MorseHeadCopying.h"
 #include "MorseModeEchoTrainer.h"
+#include "MorseModeHeadCopying.h"
 
 using namespace MorseGenerator;
 
@@ -452,7 +452,7 @@ void MorseGenerator::generateCW()
                 Serial.println("Generator: KEY_DOWN Word end");
                 // we just ended the the word
 
-                MorseHeadCopying::onGeneratorWordEnd();
+//                MorseHeadCopying::onGeneratorWordEnd();
 
                 Serial.println("Generator: KEY_DOWN Word end print char?");
                 internal::dispGeneratedChar();
