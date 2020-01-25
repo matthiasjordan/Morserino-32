@@ -166,14 +166,6 @@ void loop()
 
         switch (MorseMachine::getMode())
         {
-            case MorseMachine::morseKeyer:
-            {
-                if (morseModeKeyer.loop())
-                {
-                    return;                                                        // we are busy keying and so need a very tight loop !
-                }
-                break;
-            }
             case MorseMachine::loraTrx:
             {
                 if (MorseLoRa::loop())
@@ -182,25 +174,9 @@ void loop()
                 }
                 break;
             }
-            case MorseMachine::morseTrx:
-            {
-                if (morseModeTrx.loop())
-                {
-                    return;                                                        // we are busy keying and so need a very tight loop !
-                }
-                break;
-            }
             case MorseMachine::morseGenerator:
             {
                 if (MorseGenerator::loop())
-                {
-                    return;
-                }
-                break;
-            }
-            case MorseMachine::echoTrainer:
-            {
-                if (morseModeEchoTrainer.loop())
                 {
                     return;
                 }
