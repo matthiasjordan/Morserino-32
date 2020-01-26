@@ -475,7 +475,7 @@ int MorseText::findChar(char c)
 }
 
 
-String MorseText::cleanUpProSigns(String &input)
+String MorseText::internalToProSigns(String &input)
 {
     /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
     input.replace("S", "<as>");
@@ -490,6 +490,20 @@ String MorseText::cleanUpProSigns(String &input)
     return input;
 }
 
+String MorseText::proSignsToInternal(String &s)
+{
+    s.replace("<ar>", "+");
+    s.replace("<bt>", "=");
+    s.replace("<as>", "S");
+    s.replace("<ka>", "K");
+    s.replace("<kn>", "N");
+    s.replace("<sk>", "K");
+    s.replace("<ve>", "E");
+    s.replace("<ch>", "H");
+    s.replace("<sos>", "X");
+    return s;
+}
+
 String MorseText::utf8umlaut(String s)
 { /// replace umtf umlauts with digraphs, and interpret pro signs, written e.g. as [kn] or <kn>
     s.replace("ä", "ae");
@@ -501,14 +515,6 @@ String MorseText::utf8umlaut(String s)
     s.replace("ß", "ss");
     s.replace("[", "<");
     s.replace("]", ">");
-    s.replace("<ar>", "+");
-    s.replace("<bt>", "=");
-    s.replace("<as>", "S");
-    s.replace("<ka>", "K");
-    s.replace("<kn>", "N");
-    s.replace("<sk>", "K");
-    s.replace("<ve>", "E");
-    s.replace("<ch>", "H");
-    s.replace("<sos>", "X");
+    proSignsToInternal(s);
     return s;
 }

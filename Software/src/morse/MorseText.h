@@ -41,7 +41,8 @@ namespace MorseText
     void setRepeatLast();
     int findChar(char c);                                 // at which position is the character in CWchars?
     String utf8umlaut(String s);
-    String cleanUpProSigns(String &input);
+    String internalToProSigns(String &input);
+    String proSignsToInternal(String &input);
 
 }
 

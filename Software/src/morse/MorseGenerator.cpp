@@ -720,7 +720,7 @@ void internal::dispGeneratedChar()
         {
             MorseDisplay::printToScroll(REGULAR, "");                      // clear the buffer first
         }
-        MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseText::cleanUpProSigns(charString));
+        MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseText::internalToProSigns(charString));
         if (generatorConfig.printSpaceAfterChar)
         {
             MorseDisplay::printToScroll(REGULAR, " ");                      // output a space
