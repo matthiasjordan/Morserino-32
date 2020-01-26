@@ -20,13 +20,12 @@ namespace MorseGenerator
 
     enum WordEndMethod
     {
-        space, LF, spaceAndFlush, nothing
+        space, flush, LF, spaceAndFlush, nothing
     };
 
     typedef struct generator_config
     {
             boolean sendCWToLoRa;
-//        boolean printSpaceAfterWord;
             WordEndMethod wordEndMethod;
             boolean printDitDah;
             boolean printChar;

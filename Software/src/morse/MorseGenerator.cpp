@@ -213,40 +213,44 @@ void MorseGenerator::generateCW()
                     return;
                 }
 
-                MorseGenerator::wordCounter += 1;
-
-//                if (generatorConfig.printSpaceAfterWord)
-//                {
-//                    MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
-//                }
-
-                switch (generatorConfig.wordEndMethod)
+                if (wordCounter != 0)
                 {
-                    case LF:
+                    switch (generatorConfig.wordEndMethod)
                     {
-                        Serial.println("Generator: wordendmeth LF");
-                        MorseDisplay::printToScroll(REGULAR, "\n");
-                        break;
-                    }
-                    case spaceAndFlush:
-                    {
-                        Serial.println("Generator: wordendmeth flush");
-                        MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
-                        MorseDisplay::flushScroll();
-                        break;
-                    }
-                    case space:
-                    {
-                        MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
-                        Serial.println("Generator: wordendmeth shrug");
-                        break;
-                    }
-                    case nothing:
-                    {
-                        Serial.println("Generator: wordendmeth nothing");
-                        break;
+                        case LF:
+                        {
+                            Serial.println("Generator: wordendmeth LF");
+                            MorseDisplay::printToScroll(REGULAR, "\n");
+                            break;
+                        }
+                        case flush:
+                        {
+                            Serial.println("Generator: wordendmeth flush");
+                            MorseDisplay::flushScroll();
+                            break;
+                        }
+                        case spaceAndFlush:
+                        {
+                            Serial.println("Generator: wordendmeth spaceAndFlush");
+                            MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+                            MorseDisplay::flushScroll();
+                            break;
+                        }
+                        case space:
+                        {
+                            MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+                            Serial.println("Generator: wordendmeth shrug");
+                            break;
+                        }
+                        case nothing:
+                        {
+                            Serial.println("Generator: wordendmeth nothing");
+                            break;
+                        }
                     }
                 }
+                MorseGenerator::wordCounter += 1;
+
             }
 
             // retrieve next element from CWword; if 0, we were at end of character

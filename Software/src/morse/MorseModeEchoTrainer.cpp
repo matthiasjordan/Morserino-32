@@ -140,7 +140,7 @@ void MorseModeEchoTrainer::onPreferencesChanged()
     generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
     generatorConfig->printDitDah = false;
     generatorConfig->printChar = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
-    generatorConfig->wordEndMethod = MorseGenerator::LF;
+    generatorConfig->wordEndMethod = MorseGenerator::flush;
 //    generatorConfig->printSpaceAfterWord = true;
     generatorConfig->timing = (MorsePreferences::prefs.echoDisplay == DISP_ONLY) ? MorseGenerator::quick : MorseGenerator::tx;
 
@@ -191,7 +191,7 @@ void MorseModeEchoTrainer::echoTrainerEval()
     if (echoResponse == echoTrainerWord)
     {
         echoTrainerState = SEND_WORD;
-        MorseDisplay::printToScroll(BOLD, "OK");
+        MorseDisplay::printToScroll(BOLD, "OK\n");
         if (MorsePreferences::prefs.echoConf)
         {
             MorseSound::pwmTone(440, MorsePreferences::prefs.sidetoneVolume, false);
@@ -215,7 +215,7 @@ void MorseModeEchoTrainer::echoTrainerEval()
         if (!MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || echoResponse != "")
         {
             Serial.println("MET::eTE() 6");
-            MorseDisplay::printToScroll(BOLD, "ERR");
+            MorseDisplay::printToScroll(BOLD, "ERR\n");
             if (MorsePreferences::prefs.echoConf)
             {
                 Serial.println("MET::eTE() 7");
