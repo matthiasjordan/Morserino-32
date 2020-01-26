@@ -35,6 +35,7 @@
 #include "MorseModeKeyer.h"
 #include "MorseModeLoRa.h"
 #include "MorseModeDecoder.h"
+#include "MorseModeGenerator.h"
 #include "MorseText.h"
 
 using namespace MorseMenu;
@@ -65,19 +66,19 @@ const MenuItem menuItems[] = {
                 0, "a", 0, &morseModeKeyer}, //
 
         {"CW Generator", _gen, {0, _keyer, _echo, _dummy, _genRand}, MorseText::NA, MorsePreferences::generatorOptions, true,
-                &internal::nothing, "", &MorseGenerator::onPreferencesChanged, 0}, //
+                &internal::nothing, "", 0, 0}, //
         {"Random", _genRand, {1, _genPlayer, _genAbb, _gen, 0}, MorseText::RANDOMS, MorsePreferences::generatorOptions, true,
-                &MorseGenerator::menuExec, "a", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeGenerator}, //
         {"CW Abbrevs", _genAbb, {1, _genRand, _genWords, _gen, 0}, MorseText::ABBREVS, MorsePreferences::generatorOptions, true,
-                &MorseGenerator::menuExec, "a", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeGenerator}, //
         {"English Words", _genWords, {1, _genAbb, _genCalls, _gen, 0}, MorseText::WORDS, MorsePreferences::generatorOptions, true,
-                &MorseGenerator::menuExec, "a", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeGenerator}, //
         {"Call Signs", _genCalls, {1, _genWords, _genMixed, _gen, 0}, MorseText::CALLS, MorsePreferences::generatorOptions, true,
-                &MorseGenerator::menuExec, "a", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeGenerator}, //
         {"Mixed", _genMixed, {1, _genCalls, _genPlayer, _gen, 0}, MorseText::MIXED, MorsePreferences::generatorOptions, true,
-                &MorseGenerator::menuExec, "a", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "a", 0, &morseModeGenerator}, //
         {"File Player", _genPlayer, {1, _genMixed, _genRand, _gen, 0}, MorseText::PLAYER, MorsePreferences::playerOptions, true,
-                &MorseGenerator::menuExec, "player", &MorseGenerator::onPreferencesChanged, 0}, //
+                0, "player", 0, &morseModeGenerator}, //
 
         {"Echo Trainer", _echo, {0, _gen, _koch, _dummy, _echoRand}, MorseText::NA, MorsePreferences::echoTrainerOptions, true,
                 &internal::nothing, "", 0, 0}, //

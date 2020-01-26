@@ -26,7 +26,6 @@ class MorseModeHeadCopying: public MorseMode
     private:
         boolean active = false;
 
-        void setupHeadCopying();
         unsigned long onGeneratorWordEnd();
         void startTrainer();
 };

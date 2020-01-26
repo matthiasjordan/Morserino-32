@@ -59,15 +59,12 @@ namespace MorseGenerator
     void setup();
     void setStart();
     Config* getConfig();
-    boolean menuExec(String mode);
-    boolean loop();
     void startTrainer();
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
-    void setupHeadCopying();
-    void onPreferencesChanged();
     void setNextWordvvvA(); // to indicate that we want vvvA
     void setSendCWToLoRa(boolean mode);
+    void handleEffectiveTrainerDisplay(uint8_t mode);
 
 }
 

@@ -155,30 +155,13 @@ void loop()
 
     if (m != 0)
     {
-//        Serial.println("main running alternative loop()");
         if (m->loop())
         {
+            // We're in a hurry, so we cut it short
             return;
         }
     }
-    else
-    {
 
-        switch (MorseMachine::getMode())
-        {
-            case MorseMachine::morseGenerator:
-            {
-                if (MorseGenerator::loop())
-                {
-                    return;
-                }
-                break;
-            }
-            default:
-                break;
-
-        } // end switch and code depending on state of metaMorserino
-    }
     // if we have time check for button presses
 
     MorseUI::modeButton.Update();

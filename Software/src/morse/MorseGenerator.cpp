@@ -142,8 +142,6 @@ namespace internal
     unsigned long getInterwordSpace(MorseGenerator::Config *generatorConfig);
     unsigned long getInterelementSpace(MorseGenerator::Config *generatorConfig);
 
-    void handleEffectiveTrainerDisplay(uint8_t mode);
-
 }
 
 void MorseGenerator::setup()
@@ -151,108 +149,6 @@ void MorseGenerator::setup()
     MorseKeyer::setup();
 }
 
-boolean MorseGenerator::menuExec(String mode)
-{
-    if (mode == "a")
-    {
-//        MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
-    }
-    else if (mode == "player")
-    {
-//        MorsePreferences::currentOptions = MorsePreferences::playerOptions;                  // list of available options in player mode
-        MorsePlayerFile::openAndSkip();
-    }
-
-    MorseGenerator::startTrainer();
-    MorseGenerator::onPreferencesChanged();
-
-    return true;
-}
-
-void MorseGenerator::onPreferencesChanged()
-{
-    Serial.println("MorseGen::oPC 1");
-    internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
-
-    MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
-
-}
-
-void internal::handleEffectiveTrainerDisplay(uint8_t mode)
-{
-    Serial.println("MorseGen::i::oPC 1");
-    switch (mode)
-    {
-        case DISPLAY_BY_CHAR:
-        {
-            Serial.println("MorseGen::oPC 1 c");
-            generatorConfig.printChar = true;
-            generatorConfig.wordEndMethod = space;
-            MorseDisplay::getConfig()->autoFlush = true;
-            break;
-        }
-        case DISPLAY_BY_WORD:
-        {
-            Serial.println("MorseGen::oPC 1 w");
-            generatorConfig.printChar = true;
-            generatorConfig.wordEndMethod = spaceAndFlush;
-            MorseDisplay::getConfig()->autoFlush = false;
-            break;
-        }
-        case NO_DISPLAY:
-        {
-            Serial.println("MorseGen::oPC 1 n");
-            generatorConfig.printChar = false;
-            generatorConfig.wordEndMethod = space;
-            MorseDisplay::getConfig()->autoFlush = false;
-            break;
-        }
-    }
-}
-
-boolean MorseGenerator::loop()
-{
-    boolean activeOld = MorseGenerator::active;
-
-    if (MorseKeyer::leftKey || MorseKeyer::rightKey)
-    {                                    // touching a paddle starts and stops the generation of code
-        // for debouncing:
-        while (MorseKeyer::checkPaddles())
-            ;                                                           // wait until paddles are released
-
-        MorseGenerator::active = !MorseGenerator::active;
-
-        //delay(100);
-    } /// end squeeze
-
-    ///// check stopFlag triggered by maxSequence
-    if (MorseGenerator::stopFlag)
-    {
-        MorseGenerator::active = MorseGenerator::stopFlag = false;
-    }
-
-    if (activeOld != MorseGenerator::active)
-    {
-        if (!MorseGenerator::active)
-        {
-            MorseGenerator::keyOut(false, true, 0, 0);
-            MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-        }
-        else
-        {
-            //cleanStartSettings();
-            MorseGenerator::generatorState = MorseGenerator::KEY_UP;
-            MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-            MorseDisplay::displayTopLine();
-        }
-    }
-    if (MorseGenerator::active)
-    {
-        MorseGenerator::generateCW();
-    }
-
-    return false;
-}
 
 Config* MorseGenerator::getConfig()
 {
@@ -276,7 +172,7 @@ void MorseGenerator::setStart()
     generatorConfig.onLastWord = &voidFunction;
 //    generatorConfig.effectiveTrainerDisplay = MorsePreferences::prefs.trainerDisplay;
 
-    internal::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
+    MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
 
     internal::setStart2();
 }
@@ -303,6 +199,44 @@ void MorseGenerator::startTrainer()
     MorseDisplay::displayTopLine();
     MorseDisplay::clearScroll();      // clear the buffer
 }
+
+
+void MorseGenerator::handleEffectiveTrainerDisplay(uint8_t mode)
+{
+    Serial.println("MorseGen::i::oPC 1");
+    MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
+    switch (mode)
+    {
+        case DISPLAY_BY_CHAR:
+        {
+            Serial.println("MorseGen::oPC 1 c");
+            generatorConfig->printChar = true;
+            generatorConfig->wordEndMethod = MorseGenerator::space;
+            MorseDisplay::getConfig()->autoFlush = true;
+            break;
+        }
+        case DISPLAY_BY_WORD:
+        {
+            Serial.println("MorseGen::oPC 1 w");
+            generatorConfig->printChar = true;
+            generatorConfig->wordEndMethod = MorseGenerator::spaceAndFlush;
+            MorseDisplay::getConfig()->autoFlush = false;
+            break;
+        }
+        case NO_DISPLAY:
+        {
+            Serial.println("MorseGen::oPC 1 n");
+            generatorConfig->printChar = false;
+            generatorConfig->wordEndMethod = MorseGenerator::space;
+            MorseDisplay::getConfig()->autoFlush = false;
+            break;
+        }
+    }
+}
+
+
+
+
 
 void MorseGenerator::generateCW()
 {          // this is called from loop() (frequently!)  and generates CW
