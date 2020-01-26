@@ -484,6 +484,15 @@ The functionality is the same as described above for these two functions, with t
 - There is no sub-menu "File Player".
 
 
+=== Head Copying
+
+The ultimate goal of learning CW is not having to jot down every. single. character but to be able to sit on a park bench and operate CW just as other ops operate side band. Understanding CW without any aid is called "head copying" and this mode is aimed at helping master this skill.
+
+It mostly works like the Generator mode concerning preferences. The main difference is that in Head Copying mode the generator will not print the words it sends. Additionally, it stops after each word, giving you the opportunity to guess the word that was just sent. When you decided which word you just heard, you can use the paddles to continue in one of two ways:
+
+* Tapping the left paddle will repeat the word in case you're not super sure and want to copy again.
+* Tapping the right paddle will uncover the word just sent and pause until you tap the right paddle again.
+
 
 === Transceiver
 

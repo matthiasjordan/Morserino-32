@@ -483,6 +483,17 @@ Die Funktionalität ist die gleiche wie oben für diese beiden Funktionen beschr
 
 
 
+=== Head Copying
+
+Das große Ziel beim Morsen-Lernen ist, nicht jeden. einzelnen. Buchstaben. aufschreiben zu müssen, sondern auf einer Parkbank sitzen zu können und genau so CW zu machen, wie andere Leute SSB. CW ohne Hilfsmittel nennt man auch Gehörlesen, oder im Englischen "Head Copying". Dieser Modus soll eine Hilfe sein, Gehörlesen zu lernen.
+
+Der Modus funktionert im Grunde so wieder Generator-Modus hinsichtlich der Optionen. Der Haupt-Unterschied ist, dass bei Head Copying der Generator die Zeichen nicht anzeigt, die er morst, und nach jedem Wort eine Pause macht. Der Benutzer hat dann die Gelegenheit zu überlegen, welches Wort gerade gesendet wurde. Wenn du dich für ein Wort entschieden hast, kannst du mit einer Berührung eines der Paddles weitermachen. Es gibt zwei Möglichkeiten:
+
+* Das linke Paddle wird das zuvor gemorste Wort wiederholen, für den Fall, dass du dir nicht sicher bist, was du gehört hast.
+* Das rechte Paddle deckt das gemorste Wort auf und pausiert, bis du wieder das rechte Paddle antippst.
+
+
+
 === Transceiver
 
 Es gibt zwei Transceiver-Modi im Morserino-32. Der erste ist ein eigenständiger Sender-Empfänger für die Morse-Kommunikation unter Verwendung der LoRa Spread Spectrum Funktechnologie (in der Standardversion im 433-MHz-Band, aber es sind Versionen für die 868- und 920-MHz-Bänder erhältlich). Der andere ist ein Transceiver-Modus, der entweder mit einem externen Transceiver (z.B. einem Kurzwellen-Amateurfunkgerät) oder mit einem Protokoll wie iCW (CW over Internet) verwendet werden kann. In beiden Fällen sind der CW Keyer und der CW Decoder gleichzeitig aktiv.
