@@ -25,8 +25,8 @@
 #include "MorseGenerator.h"
 #include "MorseSound.h"
 #include "MorseText.h"
-#include "MorseEchoTrainer.h"
 #include "MorseMenu.h"
+#include "MorseModeEchoTrainer.h"
 
 using namespace MorsePreferencesMenu;
 
@@ -222,8 +222,7 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
 
 void internal::displayCurtisMode()
 {
-    String keyerModus[] =
-        {"Curtis A    ", "Curtis B    ", "Ultimatic   ", "Non-Squeeze "};
+    String keyerModus[] = {"Curtis A    ", "Curtis B    ", "Ultimatic   ", "Non-Squeeze "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, keyerModus[MorsePreferences::prefs.keyermode - 1]);
 }
 
@@ -241,8 +240,7 @@ void internal::displayCurtisBDotTiming()
 
 void internal::displayACS()
 {
-    String ACSmode[] =
-        {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
+    String ACSmode[] = {"Off         ", "Invalid     ", "min. 2 dots ", "min. 3 dots ", "min. 4 dots "};
     MorseDisplay::printOnScroll(2, REGULAR, 1, ACSmode[MorsePreferences::prefs.ACSlength]);
 }
 
@@ -284,9 +282,8 @@ void internal::displayInterCharSpace()
 
 void internal::displayRandomOption()
 {
-    String texts[] =
-        {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ", "Interp+ProSn",
-                "Alph+Num+Int", "Num+Int+ProS"};
+    String texts[] = {"All Chars   ", "Alpha       ", "Numerals    ", "Interpunct. ", "Pro Signs   ", "Alpha + Num ", "Num+Interp. ",
+            "Interp+ProSn", "Alph+Num+Int", "Num+Int+ProS"};
     MorseDisplay::printOnScroll(2, REGULAR, 1, texts[MorsePreferences::prefs.randomOption]);
 }
 
@@ -609,30 +606,28 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         MorseUI::modeButton.Update();
         switch (MorseUI::modeButton.clicks)
         {
-            case -1: {//delay(200);
+            case -1:
+            {                            //delay(200);
                 Serial.println("Click -1");
-                const MorseMenu::MenuItem* mi = MorseMenu::getCurrentMenuItem();
-                if (mi->onPreferencesChanged != 0) {
-                    Serial.println("Calling pref changed listener");
-                    mi->onPreferencesChanged();
-                }
-                MorseText::onPreferencesChanged();
-//                MorseEchoTrainer::onPreferencesChanged();
-//                MorseGenerator::onPreferencesChanged();
                 return true;
                 break;
             }
-            case 1: { //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
+            case 1:
+            { //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
                 Serial.println("Click 1 - save");
                 MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
                 const MorseMenu::MenuItem* mi = MorseMenu::getCurrentMenuItem();
-                if (mi->onPreferencesChanged != 0) {
+                if (mi->mode != 0)
+                {
+                    Serial.println("Calling alternative pref changed listener");
+                    mi->mode->onPreferencesChanged();
+                }
+                else if (mi->onPreferencesChanged != 0)
+                {
                     Serial.println("Calling pref changed listener");
                     mi->onPreferencesChanged();
                 }
                 MorseText::onPreferencesChanged();
-//                MorseEchoTrainer::onPreferencesChanged();
-//                MorseGenerator::onPreferencesChanged();
                 return false;
             }
         }

@@ -60,7 +60,11 @@
 #include "MorseKeyer.h"
 #include "decoder.h"
 #include "MorseMenu.h"
-#include "MorseEchoTrainer.h"
+#include "MorseModeEchoTrainer.h"
+#include "MorseModeHeadCopying.h"
+#include "MorseModeTrx.h"
+#include "MorseModeKeyer.h"
+#include "MorseModeKoch.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines
@@ -147,51 +151,17 @@ void loop()
     int t;
 
     MorseKeyer::checkPaddles();
-    switch (MorseMachine::getMode())
-    {
-        case MorseMachine::morseKeyer: {
-            if (MorseKeyer::doPaddleIambic())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            break;
-        }
-        case MorseMachine::loraTrx: {
-            if (MorseKeyer::doPaddleIambic())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            MorseGenerator::generateCW();
-            break;
-        }
-        case MorseMachine::morseTrx: {
-            if (MorseKeyer::doPaddleIambic())
-            {
-                return;                                                        // we are busy keying and so need a very tight loop !
-            }
-            Decoder::doDecodeShow();
-            break;
-        }
-        case MorseMachine::morseGenerator: {
-            MorseGenerator::loop();
-            break;
-        }
-        case MorseMachine::echoTrainer:
-        {
-            if (MorseEchoTrainer::loop())
-            {
-                return;
-            }
-            break;
-        }
-        case MorseMachine::morseDecoder: {
-            Decoder::doDecodeShow();
-            break;
-        }
-        default:
-            break;
 
-    } // end switch and code depending on state of metaMorserino
+    MorseMode* m = MorseMenu::getCurrentMenuItem()->mode;
+
+    if (m != 0)
+    {
+        if (m->loop())
+        {
+            // We're in a hurry, so we cut it short
+            return;
+        }
+    }
 
     // if we have time check for button presses
 
@@ -253,19 +223,14 @@ void loop()
             MorseMenu::menu_();
             return;
         case 1:
-            if (MorseMachine::isMode(MorseMachine::morseGenerator) || MorseMachine::isMode(MorseMachine::echoTrainer))
-            {                                       //  start/stop in trainer modi, in others does nothing currently
-                MorseEchoTrainer::active = !MorseEchoTrainer::active;
-                if (!MorseEchoTrainer::active)
-                {
-                    MorseGenerator::keyOut(false, true, 0, 0);
-                    MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
-                }
-                else
-                {
-                    MorseMenu::cleanStartSettings();
-                }
-
+            if ((m != 0) && m->togglePause())
+            {
+                MorseGenerator::keyOut(false, true, 0, 0);
+                MorseDisplay::printOnStatusLine(true, 0, "Continue w/ Paddle");
+            }
+            else
+            {
+                MorseMenu::cleanStartSettings();
             }
             break;
         case 2:
@@ -288,7 +253,7 @@ void loop()
         switch (MorseMachine::encoderState)
         {
             case MorseMachine::speedSettingMode:
-                MorseEchoTrainer::changeSpeed(t);
+                MorseKeyer::changeSpeed(t);
                 break;
             case MorseMachine::volumeSettingMode:
                 MorsePreferences::prefs.sidetoneVolume += (t * 10) + 11;
@@ -316,4 +281,5 @@ void loop()
     MorseSystem::checkShutDown(false);         // check for time out
 
 }     /////////////////////// end of loop() /////////
+
 

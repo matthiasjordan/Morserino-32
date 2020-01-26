@@ -1,8 +1,8 @@
 #ifndef MORSETEXT_H_
 #define MORSETEXT_H_
 
-
-namespace MorseText {
+namespace MorseText
+{
 
     enum GEN_TYPE
     {
@@ -16,6 +16,8 @@ namespace MorseText {
             GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
     } Config;
 
+    extern void (*onGeneratorNewWord)(String);
+
     void start(GEN_TYPE genType);
     void start(MorseText::Config *config);
 
@@ -28,7 +30,7 @@ namespace MorseText {
     String getCurrentWord();
     String generateWord();
     void setNextWordIsEndSequence();
+    void setRepeatLast();
 }
-
 
 #endif /* MORSETEXT_H_ */

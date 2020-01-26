@@ -9,6 +9,12 @@
 namespace MorseKeyer
 {
 
+    struct OnWordEndHandler
+    {
+            virtual ~OnWordEndHandler() = default;
+            virtual boolean handle() = 0;
+    };
+
 #define    IAMBICA      1
 // Curtis Mode A
 #define    IAMBICB      2
@@ -47,10 +53,14 @@ namespace MorseKeyer
     extern unsigned int interWordSpace;   // need to be properly initialised!
     extern unsigned int effWpm;                                // calculated effective speed in WpM
 
-    extern boolean keyTx;             // when state is set by manual key or touch paddle, then true!
-                                      // we use this to decide if Tx should be keyed or not
+    extern boolean keyTx;             // we use this to decide if Tx should be keyed or not
+
+    extern boolean (*onWordEnd)();
+    extern void (*onWordEndDitDah)();
+    extern void (*onWordEndNDitDah)();
+//    extern OnWordEndHandler *onWordEndHandler;
+
     void setup();
-    boolean menuExec(String mode);
 
     void updateTimings();
     void keyTransmitter();
@@ -58,8 +68,7 @@ namespace MorseKeyer
     boolean doPaddleIambic();
     boolean checkPaddles();
     void clearPaddleLatches();
-    void onPreferencesChanged();
-
+    void changeSpeed(int t);
 }
 
 #endif /* MORSEKEYER_H_ */

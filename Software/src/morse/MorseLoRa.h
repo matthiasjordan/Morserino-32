@@ -1,18 +1,30 @@
 #ifndef MORSELORA_H_
 #define MORSELORA_H_
 
-
 namespace MorseLoRa
 {
 
+    typedef struct
+    {
+            uint8_t protocolVersion;
+            int rssi;
+            int rxWpm;
+            String payload;
+            boolean valid = true;
+
+            String toString() {
+                return String((valid ? "ok" : "err")) + String(" ") + String(protocolVersion) + " " + String(rssi) + " " + String(rxWpm) + " : " + payload;
+            }
+    } Packet;
+
     void setup();
-    boolean menuExec(String mode);
     void idle();
 
     void cwForLora(int element);
     void sendWithLora();
     boolean loRaBuReady();
-    uint8_t decodePacket(int* rssi, int* wpm, String* cwword);
+//    uint8_t decodePacket(int* rssi, int* wpm, String* cwword);
+    Packet decodePacket();
     void receive();
 }
 

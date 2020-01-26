@@ -27,6 +27,7 @@ namespace Decoder
 
     extern boolean filteredState;
     extern boolean filteredStateBefore;
+    extern void (*storeCharInResponse)(String);
 
     /// state machine for decoding CW
     enum DECODER_STATES
@@ -46,7 +47,7 @@ namespace Decoder
     extern unsigned long interWordTimer;      // timer to detect interword spaces
     extern int goertzel_n;   //// you can use:         152, 304, 456 or 608 - thats the max buffer reserved in checktone()
 
-    boolean menuExec(String mode);
+
     void startDecoder();
     void doDecodeShow();
     void setupGoertzel();

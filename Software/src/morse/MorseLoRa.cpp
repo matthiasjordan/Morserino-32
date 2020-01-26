@@ -42,12 +42,12 @@ uint8_t loRaSerial;                 /// a 6 bit serial number, start with some r
 
 namespace internal
 {
-    void loraSystemSetup();
     void onReceive(int packetSize);
     void storePacket(int rssi, String packet);
     uint8_t loRaBuRead(uint8_t* buIndex);
     uint8_t loRaBuWrite(int rssi, String packet);
-
+    void loraSystemSetup();
+    uint8_t decodePacket(int* rssi, int* wpm, String* cwword);
 }
 
 void MorseLoRa::setup()
@@ -84,36 +84,6 @@ void MorseLoRa::setup()
     /// initialise the serial number
     loRaSerial = random(64);
 
-}
-
-boolean MorseLoRa::menuExec(String mode)
-{
-    if (mode == "trx")
-    {
-        MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
-        MorseMachine::morseState = MorseMachine::loraTrx;
-        MorseDisplay::clear();
-        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
-        delay(600);
-        MorseDisplay::clear();
-        MorseDisplay::displayTopLine();
-        MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-        MorseKeyer::setup();
-        MorseKeyer::clearPaddleLatches();
-        MorseKeyer::keyTx = false;
-        MorseGenerator::setStart();
-
-        MorseGenerator::Config *genCon =  MorseGenerator::getConfig();
-        genCon->printChar = true;
-        genCon->printCharStyle = BOLD;
-        genCon->printSpaceAfterChar = false;
-//        genCon->wordEndMethod = MorseGenerator::flush;
-//        genCon->printSpaceAfterWord = true;
-        MorseDisplay::getConfig()->autoFlush = true;
-
-        MorseLoRa::receive();
-    }
-    return true;
 }
 
 void MorseLoRa::idle()
@@ -319,13 +289,39 @@ void internal::storePacket(int rssi, String packet)
         Serial.println("LoRa Buffer full");
 }
 
+MorseLoRa::Packet MorseLoRa::decodePacket()
+{
+    Serial.println("MorseLoRa::decodePacket()");
+    MorseLoRa::Packet packet;
+
+    uint8_t header = internal::decodePacket(&packet.rssi, &packet.rxWpm, &packet.payload);
+    //Serial.println("Header: " + (String) header);
+    //Serial.println("CWword: " + (String) CWword);
+    //Serial.println("Speed: " + (String) rxWpm);
+    packet.protocolVersion = (header >> 6);
+    if (packet.protocolVersion != CWLORAVERSION)
+    {
+        // invalid protocol version
+        packet.valid = false;
+        packet.payload = "";
+    }
+    if ((packet.rxWpm < 5) || (packet.rxWpm > 60))
+    {
+        // invalid speed
+        packet.valid = false;
+        packet.payload = "";
+    }
+
+    return packet;
+}
+
 /// decodePacket analyzes packet as received and stored in buffer
 /// returns the header byte (protocol version*64 + 6bit packet serial number
 //// byte 0 (added by receiver): RSSI
 //// byte 1: header; first two bits are the protocol version (curently 01), plus 6 bit packet serial number (starting from random)
 //// byte 2: first 6 bits are wpm (must be between 5 and 60; values 00 - 04 and 61 to 63 are invalid), the remaining 2 bits are already data payload!
 
-uint8_t MorseLoRa::decodePacket(int* rssi, int* wpm, String* cwword)
+uint8_t internal::decodePacket(int* rssi, int* wpm, String* cwword)
 {
     uint8_t l, c, header = 0;
     uint8_t index = 0;

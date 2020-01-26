@@ -3,6 +3,7 @@
 
 #include "MorsePreferences.h"
 #include "MorseText.h"
+#include "MorseMode.h"
 
 namespace MorseMenu
 {
@@ -69,6 +70,7 @@ namespace MorseMenu
             boolean (*menufx)(String);
             String menufxParam;
             void (*onPreferencesChanged)(); // listener for preferences changed
+            MorseMode *mode;
     } MenuItem;
 
     void setup();

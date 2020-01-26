@@ -153,7 +153,6 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 
 ///////////////////////////////////////// END OF HARDWARE DEFS ////////////////////////////////////////////////////////////////////
 
-#endif
 
 #define SizeOfArray(x)       (sizeof(x) / sizeof(x[0]))
 
@@ -161,3 +160,10 @@ const int modeButtonPin = 37;    // input pin for mode button - needs external p
 #define _min(a,b) ((a)<(b)?(a):(b))
 #define _max(a,b) ((a)>(b)?(a):(b))
 #define uconstrain(amt,high) (amt)>(high)?(high):(amt)
+
+void voidFunction();
+unsigned long uLongFunctionMinus1();
+boolean booleanFunctionFalse();
+void voidFunction(String s);
+
+#endif

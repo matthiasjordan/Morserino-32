@@ -13,37 +13,34 @@ namespace MorseGenerator
     };
     //   State Machine Defines
 
-    enum AutoStopState
-    {
-        off, stop1, stop2
-    };
-
     enum Timing
     {
         quick, tx, rx
     };
 
-    enum WordEndMethod {
-        shrug, LF, flush
+    enum WordEndMethod
+    {
+        space, LF, spaceAndFlush, nothing
     };
 
     typedef struct generator_config
     {
-        boolean sendCWToLoRa;
+            boolean sendCWToLoRa;
 //        boolean printSpaceAfterWord;
-        WordEndMethod wordEndMethod;
-        boolean printDitDah;
-        boolean printChar;
-        Timing timing;
-        boolean key;
-        boolean clearBufferBeforPrintChar;
-        boolean printSpaceAfterChar;
-        FONT_ATTRIB printCharStyle;
-        boolean autoStop; // If to stop after each word in generator modes
-        uint8_t effectiveTrainerDisplay;
-    } Config;
+            WordEndMethod wordEndMethod;
+            boolean printDitDah;
+            boolean printChar;
+            Timing timing;
+            boolean key;
+            boolean clearBufferBeforPrintChar;
+            boolean printSpaceAfterChar;
+            FONT_ATTRIB printCharStyle;
+            uint8_t effectiveTrainerDisplay;
 
-    extern AutoStopState autoStopState;
+            void (*onFetchNewWord)(); // Called when the generator fetches a new word from MorseText
+            unsigned long (*onGeneratorWordEnd)(); // Called when the generator just sent the last character of the word
+            void (*onLastWord)(); // Called when the generator finished the last word
+    } Config;
 
     extern unsigned char generatorState; // should be MORSE_TYPE instead of uns char
     extern unsigned long genTimer;                         // timer used for generating morse code in trainer mode
@@ -62,15 +59,12 @@ namespace MorseGenerator
     void setup();
     void setStart();
     Config* getConfig();
-    boolean menuExec(String mode);
-    void loop();
     void startTrainer();
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
-    void setupHeadCopying();
-    void onPreferencesChanged();
     void setNextWordvvvA(); // to indicate that we want vvvA
     void setSendCWToLoRa(boolean mode);
+    void handleEffectiveTrainerDisplay(uint8_t mode);
 
 }
 
