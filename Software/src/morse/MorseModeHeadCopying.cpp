@@ -80,6 +80,7 @@ boolean MorseModeHeadCopying::loop()
             MorseText::setRepeatLast();
             MorseDisplay::clearScrollBuffer();
             MorseGenerator::getConfig()->wordEndMethod = MorseGenerator::nothing;
+            autoStopState = off;
         }
         else {
             MorseGenerator::getConfig()->wordEndMethod = MorseModeHeadCopying::wordEndMethod;
