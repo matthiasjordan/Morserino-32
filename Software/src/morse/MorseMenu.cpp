@@ -34,6 +34,7 @@
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
 #include "MorseModeLoRa.h"
+#include "MorseModeDecoder.h"
 #include "MorseText.h"
 
 using namespace MorseMenu;
@@ -143,8 +144,8 @@ const MenuItem menuItems[] = {
         {"iCW/Ext Trx", _trxIcw, {1, _trxLora, _trxLora, _trx, 0}, MorseText::NA, MorsePreferences::extTrxOptions, true,
                 0, "trx", 0, &morseModeTrx}, //
 
-        {"CW Decoder", _decode, {0, _trx, _wifi, _dummy, 0}, MorseText::NA, MorsePreferences::decoderOptions, true, &Decoder::menuExec,
-                "a", 0, 0}, //
+        {"CW Decoder", _decode, {0, _trx, _wifi, _dummy, 0}, MorseText::NA, MorsePreferences::decoderOptions, true, 0,
+                "a", 0, &morseModeDecoder}, //
 
         {"WiFi Functions", _wifi, {0, _decode, _goToSleep, _dummy, _wifi_mac}, MorseText::NA, MorsePreferences::noOptions, false,
                 &internal::nothing, "", 0, 0}, //

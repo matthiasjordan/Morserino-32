@@ -12,10 +12,10 @@ class MorseModeKeyer: public MorseMode
 {
     public:
 //        void setup();
-        boolean menuExec(String mode);
-        void onPreferencesChanged();
-        boolean loop();
-        boolean togglePause();
+        boolean menuExec(String mode) override;
+        void onPreferencesChanged() override;
+        boolean loop() override;
+        boolean togglePause() override;
 };
 
 extern MorseModeKeyer morseModeKeyer;

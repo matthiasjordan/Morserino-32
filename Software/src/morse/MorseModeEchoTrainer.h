@@ -14,10 +14,10 @@ class MorseModeEchoTrainer: public MorseMode
                 boolean showFailedWord;
         } Config;
 
-        boolean menuExec(String mode);
-        void onPreferencesChanged();
-        boolean loop();
-        boolean togglePause();
+        boolean menuExec(String mode) override;
+        void onPreferencesChanged() override;
+        boolean loop() override;
+        boolean togglePause() override;
         void onFetchNewWord();
         void startEcho();
 

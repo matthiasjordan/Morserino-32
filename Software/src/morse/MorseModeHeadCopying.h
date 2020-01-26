@@ -18,10 +18,10 @@ class MorseModeHeadCopying: public MorseMode
         const MorseGenerator::WordEndMethod wordEndMethod = MorseGenerator::LF;
 
         void setup();
-        boolean menuExec(String mode);
-        boolean loop();
-        void onPreferencesChanged();
-        boolean togglePause();
+        boolean menuExec(String mode) override;
+        boolean loop() override;
+        void onPreferencesChanged() override;
+        boolean togglePause() override;
 
     private:
         boolean active = false;

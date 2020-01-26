@@ -174,14 +174,6 @@ void loop()
                 }
                 break;
             }
-            case MorseMachine::morseDecoder:
-            {
-                if (Decoder::loop())
-                {
-                    return;
-                }
-                break;
-            }
             default:
                 break;
 

@@ -197,24 +197,6 @@ void Decoder::setupGoertzel()
     coeff = 2.0 * cosine;                                           // 1,999999479
 }
 
-boolean Decoder::menuExec(String mode)
-{
-    MorsePreferences::currentOptions = MorsePreferences::decoderOptions;               // list of available options in lora trx mode
-    MorseMachine::morseState = MorseMachine::morseDecoder;
-    MorseMachine::encoderState = MorseMachine::volumeSettingMode;
-    MorseKeyer::keyTx = false;
-    MorseDisplay::clear();
-    MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Decoder");
-
-    Decoder::startDecoder();
-    return true;
-}
-
-boolean Decoder::loop() {
-    Decoder::doDecodeShow();
-    return false;
-}
-
 void Decoder::startDecoder()
 {
     Decoder::storeCharInResponse = 0;

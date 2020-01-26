@@ -9,10 +9,10 @@
 class MorseModeLoRa: public MorseMode
 {
     public:
-        boolean menuExec(String mode);
-        boolean loop();
-        boolean togglePause();
-        void onPreferencesChanged();
+        boolean menuExec(String mode) override;
+        boolean loop() override;
+        boolean togglePause() override;
+        void onPreferencesChanged() override;
 };
 
 extern MorseModeLoRa morseModeLoRa;
