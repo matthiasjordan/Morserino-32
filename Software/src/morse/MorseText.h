@@ -7,6 +7,7 @@ namespace MorseText
     typedef struct {
             const String internal;
             const String code;
+            const String prosign;
     } MorseChar;
 
     enum GEN_TYPE

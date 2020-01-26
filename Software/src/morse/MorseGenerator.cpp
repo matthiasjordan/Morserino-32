@@ -30,83 +30,6 @@
 
 using namespace MorseGenerator;
 
-// we use substrings as char pool for trainer mode
-// SANK will be replaced by <as>, <ka>, <kn> and <sk>, H = ch
-// a = CWchars.substring(0,26); 9 = CWchars.substring(26,36); ? = CWchars.substring(36,45); <> = CWchars.substring(44,49);
-// a9 = CWchars.substring(0,36); 9? = CWchars.substring(26,45); ?<> = CWchars.substring(36,50);
-// a9? = CWchars.substring(0,45); 9?<> = CWchars.substring(26,50);
-// a9?<> = CWchars;
-
-//byte NoE = 0;             // Number of Elements
-// byte nextElement[8];      // the list of elements; 0 = dit, 1 = dah
-
-// for each character:
-// byte length// byte morse encoding as binary value, beginning with most significant bit
-
-
-const char* pppool[] = {
-        "12",  // a    0
-        "2111",  // b
-        "2121",  // c
-        "211",  // d
-        "1",  // e
-        "1121",  // f
-        "221",  // g
-        "1111",  // h
-        "11",  // i
-        "1222",  // j
-        "212",  // k
-        "1211",  // l
-        "22",  // m
-        "21",  // n
-        "222",  // o
-        "1221",  // p
-        "2212",  // q
-        "121",  // r
-        "111",  // s
-        "2",  // t
-        "112",  // u
-        "1112",  // v
-        "122",  // w
-        "2112",  // x
-        "2122",  // y
-        "2211",  // z  25
-        // numbers
-        "22222",  // 0  26
-        "12222",  // 1
-        "11222",  // 2
-        "11122",  // 3
-        "11112",  // 4
-        "11111",  // 5
-        "21111",  // 6
-        "22111",  // 7
-        "22211",  // 8
-        "22221",  // 9  35
-        // interpunct
-        "121212",  // .  36
-        "221122",  // ,  37
-        "222111",  // :  38
-        "211112",  // -  39
-        "21121",  // /  40
-        "21112",  // =  41
-        "112211",  // ?  42
-        "122121",  // @  43
-        "12121",  // +  44    (at the same time <ar> !)
-        // Pro signs
-        "12111",  // <as> 45 S
-        "21212",  // <ka> 46 A
-        "21221",  // <kn> 47 N
-        "111212",   // <sk> 48    K
-        "11121",  // <ve> 49 E
-        // German characters
-        "1212",  // ä    50
-        "2221",  // ö    51
-        "1122",  // ü    52
-        "2222",   // ch   53  H
-        "111222111" // <SOS> 54 X
-};
-
-
 unsigned char MorseGenerator::generatorState; // should be MORSE_TYPE instead of uns char
 unsigned long MorseGenerator::genTimer;                         // timer used for generating morse code in trainer mode
 
@@ -148,7 +71,6 @@ void MorseGenerator::setup()
 {
     MorseKeyer::setup();
 }
-
 
 Config* MorseGenerator::getConfig()
 {
@@ -200,7 +122,6 @@ void MorseGenerator::startTrainer()
     MorseDisplay::clearScroll();      // clear the buffer
 }
 
-
 void MorseGenerator::handleEffectiveTrainerDisplay(uint8_t mode)
 {
     Serial.println("MorseGen::i::oPC 1");
@@ -233,10 +154,6 @@ void MorseGenerator::handleEffectiveTrainerDisplay(uint8_t mode)
         }
     }
 }
-
-
-
-
 
 void MorseGenerator::generateCW()
 {          // this is called from loop() (frequently!)  and generates CW
@@ -548,7 +465,8 @@ String fetchNewWordFromLoRa()
 {
     MorseLoRa::Packet packet = MorseLoRa::decodePacket();
     Serial.println(packet.toString());
-    if (!packet.valid) {
+    if (!packet.valid)
+    {
         return "";
     }
 
@@ -683,7 +601,8 @@ String internal::textToCWword(String symbols)
 
     for (int i = 0; i < l; ++i)
     {
-        if (i != 0) {
+        if (i != 0)
+        {
             result += "0";
         }
         char c = symbols.charAt(i);                                 // next char in string
@@ -695,7 +614,7 @@ String internal::textToCWword(String symbols)
             result = "11111111"; // <err>
             break;
         }
-        result += pppool[pointer];
+        result += MorseText::morseChars[pointer].code;
     }
     result += "0";
     Serial.println("internal::textToCWword(): " + result);

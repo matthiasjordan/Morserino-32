@@ -34,65 +34,66 @@ namespace internal
     String fetchRandomWord();
 }
 
-const MorseChar MorseText::morseChars[56] = {//
-        {"a", "12"},  //
-        {"b", "2111"},  //
-        {"c", "2121"}, //
-        {"d", "211"}, //
-        {"e", "1"}, //
-        {"f", "1121"}, //
-        {"g", "221"},  //
-        {"h", "1111"},  //
-        {"i", "11"},  //
-        {"j", "1222"},  //
-        {"k", "212"},  //
-        {"l", "1211"},  //
-        {"m", "22"},  //
-        {"n", "21"},  //
-        {"o", "222"},  //
-        {"p", "1221"},  //
-        {"q", "2212"},  //
-        {"r", "121"},  //
-        {"s", "111"},  //
-        {"t", "2"},  //
-        {"u", "112"},  //
-        {"v", "1112"},  //
-        {"w", "122"},  //
-        {"x", "2112"},  //
-        {"y", "2122"},  //
-        {"z", "2211"},  //
-        {"0", "22222"},  //
-        {"1", "12222"},  //
-        {"2", "11222"},  //
-        {"3", "11122"},  //
-        {"4", "11112"},  //
-        {"5", "11111"},  //
-        {"6", "21111"},  //
-        {"7", "22111"},  //
-        {"8", "22211"},  //
-        {"9", "22221"},  //
+const MorseChar MorseText::morseChars[] = {//
+        {"a", "12", ""},  //
+        {"b", "2111", ""},  //
+        {"c", "2121", ""}, //
+        {"d", "211", ""}, //
+        {"e", "1", ""}, //
+        {"f", "1121", ""}, //
+        {"g", "221", ""},  //
+        {"h", "1111", ""},  //
+        {"i", "11", ""},  //
+        {"j", "1222", ""},  //
+        {"k", "212", ""},  //
+        {"l", "1211", ""},  //
+        {"m", "22", ""},  //
+        {"n", "21", ""},  //
+        {"o", "222", ""},  //
+        {"p", "1221", ""},  //
+        {"q", "2212", ""},  //
+        {"r", "121", ""},  //
+        {"s", "111", ""},  //
+        {"t", "2", ""},  //
+        {"u", "112", ""},  //
+        {"v", "1112", ""},  //
+        {"w", "122", ""},  //
+        {"x", "2112", ""},  //
+        {"y", "2122", ""},  //
+        {"z", "2211", ""},  //
+        {"0", "22222", ""},  //
+        {"1", "12222", ""},  //
+        {"2", "11222", ""},  //
+        {"3", "11122", ""},  //
+        {"4", "11112", ""},  //
+        {"5", "11111", ""},  //
+        {"6", "21111", ""},  //
+        {"7", "22111", ""},  //
+        {"8", "22211", ""},  //
+        {"9", "22221", ""},  //
 
-        {".", "121212"},  //
-        {",", "221122"},  //
-        {":", "222111"},  //
-        {"-", "211112"},  //
-        {"/", "21121"},  //
-        {"=", "21112"},  //
-        {"?", "112211"},  //
-        {"@", "122121"},  //
-        {"+", "12121"},  //   (at the same time <ar> !)
+        {".", "121212", ""},  //
+        {",", "221122", ""},  //
+        {":", "222111", ""},  //
+        {"-", "211112", ""},  //
+        {"/", "21121", ""},  //
+        {"=", "21112", ""},  //
+        {"?", "112211", ""},  //
+        {"@", "122121", ""},  //
+        {"+", "12121", ""},  //   (at the same time <ar> !)
 
-        {"S", "12111"},  // <as>
-        {"A", "21212"},  // <ka>
-        {"N", "21221"},  // <kn>
-        {"K", "111212"},   // <sk>
-        {"E", "11121"},  // <ve>
-        {"ä", "1212"},  // ä
-        {"ö", "2221"},  // ö
-        {"ü", "1122"},  // ü
-        {"H", "2222"},   // ch
-        {"X", "111222111"}, // <SOS>
-        {"*", ""}
+        {"ä", "1212", ""},  // ae
+        {"ö", "2221", ""},  // oe
+        {"ü", "1122", ""},  // ue
+
+        {"S", "12111", "<as>"},  //
+        {"A", "21212", "<ka>"},  //
+        {"N", "21221", "<kn>"},  //
+        {"K", "111212", "<sk>"},   //
+        {"E", "11121", "<ve>"},  //
+        {"H", "2222", "<ch>"},   //
+        {"X", "111222111", "<sos>"}, //
+        {"*", "", ""}
 };
 
 MorseText::Config config;
@@ -326,7 +327,7 @@ String internal::getRandomCWChars(int option, int maxLength)
     String result = "";
     for (int i = 0; i < maxLength; ++i)
     {
-        result += morseChars[random(s, e)].code;
+        result += morseChars[random(s, e)].internal;
     }
 
     return result;
@@ -463,7 +464,7 @@ int MorseText::findChar(char c)
 {
     String cStr = String(c);
     int pos = -1;
-    for (int i = 0; morseChars[i].internal != "*"; i++)
+    for (int i = 0; morseChars[i].code != ""; i++)
     {
         if (morseChars[i].internal == cStr)
         {
@@ -478,30 +479,31 @@ int MorseText::findChar(char c)
 String MorseText::internalToProSigns(String &input)
 {
     /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
-    input.replace("S", "<as>");
-    input.replace("A", "<ka>");
-    input.replace("N", "<kn>");
-    input.replace("K", "<sk>");
-    input.replace("V", "<ve>");
-    input.replace("H", "ch");
-    input.replace("E", "<err>");
-    input.replace("U", "¬");
+    int i = 0;
+    while (morseChars[i].prosign == "") {
+        i += 1;
+    }
+    while (morseChars[i].code != "") {
+        MorseChar m = morseChars[i];
+        input.replace(m.internal, m.prosign);
+        i += 1;
+    }
     //Serial.println(input);
     return input;
 }
 
-String MorseText::proSignsToInternal(String &s)
+String MorseText::proSignsToInternal(String &input)
 {
-    s.replace("<ar>", "+");
-    s.replace("<bt>", "=");
-    s.replace("<as>", "S");
-    s.replace("<ka>", "K");
-    s.replace("<kn>", "N");
-    s.replace("<sk>", "K");
-    s.replace("<ve>", "E");
-    s.replace("<ch>", "H");
-    s.replace("<sos>", "X");
-    return s;
+    int i = 0;
+    while (morseChars[i].prosign == "") {
+        i += 1;
+    }
+    while (morseChars[i].prosign != "") {
+        MorseChar m = morseChars[i];
+        input.replace(m.prosign, m.internal);
+        i += 1;
+    }
+    return input;
 }
 
 String MorseText::utf8umlaut(String s)
