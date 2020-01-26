@@ -62,6 +62,7 @@ void MorseModeGenerator::startTrainer()
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
     MorseDisplay::clearScroll();      // clear the buffer
+    active = false;
 }
 
 void MorseModeGenerator::onPreferencesChanged()
