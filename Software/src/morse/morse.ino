@@ -64,6 +64,7 @@
 #include "MorseModeHeadCopying.h"
 #include "MorseModeTrx.h"
 #include "MorseModeKeyer.h"
+#include "MorseModeKoch.h"
 
 ////////////////////////////////////////////////////////////////////
 // encoder subroutines

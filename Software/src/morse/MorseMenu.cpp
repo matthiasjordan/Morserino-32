@@ -36,6 +36,7 @@
 #include "MorseModeLoRa.h"
 #include "MorseModeDecoder.h"
 #include "MorseModeGenerator.h"
+#include "MorseModeKoch.h"
 #include "MorseText.h"
 
 using namespace MorseMenu;
@@ -100,28 +101,28 @@ const MenuItem menuItems[] = {
         {"Select Lesson", _kochSel, {1, _kochEcho, _kochLearn, _koch, 0}, MorseText::NA, MorsePreferences::kochEchoOptions, true,
                 &MorsePreferencesMenu::menuExec, "selectKoch", 0, 0}, //
         {"Learn New Chr", _kochLearn, {1, _kochSel, _kochGen, _koch, 0}, MorseText::KOCH_LEARN, MorsePreferences::kochEchoOptions,
-                true, &Koch::menuExec, "learn", 0, 0}, //
+                true, 0, "learn", 0, &morseModeKoch}, //
         {"CW Generator", _kochGen, {1, _kochLearn, _kochEcho, _koch, _kochGenRand}, MorseText::NA, MorsePreferences::kochGenOptions,
                 true, &internal::nothing, "", 0, 0}, //
         {"Random", _kochGenRand, {2, _kochGenMixed, _kochGenAbb, _kochGen, 0}, MorseText::RANDOMS, MorsePreferences::kochGenOptions,
-                true, &Koch::menuExec, "trainer", 0, 0}, //
+                true, 0, "trainer", 0, &morseModeKoch}, //
         {"CW Abbrevs", _kochGenAbb, {2, _kochGenRand, _kochGenWords, _kochGen, 0}, MorseText::ABBREVS,
-                MorsePreferences::kochGenOptions, true, &Koch::menuExec, "trainer", 0, 0}, //
+                MorsePreferences::kochGenOptions, true, 0, "trainer", 0, &morseModeKoch}, //
         {"English Words", _kochGenWords, {2, _kochGenAbb, _kochGenMixed, _kochGen, 0}, MorseText::WORDS,
-                MorsePreferences::kochGenOptions, true, &Koch::menuExec, "trainer", 0, 0}, //
+                MorsePreferences::kochGenOptions, true, 0, "trainer", 0, &morseModeKoch}, //
         {"Mixed", _kochGenMixed, {2, _kochGenWords, _kochGenRand, _kochGen, 0}, MorseText::MIXED, MorsePreferences::kochGenOptions,
-                true, &Koch::menuExec, "trainer", 0, 0}, //
+                true, 0, "trainer", 0, &morseModeKoch}, //
 
         {"Echo Trainer", _kochEcho, {1, _kochGen, _kochSel, _koch, _kochEchoRand}, MorseText::NA, MorsePreferences::kochEchoOptions,
                 true, &internal::nothing, "", 0, 0}, //
         {"Random", _kochEchoRand, {2, _kochEchoMixed, _kochEchoAbb, _kochEcho, 0}, MorseText::RANDOMS,
-                MorsePreferences::kochEchoOptions, true, &Koch::menuExec, "echo", 0, 0}, //
+                MorsePreferences::kochEchoOptions, true, 0, "echo", 0, &morseModeKoch}, //
         {"CW Abbrevs", _kochEchoAbb, {2, _kochEchoRand, _kochEchoWords, _kochEcho, 0}, MorseText::ABBREVS,
-                MorsePreferences::kochEchoOptions, true, &Koch::menuExec, "echo", 0, 0}, //
+                MorsePreferences::kochEchoOptions, true, 0, "echo", 0, &morseModeKoch}, //
         {"English Words", _kochEchoWords, {2, _kochEchoAbb, _kochEchoMixed, _kochEcho, 0}, MorseText::WORDS,
-                MorsePreferences::kochEchoOptions, true, &Koch::menuExec, "echo", 0, 0}, //
+                MorsePreferences::kochEchoOptions, true, 0, "echo", 0, &morseModeKoch}, //
         {"Mixed", _kochEchoMixed, {2, _kochEchoWords, _kochEchoRand, _kochEcho, 0}, MorseText::MIXED,
-                MorsePreferences::kochEchoOptions, true, &Koch::menuExec, "echo", 0, 0}, //
+                MorsePreferences::kochEchoOptions, true, 0, "echo", 0, &morseModeKoch}, //
 
         {"Head Copying", _head, {0, _koch, _trx, _dummy, _headRand}, MorseText::NA, MorsePreferences::headOptions, true,
                 &internal::nothing, "", 0, 0}, //
