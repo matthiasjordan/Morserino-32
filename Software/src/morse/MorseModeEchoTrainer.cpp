@@ -311,7 +311,7 @@ void MorseModeEchoTrainer::onFetchNewWord()
             {
                 Serial.println("MET::oFNW() 4");
                 String result = MorseText::getCurrentWord();
-                MorseDisplay::printToScroll(INVERSE_REGULAR, MorseDisplay::cleanUpProSigns(result)); //// clean up first!
+                MorseDisplay::printToScroll(INVERSE_REGULAR, MorseText::cleanUpProSigns(result)); //// clean up first!
                 MorseDisplay::printToScroll(REGULAR, " ");
             }
         }

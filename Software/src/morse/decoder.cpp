@@ -24,7 +24,7 @@
 
 using namespace Decoder;
 
-const struct linklist Decoder::CWtree[67] = { //
+const struct linklist Decoder::CWtree[71] = { //
         {"", 1, 2},            // 0
                 {"e", 3, 4},         // 1
                 {"t", 5, 6},          // 2
@@ -63,7 +63,7 @@ const struct linklist Decoder::CWtree[67] = { //
                 {"5", 64, 63},      // 31
                 {"4", 63, 63},      // 32
                 {"<ve>", 63, 52},      // 33  or <sn>, sometimes "*"
-                {"3", 63, 63},       // 34
+                {"3", 63, 67},       // 34
                 {"*", 53, 63, },      // 35 ¬ used for all unidentifiable characters ¬
                 {"2", 63, 63},      // 36
                 {"<as>", 63, 63},         // 37 !! <as>
@@ -97,7 +97,11 @@ const struct linklist Decoder::CWtree[67] = { //
                 {"*", 63, 63},       // 63 Default for all unidentified characters
                 {"*", 65, 63},       // 64
                 {"*", 66, 63},       // 65
-                {"<err>", 66, 63}      // 66 !! Error - backspace
+                {"<err>", 66, 63},   // 66 !! Error - backspace
+                {"*", 68, 63},       // 67 ...---
+                {"*", 69, 63},       // 68 ...---.
+                {"*", 70, 63},       // 69 ...---..
+                {"<sos>", 63, 63}    // 70 ...---...
         };
 
 uint8_t wpmDecoded;

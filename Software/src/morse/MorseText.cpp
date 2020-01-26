@@ -34,7 +34,66 @@ namespace internal
     String fetchRandomWord();
 }
 
-const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
+const MorseChar MorseText::morseChars[56] = {//
+        {"a", "12"},  //
+        {"b", "2111"},  //
+        {"c", "2121"}, //
+        {"d", "211"}, //
+        {"e", "1"}, //
+        {"f", "1121"}, //
+        {"g", "221"},  //
+        {"h", "1111"},  //
+        {"i", "11"},  //
+        {"j", "1222"},  //
+        {"k", "212"},  //
+        {"l", "1211"},  //
+        {"m", "22"},  //
+        {"n", "21"},  //
+        {"o", "222"},  //
+        {"p", "1221"},  //
+        {"q", "2212"},  //
+        {"r", "121"},  //
+        {"s", "111"},  //
+        {"t", "2"},  //
+        {"u", "112"},  //
+        {"v", "1112"},  //
+        {"w", "122"},  //
+        {"x", "2112"},  //
+        {"y", "2122"},  //
+        {"z", "2211"},  //
+        {"0", "22222"},  //
+        {"1", "12222"},  //
+        {"2", "11222"},  //
+        {"3", "11122"},  //
+        {"4", "11112"},  //
+        {"5", "11111"},  //
+        {"6", "21111"},  //
+        {"7", "22111"},  //
+        {"8", "22211"},  //
+        {"9", "22221"},  //
+
+        {".", "121212"},  //
+        {",", "221122"},  //
+        {":", "222111"},  //
+        {"-", "211112"},  //
+        {"/", "21121"},  //
+        {"=", "21112"},  //
+        {"?", "112211"},  //
+        {"@", "122121"},  //
+        {"+", "12121"},  //   (at the same time <ar> !)
+
+        {"S", "12111"},  // <as>
+        {"A", "21212"},  // <ka>
+        {"N", "21221"},  // <kn>
+        {"K", "111212"},   // <sk>
+        {"E", "11121"},  // <ve>
+        {"ä", "1212"},  // ä
+        {"ö", "2221"},  // ö
+        {"ü", "1122"},  // ü
+        {"H", "2222"},   // ch
+        {"X", "111222111"}, // <SOS>
+        {"*", ""}
+};
 
 MorseText::Config config;
 
@@ -43,7 +102,6 @@ String lastGeneratedWord = "";
 boolean nextWordIsEndSequence;
 boolean repeatLast;
 void (*MorseText::onGeneratorNewWord)(String);
-
 
 void MorseText::start(GEN_TYPE genType)
 {
@@ -76,7 +134,7 @@ void MorseText::setRepeatEach(uint8_t n)
 
 void MorseText::setRepeatLast()
 {
-repeatLast = true;
+    repeatLast = true;
 }
 
 void MorseText::onPreferencesChanged()
@@ -111,7 +169,8 @@ String MorseText::generateWord()
         nextWordIsEndSequence = false;
         Serial.println("genWord(): generating end sequence");
     }
-    else if (repeatLast) {
+    else if (repeatLast)
+    {
         repeatLast = false;
         result = lastGeneratedWord;
     }
@@ -267,7 +326,7 @@ String internal::getRandomCWChars(int option, int maxLength)
     String result = "";
     for (int i = 0; i < maxLength; ++i)
     {
-        result += CWchars.charAt(random(s, e));
+        result += morseChars[random(s, e)].code;
     }
 
     return result;
@@ -329,27 +388,27 @@ String internal::getRandomCall(int maxLength)
     switch (prefix)
     {
         case 1:
-            call += CWchars.charAt(random(0, 26));
-            call += CWchars.charAt(random(0, 26));
+            call += String(morseChars[random(0, 26)].internal);
+            call += morseChars[random(0, 26)].internal;
             l += 2;
             break;
         case 0:
-            call += CWchars.charAt(random(0, 26));
+            call += morseChars[random(0, 26)].internal;
             ++l;
             break;
         case 2:
-            call += CWchars.charAt(random(0, 26));
-            call += CWchars.charAt(random(26, 36));
+            call += morseChars[random(0, 26)].internal;
+            call += morseChars[random(26, 36)].internal;
             l = 2;
             break;
         case 3:
-            call += CWchars.charAt(random(26, 36));
-            call += CWchars.charAt(random(0, 26));
+            call += morseChars[random(26, 36)].internal;
+            call += morseChars[random(0, 26)].internal;
             l = 2;
             break;
     } // we have a prefix by now; l is its length
       // now generate a number
-    call += CWchars.charAt(random(26, 36));
+    call += morseChars[random(26, 36)].internal;
     ++l;
     // generate a suffix, 1 2 or 3 chars long - we re-use prefix for the suffix length
     if (maxLength == 3)
@@ -366,7 +425,7 @@ String internal::getRandomCall(int maxLength)
     }
     while (prefix--)
     {
-        call += CWchars.charAt(random(0, 26));
+        call += morseChars[random(0, 26)].internal;
         ++l;
     } // now we have the suffix as well
       // are we /p or /m? - we do this only in rare cases - 1 out of 9, and only when maxLength = 0, or maxLength-l >= 2
@@ -398,4 +457,58 @@ String internal::getRandomAbbrev(int maxLength)
         return Koch::getRandomAbbrev();
     else
         return Abbrev::getRandomAbbrev(maxLength);
+}
+
+int MorseText::findChar(char c)
+{
+    String cStr = String(c);
+    int pos = -1;
+    for (int i = 0; morseChars[i].internal != "*"; i++)
+    {
+        if (morseChars[i].internal == cStr)
+        {
+            pos = i;
+            break;
+        }
+    }
+    return pos;
+}
+
+
+String MorseText::cleanUpProSigns(String &input)
+{
+    /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
+    input.replace("S", "<as>");
+    input.replace("A", "<ka>");
+    input.replace("N", "<kn>");
+    input.replace("K", "<sk>");
+    input.replace("V", "<ve>");
+    input.replace("H", "ch");
+    input.replace("E", "<err>");
+    input.replace("U", "¬");
+    //Serial.println(input);
+    return input;
+}
+
+String MorseText::utf8umlaut(String s)
+{ /// replace umtf umlauts with digraphs, and interpret pro signs, written e.g. as [kn] or <kn>
+    s.replace("ä", "ae");
+    s.replace("ö", "oe");
+    s.replace("ü", "ue");
+    s.replace("Ä", "ae");
+    s.replace("Ö", "oe");
+    s.replace("Ü", "ue");
+    s.replace("ß", "ss");
+    s.replace("[", "<");
+    s.replace("]", ">");
+    s.replace("<ar>", "+");
+    s.replace("<bt>", "=");
+    s.replace("<as>", "S");
+    s.replace("<ka>", "K");
+    s.replace("<kn>", "N");
+    s.replace("<sk>", "K");
+    s.replace("<ve>", "E");
+    s.replace("<ch>", "H");
+    s.replace("<sos>", "X");
+    return s;
 }

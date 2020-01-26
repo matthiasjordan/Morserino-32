@@ -23,7 +23,7 @@ namespace Decoder
             const uint8_t dah;
     };
 
-    extern const struct linklist CWtree[67];
+    extern const struct linklist CWtree[71];
 
     extern boolean filteredState;
     extern boolean filteredStateBefore;

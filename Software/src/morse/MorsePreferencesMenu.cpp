@@ -461,7 +461,7 @@ void internal::displayKochFilter()
     String str;
     str.reserve(6);
     str = (String) Koch::kochChars.charAt(MorsePreferences::prefs.kochFilter - 1);
-    MorseDisplay::cleanUpProSigns(str);
+    MorseText::cleanUpProSigns(str);
     MorseDisplay::vprintOnScroll(2, REGULAR, 1, "%2i %s   ", MorsePreferences::prefs.kochFilter, str.c_str());
 }
 

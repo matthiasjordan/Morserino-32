@@ -124,6 +124,10 @@ String Koch::getRandomAbbrev()
 
 String Koch::filterNonKoch(String w)
 {
+    if (!isKochActive()) {
+        return w;
+    }
+
     char c;
     String result = "";
     result.reserve(64);

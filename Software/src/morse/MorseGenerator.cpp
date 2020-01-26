@@ -30,8 +30,6 @@
 
 using namespace MorseGenerator;
 
-const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
-//                      0....5....1....5....2....5....3....5....4....5....5...
 // we use substrings as char pool for trainer mode
 // SANK will be replaced by <as>, <ka>, <kn> and <sk>, H = ch
 // a = CWchars.substring(0,26); 9 = CWchars.substring(26,36); ? = CWchars.substring(36,45); <> = CWchars.substring(44,49);
@@ -45,67 +43,69 @@ const String CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöü
 // for each character:
 // byte length// byte morse encoding as binary value, beginning with most significant bit
 
-const byte pool[][2] = {
-// letters
-        {B01000000, 2},  // a    0
-        {B10000000, 4},  // b
-        {B10100000, 4},  // c
-        {B10000000, 3},  // d
-        {B00000000, 1},  // e
-        {B00100000, 4},  // f
-        {B11000000, 3},  // g
-        {B00000000, 4},  // h
-        {B00000000, 2},  // i
-        {B01110000, 4},  // j
-        {B10100000, 3},  // k
-        {B01000000, 4},  // l
-        {B11000000, 2},  // m
-        {B10000000, 2},  // n
-        {B11100000, 3},  // o
-        {B01100000, 4},  // p
-        {B11010000, 4},  // q
-        {B01000000, 3},  // r
-        {B00000000, 3},  // s
-        {B10000000, 1},  // t
-        {B00100000, 3},  // u
-        {B00010000, 4},  // v
-        {B01100000, 3},  // w
-        {B10010000, 4},  // x
-        {B10110000, 4},  // y
-        {B11000000, 4},  // z  25
-// numbers
-        {B11111000, 5},  // 0  26
-        {B01111000, 5},  // 1
-        {B00111000, 5},  // 2
-        {B00011000, 5},  // 3
-        {B00001000, 5},  // 4
-        {B00000000, 5},  // 5
-        {B10000000, 5},  // 6
-        {B11000000, 5},  // 7
-        {B11100000, 5},  // 8
-        {B11110000, 5},  // 9  35
-// interpunct   . , : - / = ? @ +    010101 110011 111000 100001 10010 10001 001100 011010 01010
-        {B01010100, 6},  // .  36
-        {B11001100, 6},  // ,  37
-        {B11100000, 6},  // :  38
-        {B10000100, 6},  // -  39
-        {B10010000, 5},  // /  40
-        {B10001000, 5},  // =  41
-        {B00110000, 6},  // ?  42
-        {B01101000, 6},  // @  43
-        {B01010000, 5},  // +  44    (at the same time <ar> !)
-// Pro signs  <>  <as> <ka> <kn> <sk>
-        {B01000000, 5},  // <as> 45 S
-        {B10101000, 5},  // <ka> 46 A
-        {B10110000, 5},  // <kn> 47 N
-        {B00010100, 6},   // <sk> 48    K
-        {B00010000, 5},  // <ve> 49 E
-// German characters
-        {B01010000, 4},  // ä    50
-        {B11100000, 4},  // ö    51
-        {B00110000, 4},  // ü    52
-        {B11110000, 4}   // ch   53  H
+
+const char* pppool[] = {
+        "12",  // a    0
+        "2111",  // b
+        "2121",  // c
+        "211",  // d
+        "1",  // e
+        "1121",  // f
+        "221",  // g
+        "1111",  // h
+        "11",  // i
+        "1222",  // j
+        "212",  // k
+        "1211",  // l
+        "22",  // m
+        "21",  // n
+        "222",  // o
+        "1221",  // p
+        "2212",  // q
+        "121",  // r
+        "111",  // s
+        "2",  // t
+        "112",  // u
+        "1112",  // v
+        "122",  // w
+        "2112",  // x
+        "2122",  // y
+        "2211",  // z  25
+        // numbers
+        "22222",  // 0  26
+        "12222",  // 1
+        "11222",  // 2
+        "11122",  // 3
+        "11112",  // 4
+        "11111",  // 5
+        "21111",  // 6
+        "22111",  // 7
+        "22211",  // 8
+        "22221",  // 9  35
+        // interpunct
+        "121212",  // .  36
+        "221122",  // ,  37
+        "222111",  // :  38
+        "211112",  // -  39
+        "21121",  // /  40
+        "21112",  // =  41
+        "112211",  // ?  42
+        "122121",  // @  43
+        "12121",  // +  44    (at the same time <ar> !)
+        // Pro signs
+        "12111",  // <as> 45 S
+        "21212",  // <ka> 46 A
+        "21221",  // <kn> 47 N
+        "111212",   // <sk> 48    K
+        "11121",  // <ve> 49 E
+        // German characters
+        "1212",  // ä    50
+        "2221",  // ö    51
+        "1122",  // ü    52
+        "2222",   // ch   53  H
+        "111222111" // <SOS> 54 X
 };
+
 
 unsigned char MorseGenerator::generatorState; // should be MORSE_TYPE instead of uns char
 unsigned long MorseGenerator::genTimer;                         // timer used for generating morse code in trainer mode
@@ -673,35 +673,32 @@ void MorseGenerator::keyOut(boolean on, boolean fromHere, int f, int volume)
 }
 
 /////// generate CW representations from its input string
-/////// CWchars = "abcdefghijklmnopqrstuvwxyz0123456789.,:-/=?@+SANKVäöüH";
 
 String internal::textToCWword(String symbols)
 {
     int pointer;
-    byte bitMask, NoE;
-    //byte nextElement[8];      // the list of elements; 0 = dit, 1 = dah
     String result = "";
 
     int l = symbols.length();
 
     for (int i = 0; i < l; ++i)
     {
+        if (i != 0) {
+            result += "0";
+        }
         char c = symbols.charAt(i);                                 // next char in string
-        pointer = CWchars.indexOf(c);                                 // at which position is the character in CWchars?
+        Serial.println("internal::textToCWword c " + String(c));
+        pointer = MorseText::findChar(c);                                 // at which position is the character in CWchars?
+        Serial.println("internal::textToCWword p " + String(pointer));
         if (pointer == -1)
         {
-            return "111111110"; // <err>
+            result = "11111111"; // <err>
+            break;
         }
-        NoE = pool[pointer][1];                                     // how many elements in this morse code symbol?
-        bitMask = pool[pointer][0];                                 // bitMask indicates which of the elements are dots and which are dashes
-        for (int j = 0; j < NoE; ++j)
-        {
-            result += (bitMask & B10000000 ? "2" : "1");     // get MSB and store it in string - 2 is dah, 1 is dit, 0 = inter-element space
-            bitMask = bitMask << 1;     // shift bitmask 1 bit to the left
-        } /// now we are at the end of one character, therefore we add enough space for inter-character
-        result += "0";
-    }     /// now we are at the end of the word, therefore we remove the final 0!
-//    result.remove(result.length() - 1);
+        result += pppool[pointer];
+    }
+    result += "0";
+    Serial.println("internal::textToCWword(): " + result);
     return result;
 }
 
@@ -723,7 +720,7 @@ void internal::dispGeneratedChar()
         {
             MorseDisplay::printToScroll(REGULAR, "");                      // clear the buffer first
         }
-        MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseDisplay::cleanUpProSigns(charString));
+        MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseText::cleanUpProSigns(charString));
         if (generatorConfig.printSpaceAfterChar)
         {
             MorseDisplay::printToScroll(REGULAR, " ");                      // output a space

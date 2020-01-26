@@ -164,20 +164,6 @@ void MorseDisplay::clearStatusLine()
     display.display();
 }
 
-String MorseDisplay::cleanUpProSigns(String &input)
-{
-    /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
-    input.replace("S", "<as>");
-    input.replace("A", "<ka>");
-    input.replace("N", "<kn>");
-    input.replace("K", "<sk>");
-    input.replace("V", "<ve>");
-    input.replace("H", "ch");
-    input.replace("E", "<err>");
-    input.replace("U", "¬");
-    //Serial.println(input);
-    return input;
-}
 
 void MorseDisplay::printOnStatusLine(boolean strong, uint8_t xpos, String string)
 {    // place a string onto the status line; chars are 7px wide = 18 chars per line
