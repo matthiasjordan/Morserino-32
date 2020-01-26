@@ -2,10 +2,15 @@ Work-in-progress 2.1.0
 
 * Source code extensively refactored into smaller files for easier navigation
   and maintenance. In particular the menu subsystem was changed so new menu
-  items can be added easier and with fewer side effects.
+  items can be added easier and without side effects.
   
 * Removed "auto stop" feature and changed it into a new menu option 
-  "Head Copying".
+  "Head Copying", which is way cooler.
 
 * Removed some dead code.
+
+* Now supporting SOS prosign.
+
+* Generator mode does no longer print a white space at the beginning.
+
 
