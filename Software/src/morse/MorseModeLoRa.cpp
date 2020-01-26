@@ -52,6 +52,7 @@ boolean MorseModeLoRa::menuExec(String mode)
         genCon->printChar = true;
         genCon->printCharStyle = BOLD;
         genCon->printSpaceAfterChar = false;
+        genCon->timing = MorseGenerator::rx;
 //        genCon->wordEndMethod = MorseGenerator::flush;
 //        genCon->printSpaceAfterWord = true;
         MorseDisplay::getConfig()->autoFlush = true;
