@@ -284,7 +284,7 @@ void MorseModeEchoTrainer::onFetchNewWord()
             {
                 String result = MorseText::getCurrentWord();
                 MorseDisplay::printToScroll(INVERSE_REGULAR, MorseText::internalToProSigns(result)); //// clean up first!
-                MorseDisplay::printToScroll(REGULAR, " ");
+                MorseDisplay::printToScroll(REGULAR, "\n");
             }
         }
     }
