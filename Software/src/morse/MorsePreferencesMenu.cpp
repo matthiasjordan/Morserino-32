@@ -619,10 +619,6 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                 {
                     mi->mode->onPreferencesChanged();
                 }
-                else if (mi->onPreferencesChanged != 0)
-                {
-                    mi->onPreferencesChanged();
-                }
                 MorseText::onPreferencesChanged();
                 return false;
             }

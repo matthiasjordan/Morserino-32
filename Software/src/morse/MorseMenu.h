@@ -63,15 +63,43 @@ namespace MorseMenu
 
     typedef struct menuItem_t
     {
+            /*
+             * The text to display in the menu.
+             */
             String text;
+            /**
+             * The menu item's ID.
+             */
             menuNo no;
+            /*
+             * An array with navigation information. See enum navi.
+             */
             uint8_t nav[5];
+            /**
+             * The mode the MorseGenerator is operated in when selecting this menu item.
+             * This member will likely go away soon.
+             */
             MorseText::GEN_TYPE generatorMode;
+            /**
+             * The array of preferences available when selecting this menu item.
+             */
             MorsePreferences::prefPos *options;
+            /**
+             * If Morselino is supposed to remember this menu item when rebooting.
+             */
             boolean remember;
+            /**
+             * A function that is called when the menu item is selected.
+             */
             boolean (*menufx)(String);
+            /**
+             * A string ID passed to menufx.
+             */
             String menufxParam;
-            void (*onPreferencesChanged)(); // listener for preferences changed
+            /**
+             * A pointer to a MorseMode object handling this item.
+             * If this pointer is not 0, the mode will also take precedence over the above defined menufx function.
+             */
             MorseMode *mode;
     } MenuItem;
 
