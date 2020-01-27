@@ -1,4 +1,4 @@
-Work-in-progress 2.1.0
+Release 2.1.0
 
 * Source code extensively refactored into smaller files for easier navigation
   and maintenance. In particular the menu subsystem was changed so new menu
