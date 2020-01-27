@@ -1,7 +1,6 @@
 #ifndef MORSEMODEKOCH_H
 #define MORSEMODEKOCH_H
 
-#include <Arduino.h>
 #include "MorseMode.h"
 
 class MorseModeKoch: public MorseMode

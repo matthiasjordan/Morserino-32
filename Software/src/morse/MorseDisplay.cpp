@@ -23,7 +23,6 @@
 #include "MorsePreferences.h"
 #include "MorseSystem.h"
 #include "MorseMachine.h"
-//#include "MorseGenerator.h"
 #include "MorseKeyer.h"
 #include "decoder.h"
 

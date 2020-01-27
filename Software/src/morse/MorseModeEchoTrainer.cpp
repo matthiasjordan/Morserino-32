@@ -13,8 +13,6 @@
  *****************************************************************************************************************************/
 
 #include "MorseModeEchoTrainer.h"
-
-#include "MorsePreferences.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
 #include "MorseDisplay.h"
@@ -23,7 +21,6 @@
 #include "MorseMachine.h"
 #include "MorseMenu.h"
 #include "decoder.h"
-#include "MorseText.h"
 
 MorseModeEchoTrainer morseModeEchoTrainer;
 

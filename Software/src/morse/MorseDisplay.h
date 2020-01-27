@@ -2,7 +2,6 @@
 #define MORSEDISPLAY_H_
 
 #include <Arduino.h>
-//#include "SSD1306.h"       // alias for `#include "SSD1306Wire.h"
 #include "morsedefs.h"
 
 #define NoOfLines 15

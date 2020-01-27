@@ -17,14 +17,10 @@
 #include <SPI.h>           // library for SPI interface
 #include <LoRa.h>          // library for LoRa transceiver
 
-#include "morsedefs.h"
 #include "MorseDisplay.h"
-#include "MorsePreferences.h"
 #include "MorsePreferencesMenu.h"
 #include "MorseMachine.h"
 #include "MorseLoRa.h"
-#include "MorseKeyer.h"
-#include "MorseGenerator.h"
 
 using namespace MorseLoRa;
 

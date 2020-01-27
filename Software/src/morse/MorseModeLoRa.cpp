@@ -12,15 +12,7 @@
  *  If not, see <https://www.gnu.org/licenses/>.
  *****************************************************************************************************************************/
 
-#include <Arduino.h>
-#include "SPIFFS.h"
-#include <SPI.h>           // library for SPI interface
-#include <LoRa.h>          // library for LoRa transceiver
-
-#include "morsedefs.h"
 #include "MorseDisplay.h"
-#include "MorsePreferences.h"
-#include "MorsePreferencesMenu.h"
 #include "MorseMachine.h"
 #include "MorseModeLoRa.h"
 #include "MorseLoRa.h"

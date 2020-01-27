@@ -12,22 +12,17 @@
  *  If not, see <https://www.gnu.org/licenses/>.
  *****************************************************************************************************************************/
 
-#include <Arduino.h>
-
 #include "MorseMenu.h"
 #include "MorseSystem.h"
 #include "koch.h"
 #include "MorseDisplay.h"
-#include "MorsePreferences.h"
 #include "MorsePreferencesMenu.h"
 #include "MorseKeyer.h"
 #include "MorseUI.h"
 #include "MorseRotaryEncoder.h"
-#include "MorseGenerator.h"
 #include "MorseLoRa.h"
 #include "decoder.h"
 #include "MorseMachine.h"
-#include "MorsePlayerFile.h"
 #include "MorseWifi.h"
 #include "MorseModeEchoTrainer.h"
 #include "MorseModeHeadCopying.h"
@@ -37,7 +32,6 @@
 #include "MorseModeDecoder.h"
 #include "MorseModeGenerator.h"
 #include "MorseModeKoch.h"
-#include "MorseText.h"
 
 using namespace MorseMenu;
 

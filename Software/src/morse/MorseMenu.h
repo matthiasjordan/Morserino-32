@@ -1,9 +1,11 @@
 #ifndef MORSEMENU_H_
 #define MORSEMENU_H_
 
-#include "MorsePreferences.h"
+#include <Arduino.h>
+
 #include "MorseText.h"
 #include "MorseMode.h"
+#include "MorsePreferences.h"
 
 namespace MorseMenu
 {

@@ -1,7 +1,6 @@
 #ifndef MORSEMODEECHOTRAINER_H_
 #define MORSEMODEECHOTRAINER_H_
 
-#include <Arduino.h>
 #include "MorseMode.h"
 
 class MorseModeEchoTrainer: public MorseMode

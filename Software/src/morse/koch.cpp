@@ -13,11 +13,9 @@
  *****************************************************************************************************************************/
 
 #include "koch.h"
-#include "MorsePreferences.h"
 #include "abbrev.h"
 #include "english_words.h"
 #include "MorseGenerator.h"
-#include "MorseModeEchoTrainer.h"
 
 using namespace Koch;
 

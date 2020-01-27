@@ -14,14 +14,10 @@
 
 #include "MorseModeDecoder.h"
 #include "decoder.h"
-
-#include "MorsePreferences.h"
 #include "MorseMachine.h"
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
 #include "MorseDisplay.h"
-#include "MorseModeEchoTrainer.h"
-#include "MorseSound.h"
 
 MorseModeDecoder morseModeDecoder;
 

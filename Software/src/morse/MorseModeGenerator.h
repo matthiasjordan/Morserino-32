@@ -1,7 +1,6 @@
 #ifndef MORSEMODEGENERATOR_H_
 #define MORSEMODEGENERATOR_H_
 
-#include "MorsePreferences.h"
 #include "MorseMode.h"
 
 class MorseModeGenerator: public MorseMode

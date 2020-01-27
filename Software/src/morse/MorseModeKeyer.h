@@ -1,8 +1,6 @@
 #ifndef MORSEMODEKEYER_H_
 #define MORSEMODEKEYER_H_
 
-#include <Arduino.h>
-
 #include "MorseMode.h"
 
 class MorseModeKeyer: public MorseMode

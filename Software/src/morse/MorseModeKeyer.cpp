@@ -15,13 +15,9 @@
 #include "MorseModeKeyer.h"
 #include "MorseKeyer.h"
 #include "MorseMachine.h"
-#include "MorsePreferences.h"
 #include "MorseGenerator.h"
 #include "decoder.h"
-#include "MorseLoRa.h"
 #include "MorseDisplay.h"
-#include "MorseModeEchoTrainer.h"
-#include "MorseSound.h"
 
 MorseModeKeyer morseModeKeyer;
 

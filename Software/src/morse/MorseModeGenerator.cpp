@@ -15,18 +15,10 @@
 #include <Arduino.h>
 
 #include "MorseModeGenerator.h"
-#include "MorseGenerator.h"
 #include "MorseDisplay.h"
 #include "MorseMachine.h"
-#include "MorsePreferences.h"
-#include "MorseLoRa.h"
 #include "MorseKeyer.h"
-#include "MorseSound.h"
-#include "decoder.h"
 #include "MorsePlayerFile.h"
-#include "MorseText.h"
-#include "MorseMenu.h"
-#include "MorseModeEchoTrainer.h"
 #include "MorseModeHeadCopying.h"
 
 MorseModeGenerator morseModeGenerator;

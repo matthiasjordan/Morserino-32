@@ -2,7 +2,6 @@
 #define MORSEMODEHEADCOPYING_H_
 
 #include <Arduino.h>
-#include "MorseMenu.h"
 #include "MorseMode.h"
 #include "MorseGenerator.h"
 

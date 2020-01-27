@@ -1,8 +1,7 @@
-#include "MorseGenerator.h"
 #include "MorseMachine.h"
 #include "MorseDisplay.h"
 #include "MorseKeyer.h"
-#include "MorseMenu.h"
+#include "MorseText.h"
 #include "MorseModeHeadCopying.h"
 #include "MorsePlayerFile.h"
 

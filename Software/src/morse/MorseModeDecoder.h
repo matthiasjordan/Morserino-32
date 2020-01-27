@@ -8,8 +8,6 @@
 #ifndef MORSEMODEDECODER_H_
 #define MORSEMODEDECODER_H_
 
-#include <Arduino.h>
-#include "morsedefs.h"
 #include "MorseMode.h"
 
 class MorseModeDecoder: public MorseMode
