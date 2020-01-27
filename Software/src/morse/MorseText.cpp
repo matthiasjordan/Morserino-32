@@ -34,68 +34,78 @@ namespace internal
     String fetchRandomWord();
 }
 
-const MorseChar MorseText::morseChars[] = {//
+const MorseChar MorseText::morseChars[] = { //
         {"a", "12", ""},  //
-        {"b", "2111", ""},  //
-        {"c", "2121", ""}, //
-        {"d", "211", ""}, //
-        {"e", "1", ""}, //
-        {"f", "1121", ""}, //
-        {"g", "221", ""},  //
-        {"h", "1111", ""},  //
-        {"i", "11", ""},  //
-        {"j", "1222", ""},  //
-        {"k", "212", ""},  //
-        {"l", "1211", ""},  //
-        {"m", "22", ""},  //
-        {"n", "21", ""},  //
-        {"o", "222", ""},  //
-        {"p", "1221", ""},  //
-        {"q", "2212", ""},  //
-        {"r", "121", ""},  //
-        {"s", "111", ""},  //
-        {"t", "2", ""},  //
-        {"u", "112", ""},  //
-        {"v", "1112", ""},  //
-        {"w", "122", ""},  //
-        {"x", "2112", ""},  //
-        {"y", "2122", ""},  //
-        {"z", "2211", ""},  //
-        {"0", "22222", ""},  //
-        {"1", "12222", ""},  //
-        {"2", "11222", ""},  //
-        {"3", "11122", ""},  //
-        {"4", "11112", ""},  //
-        {"5", "11111", ""},  //
-        {"6", "21111", ""},  //
-        {"7", "22111", ""},  //
-        {"8", "22211", ""},  //
-        {"9", "22221", ""},  //
+                {"b", "2111", ""},  //
+                {"c", "2121", ""}, //
+                {"d", "211", ""}, //
+                {"e", "1", ""}, //
+                {"f", "1121", ""}, //
+                {"g", "221", ""},  //
+                {"h", "1111", ""},  //
+                {"i", "11", ""},  //
+                {"j", "1222", ""},  //
+                {"k", "212", ""},  //
+                {"l", "1211", ""},  //
+                {"m", "22", ""},  //
+                {"n", "21", ""},  //
+                {"o", "222", ""},  //
+                {"p", "1221", ""},  //
+                {"q", "2212", ""},  //
+                {"r", "121", ""},  //
+                {"s", "111", ""},  //
+                {"t", "2", ""},  //
+                {"u", "112", ""},  //
+                {"v", "1112", ""},  //
+                {"w", "122", ""},  //
+                {"x", "2112", ""},  //
+                {"y", "2122", ""},  //
+                {"z", "2211", ""},  //
+                {"0", "22222", ""},  //
+                {"1", "12222", ""},  //
+                {"2", "11222", ""},  //
+                {"3", "11122", ""},  //
+                {"4", "11112", ""},  //
+                {"5", "11111", ""},  //
+                {"6", "21111", ""},  //
+                {"7", "22111", ""},  //
+                {"8", "22211", ""},  //
+                {"9", "22221", ""},  //
 
-        {".", "121212", ""},  //
-        {",", "221122", ""},  //
-        {":", "222111", ""},  //
-        {"-", "211112", ""},  //
-        {"/", "21121", ""},  //
-        {"=", "21112", ""},  //
-        {"?", "112211", ""},  //
-        {"@", "122121", ""},  //
+                {".", "121212", ""},  //
+                {",", "221122", ""},  //
+                {":", "222111", ""},  //
+                {"-", "211112", ""},  //
+                {"/", "21121", ""},  //
+                {"=", "21112", ""},  //
+                {"?", "112211", ""},  //
+                {"@", "122121", ""},  //
 
-        {"ä", "1212", ""},  // ae
-        {"ö", "2221", ""},  // oe
-        {"ü", "1122", ""},  // ue
+                {"+", "12121", "<ar>"},  //   (at the same time <ar> !)
+                {"S", "12111", "<as>"},  //
+                {"A", "21212", "<ka>"},  //
+                {"N", "21221", "<kn>"},  //
+                {"K", "111212", "<sk>"},   //
+                {"E", "11121", "<ve>"},  //
+                {"H", "2222", "<ch>"},   //
+                {"X", "111222111", "<sos>"}, //
+                {"R", "11111111", "<err>"}, //
 
-        {"+", "12121", "<ar>"},  //   (at the same time <ar> !)
-        {"S", "12111", "<as>"},  //
-        {"A", "21212", "<ka>"},  //
-        {"N", "21221", "<kn>"},  //
-        {"K", "111212", "<sk>"},   //
-        {"E", "11121", "<ve>"},  //
-        {"H", "2222", "<ch>"},   //
-        {"X", "111222111", "<sos>"}, //
-        {"R", "11111111", "<err>"}, //
-        {"*", "", ""}
-};
+                {"ä", "1212", ""},  // ae
+                {"ö", "2221", ""},  // oe
+                {"ü", "1122", ""},  // ue
+
+                {"*", "", ""}};
+
+uint8_t OPT_NUM_start = MorseText::findChar('0');
+uint8_t OPT_NUM_end = MorseText::findChar('9');
+uint8_t OPT_PUNCT_start = MorseText::findChar('.');
+uint8_t OPT_PUNCT_end = MorseText::findChar('@');
+uint8_t OPT_PRO_start = MorseText::findChar('+');
+uint8_t OPT_PRO_end = MorseText::findChar('R');
+uint8_t OPT_ALPHA_start = MorseText::findChar('a');
+uint8_t OPT_ALPHA_end = MorseText::findChar('z');
+
 
 MorseText::Config config;
 
@@ -104,6 +114,7 @@ String lastGeneratedWord = "";
 boolean nextWordIsEndSequence;
 boolean repeatLast;
 void (*MorseText::onGeneratorNewWord)(String);
+
 
 void MorseText::start(GEN_TYPE genType)
 {
@@ -278,43 +289,72 @@ String internal::fetchRandomWord()
 
 String internal::getRandomCWChars(int option, int maxLength)
 {
-    int s = 0, e = 50;
+    int s;
+    int e;
+
     switch (option)
     {
         case OPT_NUM:
+        {
+            s = OPT_NUM_start;
+            e = OPT_NUM_end;
+            break;
+        }
         case OPT_NUMPUNCT:
+        {
+            s = OPT_NUM_start;
+            e = OPT_PUNCT_end;
+            break;
+        }
         case OPT_NUMPUNCTPRO:
-            s = 26;
+        {
+            s = OPT_NUM_start;
+            e = OPT_PRO_end;
             break;
+        }
         case OPT_PUNCT:
+        {
+            s = OPT_PUNCT_start;
+            e = OPT_PUNCT_end;
+            break;
+        }
         case OPT_PUNCTPRO:
-            s = 36;
+        {
+            s = OPT_PUNCT_start;
+            e = OPT_PRO_end;
             break;
+        }
         case OPT_PRO:
-            s = 44;
+        {
+            s = OPT_PRO_start;
+            e = OPT_PRO_end;
             break;
-        default:
-            s = 0;
-            break;
-    }
-    switch (option)
-    {
+        }
         case OPT_ALPHA:
-            e = 26;
+        {
+            s = OPT_ALPHA_start;
+            e = OPT_ALPHA_end;
             break;
+        }
         case OPT_ALNUM:
-        case OPT_NUM:
-            e = 36;
+        {
+            s = OPT_ALPHA_start;
+            e = OPT_NUM_end;
             break;
+        }
         case OPT_ALNUMPUNCT:
-        case OPT_NUMPUNCT:
-        case OPT_PUNCT:
-            e = 45;
+        {
+            s = OPT_ALPHA_start;
+            e = OPT_PUNCT_end;
             break;
+        }
         default:
-            e = 50;
-            break;
+        {
+            s = OPT_ALPHA_start;
+            e = OPT_PRO_end;
+        }
     }
+
     String result = "";
     for (int i = 0; i < maxLength; ++i)
     {
@@ -323,22 +363,6 @@ String internal::getRandomCWChars(int option, int maxLength)
 
     return result;
 }
-
-// we use substrings as char pool for trainer mode
-// SANK will be replaced by <as>, <ka>, <kn> and <sk>
-// Options:
-//    0: a9?<> = CWchars; all of them; same as Koch 45+
-//    1: a = CWchars.substring(0,26);
-//    2: 9 = CWchars.substring(26,36);
-//    3: ? = CWchars.substring(36,45);
-//    4: <> = CWchars.substring(44,50);
-//    5: a9 = CWchars.substring(0,36);
-//    6: 9? = CWchars.substring(26,45);
-//    7: ?<> = CWchars.substring(36,50);
-//    8: a9? = CWchars.substring(0,45);
-//    9: 9?<> = CWchars.substring(26,50);
-
-//  {OPT_ALL, OPT_ALPHA, OPT_NUM, OPT_PUNCT, OPT_PRO, OPT_ALNUM, OPT_NUMPUNCT, OPT_PUNCTPRO, OPT_ALNUMPUNCT, OPT_NUMPUNCTPRO}
 
 String internal::getRandomChars(int maxLength, int option)
 {             /// random char string, eg. group of 5, 9 differing character pools; maxLength = 1-6
@@ -466,15 +490,16 @@ int MorseText::findChar(char c)
     return pos;
 }
 
-
 String MorseText::internalToProSigns(String &input)
 {
     /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
     int i = 0;
-    while (morseChars[i].prosign == "") {
+    while (morseChars[i].prosign == "")
+    {
         i += 1;
     }
-    while (morseChars[i].code != "") {
+    while (morseChars[i].code != "")
+    {
         MorseChar m = morseChars[i];
         input.replace(m.internal, m.prosign);
         i += 1;
@@ -485,10 +510,12 @@ String MorseText::internalToProSigns(String &input)
 String MorseText::proSignsToInternal(String &input)
 {
     int i = 0;
-    while (morseChars[i].prosign == "") {
+    while (morseChars[i].prosign == "")
+    {
         i += 1;
     }
-    while (morseChars[i].prosign != "") {
+    while (morseChars[i].prosign != "")
+    {
         MorseChar m = morseChars[i];
         input.replace(m.prosign, m.internal);
         i += 1;
