@@ -50,8 +50,6 @@ namespace MorseGenerator
     extern int repeats;
     extern uint8_t wordCounter;                          // for maxSequence
 
-//    extern uint8_t effectiveTrainerDisplay;
-
     extern boolean stopFlag;                         // for maxSequence
     extern boolean firstTime;                         /// for word doubler mode
 

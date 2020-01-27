@@ -7,11 +7,6 @@
 
 MorseModeTrx morseModeTrx;
 
-//void MorseModeTrx::setup()
-//{
-//
-//}
-
 boolean MorseModeTrx::menuExec(String mode)
 {
     MorseMachine::morseState = MorseMachine::morseTrx;
@@ -25,19 +20,16 @@ boolean MorseModeTrx::menuExec(String mode)
 
 boolean MorseModeTrx::loop()
 {
-    Serial.println("MorseModeTrx::loop()");
     if (MorseKeyer::doPaddleIambic())
     {
         return true;                                                        // we are busy keying and so need a very tight loop !
     }
     Decoder::doDecodeShow();
-    Serial.println("MorseModeTrx::loop()");
     return false;
 }
 
 void MorseModeTrx::onPreferencesChanged()
 {
-    Serial.println("MorseModeTrx::onPrefsChanged()");
 }
 
 boolean MorseModeTrx::togglePause()

@@ -16,7 +16,6 @@
 
 #include <ESPmDNS.h>       // DNS functionality
 #include <Update.h>        // update "over the air" (OTA) functionality
-//#include <WiFiClient.h>    //WiFi clinet library
 
 #include "MorseWifi.h"
 #include "MorseDisplay.h"
@@ -264,15 +263,12 @@ void MorseWifi::startAP()
     WiFi.mode(WIFI_AP);
     WiFi.setHostname(ssid);
     WiFi.softAP(ssid);
-    //a = WiFi.softAPIP();
     MorseDisplay::clear();
     MorseDisplay::printOnStatusLine(true, 0, "Enter Wifi Info @");
     MorseDisplay::printOnScroll(0, REGULAR, 0, "AP: morserino");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "URL: m32.local");
     MorseDisplay::printOnScroll(2, REGULAR, 0, "RED to abort");
 
-    //printOnScroll(2, REGULAR, 0, WiFi.softAPIP().toString());
-    //Serial.println(WiFi.softAPIP());
 
     internal::startMDNS();
 
@@ -303,7 +299,7 @@ void MorseWifi::startAP()
         if (MorseUI::volButton.clicks)
         {
             MorseDisplay::clear();
-            MorseDisplay::printOnStatusLine(true, 0, "Resetting now...");
+            MorseDisplay::printOnStatusLine(true, 0, "Resetting now ...");
             delay(2000);
             ESP.restart();
         }
@@ -338,7 +334,7 @@ void MorseWifi::updateFirmware()
         HTTPUpload& upload = server.upload();
         if (upload.status == UPLOAD_FILE_START)
         {
-            //Serial.printf("Update: %s\n", upload.filename.c_str());
+            //MORSELOGf("Update: %s\n", upload.filename.c_str());
             if (!Update.begin(UPDATE_SIZE_UNKNOWN))
             { //start with max available size
                 Update.printError(Serial);
@@ -364,7 +360,7 @@ void MorseWifi::updateFirmware()
             }
         }
     });
-    //Serial.println("Starting web server");
+    //MORSELOGLN("Starting web server");
     server.begin();
     MorseDisplay::clear();
     MorseDisplay::printOnStatusLine(true, 0, "Waiting f. Update ");
@@ -394,10 +390,10 @@ boolean MorseWifi::wifiConnect()
         if ((millis() - wait) > 20000)
             return internal::errorConnect(String("No WiFi:"));
     }
-    //Serial.print("Connected to ");
-    //Serial.println(MorsePreferences::prefs.wlanSSID);
-    //Serial.print("IP address: ");
-    //Serial.println(WiFi.localIP());
+    //MORSELOG("Connected to ");
+    //MORSELOGLN(MorsePreferences::prefs.wlanSSID);
+    //MORSELOG("IP address: ");
+    //MORSELOGLN(WiFi.localIP());
     internal::startMDNS();
     return true;
 }
@@ -417,7 +413,7 @@ void internal::startMDNS()
     /*use mdns for host name resolution*/
     if (!MDNS.begin(MorseWifi::host))
     { //http://m32.local
-        Serial.println("Error setting up MDNS responder!");
+        MORSELOGLN("Error setting up MDNS responder!");
         while (1)
         {
             delay(1000);
@@ -425,7 +421,7 @@ void internal::startMDNS()
                 break;
         }
     }
-    //Serial.println("mDNS responder started");
+    //MORSELOGLN("mDNS responder started");
 }
 
 void MorseWifi::uploadFile()
@@ -458,7 +454,7 @@ void MorseWifi::uploadFile()
             });
 
     server.begin();                           // Actually start the server
-    //Serial.println("HTTP server started");
+    //MORSELOGLN("HTTP server started");
     MorseDisplay::clear();
     MorseDisplay::printOnStatusLine(true, 0, "Waiting f. Upload ");
     MorseDisplay::printOnScroll(0, REGULAR, 0, "URL: m32.local");
@@ -488,7 +484,7 @@ String internal::getContentType(String filename)
 
 bool internal::handleFileRead(String path)
 { // send the right file to the client (if it exists)
-  //Serial.println("handleFileRead: " + path);
+  //MORSELOGLN("handleFileRead: " + path);
     if (path.endsWith("/"))
         path += "index.html";          // If a folder is requested, send the index file
     String contentType = internal::getContentType(path);             // Get the MIME type
@@ -500,10 +496,10 @@ bool internal::handleFileRead(String path)
         File file = SPIFFS.open(path, "r");                       // Open the file
         MorseWifi::server.streamFile(file, contentType);                     // Send it to the client
         file.close();                                             // Close the file again
-        Serial.println(String("\tSent file: ") + path);
+        MORSELOGLN(String("\tSent file: ") + path);
         return true;
     }
-    //Serial.println(String("\tFile Not Found: ") + path);   // If the file doesn't exist, return false
+    //MORSELOGLN(String("\tFile Not Found: ") + path);   // If the file doesn't exist, return false
     return false;
 }
 
@@ -515,7 +511,7 @@ void internal::handleFileUpload()
         String filename = upload.filename;
         if (!filename.startsWith("/"))
             filename = "/" + filename;
-        //Serial.print("handleFileUpload Name: "); Serial.println(filename);
+        //MORSELOG("handleFileUpload Name: "); MORSELOGLN(filename);
         MorseWifi::fsUploadFile = MorsePlayerFile::openForWriting();     // Open the file for writing in SPIFFS (create if it doesn't exist)
         filename = String();
     }
@@ -532,7 +528,7 @@ void internal::handleFileUpload()
             MorsePreferences::prefs.fileWordPointer = 0;                              // reset word counter for file player
             MorsePreferences::writeWordPointer();
 
-            //Serial.print("handleFileUpload Size: "); Serial.println(upload.totalSize);
+            //MORSELOG("handleFileUpload Size: "); MORSELOGLN(upload.totalSize);
             //server.sendHeader("Location","/success.html");      // Redirect the client to the success page
             //server.send(303);
         }

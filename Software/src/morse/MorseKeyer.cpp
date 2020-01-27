@@ -56,8 +56,6 @@ boolean (*MorseKeyer::onWordEnd)();
 void (*MorseKeyer::onWordEndDitDah)();
 void (*MorseKeyer::onWordEndNDitDah)();
 
-
-
 void MorseKeyer::setup()
 {
     // to calibrate sensors, we record the values in untouched state
@@ -81,17 +79,9 @@ void MorseKeyer::updateTimings()
 
 void MorseKeyer::keyTransmitter()
 {
-//    Serial.println("MorseKeyer::keyTrans() 1");
-//    if (MorsePreferences::prefs.keyTrainerMode == 0 || MorseMachine::isMode(MorseMachine::echoTrainer)
-//            || MorseMachine::isMode(MorseMachine::loraTrx))
-//        return;                              // we never key Tx under these conditions
-//    Serial.println("MorseKeyer::keyTrans() 2");
-//    if (MorsePreferences::prefs.keyTrainerMode == 1 && MorseMachine::isMode(MorseMachine::morseGenerator))
-//        return;                              // we key only in keyer mode; in all other case we key TX
-//    Serial.println("MorseKeyer::keyTrans() 3");
     if (MorseKeyer::keyTx == true)
     {
-        Serial.println("MorseKeyer::keyTrans() 4");
+        MORSELOGLN("MorseKeyer::keyTrans() 4");
         digitalWrite(keyerPin, HIGH);           // turn the LED on, key transmitter, or whatever
     }
 }
@@ -173,8 +163,10 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
 
         case DIT:
             /// first we check that we have waited as defined by ACS settings
-            if (MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer)) // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
+            if (MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))
+            { // if we do automatic character spacing, and haven't waited for (3 or whatever) dits...
                 break;
+            }
             clearPaddleLatches();                           // always clear the paddle latches at beginning of new element
             keyerControl |= DIT_LAST;                        // remember that we process a DIT
 
@@ -182,21 +174,30 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             switch (MorsePreferences::prefs.keyermode)
             {
                 case IAMBICB:
+                {
                     curtistimer = 2 + (ditLength * MorsePreferences::prefs.curtisBDotTiming / 100);
                     break;                         // enhanced Curtis mode B starts checking after some time
+                }
                 case NONSQUEEZE:
+                {
                     curtistimer = 3;
                     break;
+                }
                 default:
+                {
                     curtistimer = ditLength;        // no early paddle checking in Curtis mode A Ultimatic mode oder Non-squeeze
                     break;
+                }
             }
             keyerState = KEY_START;                          // set next state of state machine
             break;
 
         case DAH:
-            if (MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer)) // if we do automatic character spacing, and haven't waited for 3 dits...
+            if (MorsePreferences::prefs.ACSlength > 0 && (millis() <= Decoder::acsTimer))
+            {
+                // if we do automatic character spacing, and haven't waited for 3 dits...
                 break;
+            }
             clearPaddleLatches();                          // clear the paddle latches
             keyerControl &= ~(DIT_LAST);                    // clear dit latch  - we are not processing a DIT
 
@@ -204,14 +205,20 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             switch (MorsePreferences::prefs.keyermode)
             {
                 case IAMBICB:
+                {
                     curtistimer = 2 + (dahLength * MorsePreferences::prefs.curtisBTiming / 100); // enhanced Curtis mode B starts checking after some time
                     break;
+                }
                 case NONSQUEEZE:
+                {
                     curtistimer = 3;
                     break;
+                }
                 default:
+                {
                     curtistimer = dahLength;        // no early paddle checking in Curtis mode A or Ultimatic mode
                     break;
+                }
             }
             keyerState = KEY_START;                          // set next state of state machine
             break;
@@ -244,12 +251,17 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
                 keyerState = INTER_ELEMENT;       // next state
             }
             else if (millis() > curtistimer)
-            {     // in Curtis mode we check paddle as soon as Curtis time is off
-                if (keyerControl & DIT_LAST)       // last element was a dit
+            {
+                // in Curtis mode we check paddle as soon as Curtis time is off
+                if (keyerControl & DIT_LAST)
+                {
+                    // last element was a dit
                     internal::updatePaddleLatch(false, dah); // not sure here: we only check the opposite paddle - should be ok for Curtis B
+                }
                 else
-                    internal::updatePaddleLatch(dit, false);
-                // updatePaddleLatch(dit, dah);       // but we remain in the same state until element time is off!
+                {
+                    internal::updatePaddleLatch(dit, false); // but we remain in the same state until element time is off!
+                }
             }
             break;
 
@@ -257,11 +269,15 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             //if ((MorsePreferences::prefs.keyermode != NONSQUEEZE) && (millis() < latencytimer)) {     // or should it be MorsePreferences::prefs.keyermode > 2 ? Latency for Ultimatic mode?
             if (millis() < latencytimer)
             {
-                if (keyerControl & DIT_LAST)       // last element was a dit
+                if (keyerControl & DIT_LAST)
+                {
+                    // last element was a dit
                     internal::updatePaddleLatch(false, dah); // not sure here: we only check the opposite paddle - should be ok for Curtis B
+                }
                 else
+                {
                     internal::updatePaddleLatch(dit, false);
-                // updatePaddleLatch(dit, dah);
+                }
             }
             else
             {
@@ -272,71 +288,111 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
                     {
                         case 3:                                         // both paddles are latched
                         case 7:
+                        {
                             switch (MorsePreferences::prefs.keyermode)
                             {
                                 case NONSQUEEZE:
-                                    if (DIT_FIRST)                      // when first element was a DIT
+                                {
+                                    if (DIT_FIRST)
+                                    {                     // when first element was a DIT
                                         internal::setDITstate();            // next element is a DIT again
+                                    }
                                     else
+                                    {
                                         // but when first element was a DAH
                                         internal::setDAHstate();            // the next element is a DAH again!
+                                    }
                                     break;
+                                }
                                 case ULTIMATIC:
-                                    if (DIT_FIRST)                      // when first element was a DIT
+                                {
+                                    if (DIT_FIRST)
+                                    {                     // when first element was a DIT
                                         internal::setDAHstate();            // next element is a DAH
+                                    }
                                     else
+                                    {
                                         // but when first element was a DAH
                                         internal::setDITstate();            // the next element is a DIT!
+                                    }
                                     break;
+                                }
                                 default:
-                                    if (keyerControl & DIT_LAST)     // Iambic: last element was a dit - this is case 7, really
+                                {
+                                    if (keyerControl & DIT_LAST)
+                                    {     // Iambic: last element was a dit - this is case 7, really
                                         internal::setDAHstate();               // next element will be a DAH
+                                    }
                                     else
+                                    {
                                         // and this is case 3 - last element was a DAH
                                         internal::setDITstate();               // the next element is a DIT
+                                    }
+                                }
                             }
                             break;
                             // dit only is latched, regardless what was last element
+                        }
                         case 1:
                         case 5:
+                        {
                             internal::setDITstate();
                             break;
                             // dah only latched, regardless what was last element
+                        }
                         case 2:
                         case 6:
+                        {
                             internal::setDAHstate();
                             break;
                             // none latched, regardless what was last element
+                        }
                         case 0:
                         case 4:
+                        {
                             keyerState = IDLE_STATE;               // we are at the end of the character and go back into IDLE STATE
                             Decoder::displayMorse();                        // display the decoded morse character(s)
                             if (MorseMachine::isMode(MorseMachine::loraTrx))
+                            {
                                 MorseLoRa::cwForLora(0);
+                            }
 
                             MorsePreferences::fireCharSeen(false);
 
                             if (MorsePreferences::prefs.ACSlength > 0)
+                            {
                                 Decoder::acsTimer = millis() + MorsePreferences::prefs.ACSlength * ditLength; // prime the ACS timer
+                            }
+
                             if (MorseMachine::isMode(MorseMachine::morseKeyer) || MorseMachine::isMode(MorseMachine::loraTrx)
                                     || MorseMachine::isMode(MorseMachine::morseTrx))
+                            {
                                 Decoder::interWordTimer = millis() + 5 * ditLength;
+                            }
                             else
+                            {
                                 Decoder::interWordTimer = millis() + interWordSpace; // prime the timer to detect a space between characters
+                            }
+
                             // nominally 7 dit-lengths, but we are not quite so strict here in keyer or TrX mode,
                             // use the extended time in echo trainer mode to allow longer space between characters,
                             // like in listening
                             keyerControl = 0;                          // clear all latches completely before we go to IDLE
                             break;
+                        }
                     } // switch keyerControl : evaluation of flags
                 }
             } // end of INTER_ELEMENT
     } // end switch keyerState - end of state machine
 
-    if (keyerControl & 3)                                               // any paddle latch?
+    if (keyerControl & 3)
+    {                                               // any paddle latch?
         return true;                                                      // we return true - we processed a paddle press
+    }
     else
+    {
         return false;                                                     // when paddle latches are cleared, we return false
+    }
 } /////////////////// end function doPaddleIambic()
 
 //// this function checks the paddles (touch or external), returns true when a paddle has been activated,
@@ -358,18 +414,35 @@ boolean MorseKeyer::checkPaddles()
     newR = (sensor & 0x01) | (!digitalRead(right));
 
     if ((MorsePreferences::prefs.keyermode == NONSQUEEZE) && newL && newR)
+    {
         return (leftKey || rightKey);
+    }
 
     if (newL != oldL)
+    {
         lTimer = micros();
+    }
+
     if (newR != oldR)
+    {
         rTimer = micros();
+    }
+
     if (micros() - lTimer > debDelay)
+    {
         if (newL != leftKey)
+        {
             leftKey = newL;
+        }
+    }
+
     if (micros() - rTimer > debDelay)
+    {
         if (newR != rightKey)
+        {
             rightKey = newR;
+        }
+    }
 
     oldL = newL;
     oldR = newR;
@@ -384,10 +457,13 @@ boolean MorseKeyer::checkPaddles()
 // update the paddle latches in keyerControl
 void internal::updatePaddleLatch(boolean dit, boolean dah)
 {
-    if (dit)
+    if (dit) {
         MorseKeyer::keyerControl |= DIT_L;
-    if (dah)
+    }
+
+    if (dah) {
         MorseKeyer::keyerControl |= DAH_L;
+    }
 }
 
 // clear the paddle latches in keyer control
@@ -401,16 +477,18 @@ void internal::setDITstate()
 {
     keyerState = DIT;
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
-    if (MorseMachine::isMode(MorseMachine::loraTrx))
+    if (MorseMachine::isMode(MorseMachine::loraTrx)) {
         MorseLoRa::cwForLora(1);                         // build compressed string for LoRA
+    }
 }
 
 void internal::setDAHstate()
 {
     keyerState = DAH;
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
-    if (MorseMachine::isMode(MorseMachine::loraTrx))
+    if (MorseMachine::isMode(MorseMachine::loraTrx)) {
         MorseLoRa::cwForLora(2);
+    }
 }
 
 /// function to read sensors:
@@ -424,34 +502,42 @@ uint8_t internal::readSensors(int left, int right)
     //static boolean first = true;
     uint8_t v, lValue, rValue;
 
-    while (!(v = touchRead(left)))
+    while (!(v = touchRead(left))) {
         ;                                       // ignore readings with value 0
+    }
+
     lValue = v;
-    while (!(v = touchRead(right)))
+    while (!(v = touchRead(right))) {
         ;                                       // ignore readings with value 0
+    }
+
     rValue = v;
-    while (!(v = touchRead(left)))
+    while (!(v = touchRead(left))) {
         ;                                       // ignore readings with value 0
+    }
+
     lValue = (lValue + v) / 2;
-    while (!(v = touchRead(right)))
+    while (!(v = touchRead(right))) {
         ;                                       // ignore readings with value 0
+    }
+
     rValue = (rValue + v) / 2;
 
     if (lValue < (MorsePreferences::prefs.tLeft + 10))
     {           //adaptive calibration
-        //if (first) Serial.println("p-tLeft " + String(MorsePreferences::prefs.tLeft));
-        //if (first) Serial.print("lValue: "); if (first) Serial.println(lValue);
+        //if (first) MORSELOGLN("p-tLeft " + String(MorsePreferences::prefs.tLeft));
+        //if (first) MORSELOG("lValue: "); if (first) MORSELOGLN(lValue);
         //printOnScroll(0, INVERSE_BOLD, 0,  String(lValue) + " " + String(MorsePreferences::prefs.tLeft));
         MorsePreferences::prefs.tLeft = (7 * MorsePreferences::prefs.tLeft + ((lValue + lUntouched) / SENS_FACTOR)) / 8;
-        //Serial.print("MorsePreferences::prefs.tLeft: "); Serial.println(MorsePreferences::prefs.tLeft);
+        //MORSELOG("MorsePreferences::prefs.tLeft: "); MORSELOGLN(MorsePreferences::prefs.tLeft);
     }
     if (rValue < (MorsePreferences::prefs.tRight + 10))
     {           //adaptive calibration
-        //if (first) Serial.println("p-tRight " + String(MorsePreferences::prefs.tRight));
-        //if (first) Serial.print("rValue: "); if (first) Serial.println(rValue);
+        //if (first) MORSELOGLN("p-tRight " + String(MorsePreferences::prefs.tRight));
+        //if (first) MORSELOG("rValue: "); if (first) MORSELOGLN(rValue);
         //printOnScroll(1, INVERSE_BOLD, 0,  String(rValue) + " " + String(MorsePreferences::prefs.tRight));
         MorsePreferences::prefs.tRight = (7 * MorsePreferences::prefs.tRight + ((rValue + rUntouched) / SENS_FACTOR)) / 8;
-        //Serial.print("MorsePreferences::prefs.tRight: "); Serial.println(MorsePreferences::prefs.tRight);
+        //MORSELOG("MorsePreferences::prefs.tRight: "); MORSELOGLN(MorsePreferences::prefs.tRight);
     }
     //first = false;
     return (lValue < MorsePreferences::prefs.tLeft ? 2 : 0) + (rValue < MorsePreferences::prefs.tRight ? 1 : 0);
@@ -463,12 +549,14 @@ void internal::initSensors()
     lUntouched = rUntouched = 60;       /// new: we seek minimum
     for (int i = 0; i < 8; ++i)
     {
-        while (!(v = touchRead(LEFT)))
+        while (!(v = touchRead(LEFT))) {
             ;                                       // ignore readings with value 0
+        }
         lUntouched += v;
         //lUntouched = _min(lUntouched, v);
-        while (!(v = touchRead(RIGHT)))
+        while (!(v = touchRead(RIGHT))) {
             ;                                       // ignore readings with value 0
+        }
         rUntouched += v;
         //rUntouched = _min(rUntouched, v);
     }
@@ -477,7 +565,6 @@ void internal::initSensors()
     MorsePreferences::prefs.tLeft = lUntouched - 9;
     MorsePreferences::prefs.tRight = rUntouched - 9;
 }
-
 
 void MorseKeyer::changeSpeed(int t)
 {

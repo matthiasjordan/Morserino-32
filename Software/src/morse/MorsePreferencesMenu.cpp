@@ -608,23 +608,19 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
         {
             case -1:
             {                            //delay(200);
-                Serial.println("Click -1");
                 return true;
                 break;
             }
             case 1:
             { //MorseDisplay::printOnScroll(1, BOLD, 0,  ">");
-                Serial.println("Click 1 - save");
                 MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
                 const MorseMenu::MenuItem* mi = MorseMenu::getCurrentMenuItem();
                 if (mi->mode != 0)
                 {
-                    Serial.println("Calling alternative pref changed listener");
                     mi->mode->onPreferencesChanged();
                 }
                 else if (mi->onPreferencesChanged != 0)
                 {
-                    Serial.println("Calling pref changed listener");
                     mi->onPreferencesChanged();
                 }
                 MorseText::onPreferencesChanged();
@@ -955,13 +951,10 @@ boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu)
             MorseUI::click();
 
             ptrIndex = internal::calcNewIndexWraparound(ptrIndex, t);
-            //Serial.println("ptrIndex: " + String(ptrIndex));
             posPtr = MorsePreferences::currentOptions[ptrIndex];
-            //oldIndex = ptrIndex;                                                              // remember menu position
             oldPos = posPtr;
 
             MorsePreferencesMenu::displayKeyerPreferencesMenu(posPtr);
-            //printOnScroll(1, BOLD, 0, ">");
             MorseDisplay::printOnScroll(2, REGULAR, 0, " ");
 
             MorseDisplay::displayDisplay();                                                        // update the display
@@ -1003,7 +996,5 @@ boolean MorsePreferencesMenu::selectKochFilter()
     MorsePreferencesMenu::displayKeyerPreferencesMenu(MorsePreferences::posKochFilter);
     MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::posKochFilter);
     MorsePreferences::writePreferences("morserino");
-    //createKochWords(MorsePreferences::prefs.wordLength, MorsePreferences::prefs.kochFilter) ;  // update the arrays!
-    //createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
     return false;
 }

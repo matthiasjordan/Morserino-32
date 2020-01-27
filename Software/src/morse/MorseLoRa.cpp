@@ -59,8 +59,10 @@ void MorseLoRa::setup()
         MorseDisplay::clearDisplay();
         MorseDisplay::printOnStatusLine(true, 0, "Release BLACK");
         while (digitalRead(modeButtonPin) == LOW)
+        {
             // wait until released
             ;
+        }
         internal::loraSystemSetup();
     }
 
@@ -69,9 +71,11 @@ void MorseLoRa::setup()
     LoRa.setPins(SS, RST, DI0);
     if (!LoRa.begin(MorsePreferences::prefs.loraQRG, PABOOSTx))
     {
-        Serial.println("Starting LoRa failed!");
+        MORSELOGLN("Starting LoRa failed!");
         while (1)
+        {
             ;
+        }
     }
     LoRa.setFrequency(MorsePreferences::prefs.loraQRG);        /// default = 434.150 MHz - Region 1 ISM Band, can be changed by system setup
     LoRa.setSpreadingFactor(7);                         /// default
@@ -120,9 +124,6 @@ void internal::loraSystemSetup()
 
 void MorseLoRa::cwForLora(int element)
 {
-    //static String result;
-    //result.reserve(36);
-    //static char buf[32];
     static int pairCounter = 0;
     uint8_t temp;
     uint8_t header;
@@ -134,19 +135,15 @@ void MorseLoRa::cwForLora(int element)
 
         /// 1st byte: version + serial number
         header = ++loRaSerial % 64;
-        //Serial.println("loRaSerial: " + String(loRaSerial));
         header += CWLORAVERSION * 64;        //// shift VERSION left 6 bits and add to the serial number
         loraTxBuffer[0] = header;
 
         temp = MorsePreferences::prefs.wpm * 4;                   /// shift left 2 bits
         loraTxBuffer[1] |= temp;
         pairCounter = 7;         /// so far we have used 7 bit pairs: 4 in the first byte (protocol version+serial); 3 in the 2nd byte (wpm)
-        //Serial.println(temp);
-        //Serial.println(loraBuffer);
     }
 
     temp = element & B011;      /// take the two left bits
-    //Serial.println("Temp before shift: " + String(temp));
     /// now store these two bits in the correct location in loraBuffer
 
     if (temp && (temp != 3))
@@ -159,7 +156,9 @@ void MorseLoRa::cwForLora(int element)
     /// have we get end of word, we got end of character (0) before
 
     if (temp != 3)
+    {
         ++pairCounter;
+    }
     else
     {
         --pairCounter; /// we are at end of word and step back to end of character
@@ -179,7 +178,9 @@ void MorseLoRa::sendWithLora()
     LoRa.print(loraTxBuffer);
     LoRa.endPacket();
     if (MorseMachine::isMode(MorseMachine::loraTrx))
+    {
         LoRa.receive();
+    }
 }
 
 void internal::onReceive(int packetSize)
@@ -193,17 +194,17 @@ void internal::onReceive(int packetSize)
     for (int i = 0; i < packetSize; i++)
     {
         result += (char) LoRa.read();
-        //Serial.print((char)LoRa.read());
     }
+
     if (packetSize < 49)
+    {
         internal::storePacket(LoRa.packetRssi(), result);
+    }
     else
+    {
         Serial.println("LoRa Packet longer than 48 bytes! Discarded...");
+    }
     // print RSSI of packet
-    //Serial.print("' with RSSI ");
-    //Serial.println(LoRa.packetRssi());
-    //Serial.print(" S-Meter: ");
-    //Serial.println(map(LoRa.packetRssi(), -160, -20, 0, 100));
 }
 
 //// new buffer code: unpack when needed, to save buffer space. We just use 256 bytes of buffer, instead of 32k!
@@ -244,8 +245,11 @@ uint8_t internal::loRaBuWrite(int rssi, String packet)
 
     posRssi = (uint8_t) abs(rssi);
     l = 2 + packet.length();
-    if (byteBuFree < l)                               // buffer full - discard packet
+    if (byteBuFree < l)
+    {                               // buffer full - discard packet
         return 0;
+    }
+
     loRaRxBuffer[nextBuWrite++] = l;
     loRaRxBuffer[nextBuWrite++] = posRssi;
     for (int i = 0; i < packet.length(); ++i)
@@ -253,17 +257,19 @@ uint8_t internal::loRaBuWrite(int rssi, String packet)
         loRaRxBuffer[nextBuWrite++] = packet[i];       // at end nextBuWrite is alread where it should be
     }
     byteBuFree -= l;
-    //Serial.println(byteBuFree);
-    //Serial.println((String)loRaRxBuffer[0]);
     return l;
 }
 
 boolean MorseLoRa::loRaBuReady()
 {
     if (byteBuFree == 256)
-        return (false);
+    {
+        return false;
+    }
     else
+    {
         return true;
+    }
 }
 
 uint8_t internal::loRaBuRead(uint8_t* buIndex)
@@ -271,7 +277,9 @@ uint8_t internal::loRaBuRead(uint8_t* buIndex)
 ////    uint8_t loRaBuRead(uint8_t* buIndex): returns length of packet, and index where to read in buffer by reference
     uint8_t l;
     if (byteBuFree == 256)
+    {
         return 0;
+    }
     else
     {
         l = loRaRxBuffer[nextBuRead++];
@@ -286,18 +294,16 @@ uint8_t internal::loRaBuRead(uint8_t* buIndex)
 void internal::storePacket(int rssi, String packet)
 {             // whenever we receive something, we just store it in our buffer
     if (loRaBuWrite(rssi, packet) == 0)
+    {
         Serial.println("LoRa Buffer full");
+    }
 }
 
 MorseLoRa::Packet MorseLoRa::decodePacket()
 {
-    Serial.println("MorseLoRa::decodePacket()");
     MorseLoRa::Packet packet;
 
     uint8_t header = internal::decodePacket(&packet.rssi, &packet.rxWpm, &packet.payload);
-    //Serial.println("Header: " + (String) header);
-    //Serial.println("CWword: " + (String) CWword);
-    //Serial.println("Speed: " + (String) rxWpm);
     packet.protocolVersion = (header >> 6);
     if (packet.protocolVersion != CWLORAVERSION)
     {
@@ -305,6 +311,7 @@ MorseLoRa::Packet MorseLoRa::decodePacket()
         packet.valid = false;
         packet.payload = "";
     }
+
     if ((packet.rxWpm < 5) || (packet.rxWpm > 60))
     {
         // invalid speed
@@ -335,17 +342,26 @@ uint8_t internal::decodePacket(int* rssi, int* wpm, String* cwword)
         switch (i)
         {
             case 0:
+            {
                 *rssi = (int) (-1 * c);    // the rssi byte
                 break;
+            }
             case 1:
+            {
                 header = c;
                 break;
+            }
             case 2:
+            {
                 *wpm = (uint8_t) (c >> 2); // the first data byte contains the wpm info in the first six bits, and actual morse in the remaining two bits
                                            // now take remaining two bits and store them in CWword as ASCII
                 *cwword = (char) ((c & B011) + 48);
                 break;
-            default: // decode the rest of the packet; we do this for all but the first byte  /// we need to handle end of word!!! therefore the break
+            }
+            default:
+            {
+                // decode the rest of the packet; we do this for all but the first byte  /// we need to handle end of word!!! therefore the break
+
                 for (int j = 0; j < 4; ++j)
                 {
                     char cc = ((c >> 2 * (3 - j)) & B011);                // we store them as ASCII characters 0,1,2,3 !
@@ -354,9 +370,12 @@ uint8_t internal::decodePacket(int* rssi, int* wpm, String* cwword)
                         *cwword += (char) (cc + 48);
                     }
                     else
+                    {
                         break;
+                    }
                 }
                 break;
+            }
         } // end switch
     }   // end for
     return header;

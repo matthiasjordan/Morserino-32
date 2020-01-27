@@ -4,23 +4,23 @@
 void voidFunction()
 {
     // Well, nothing.
-    Serial.println("voidFunction");
+    MORSELOGLN("voidFunction");
 }
 
 void voidFunction(String s) {
-    Serial.println("voidFunction String");
+    MORSELOGLN("voidFunction String");
 }
 
 
 unsigned long uLongFunctionMinus1()
 {
-    Serial.println("uLongFunctionMinus1");
+    MORSELOGLN("uLongFunctionMinus1");
     return -1;
 }
 
 
 boolean booleanFunctionFalse()
 {
-    Serial.println("booleanFunctionFalse");
+    MORSELOGLN("booleanFunctionFalse");
     return false;
 }

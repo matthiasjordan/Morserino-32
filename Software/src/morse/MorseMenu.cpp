@@ -193,22 +193,8 @@ void MorseMenu::menu_()
     uint8_t disp = 0;
     int t, command;
 
-    //// initialize a few things now
-    //Serial.println("THE MENU");
-    ///updateTimings(); // now done after reading preferences
     MorseLoRa::idle();
-    //keyerState = IDLE_STATE;
-    //startFirst = true;
     MorseMenu::cleanStartSettings();
-    /*
-     clearText = "";
-     CWword = "";
-     echoTrainerState = START_ECHO;
-     generatorState = KEY_UP;
-     keyerState = IDLE_STATE;
-     interWordTimer = 4294967000;                 // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
-     genTimer = millis()-1;                       // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
-     */
     MorseDisplay::clearScroll();                  // clear the buffer
     MorseDisplay::clearScrollBuffer();
 
@@ -249,7 +235,6 @@ void MorseMenu::menu_()
                 internal::menuDisplay(newMenuPtr);
                 break;
             case 1: // check if we have a submenu or if we execute the selection
-                    //Serial.println("newMP: " + String(newMenuPtr) + " navi: " + String(menuNav[newMenuPtr][naviDown]));
                 if (menuItems[newMenuPtr].nav[naviDown] == 0)
                 {
                     MorsePreferences::prefs.menuPtr = newMenuPtr;
@@ -299,7 +284,6 @@ void MorseMenu::menu_()
 
 void internal::menuDisplay(uint8_t ptr)
 {
-    //Serial.println("Level: " + (String) menuItems[ptr].nav[naviLevel] + " " + menuItems[ptr].text);
     uint8_t oneUp = menuItems[ptr].nav[naviUp];
     uint8_t twoUp = menuItems[oneUp].nav[naviUp];
     uint8_t oneDown = menuItems[ptr].nav[naviDown];
@@ -347,8 +331,6 @@ void internal::menuDisplay(uint8_t ptr)
 
 boolean internal::menuExec()
 {                                          // return true if we should  leave menu after execution, true if we should stay in menu
-    //Serial.println("Executing menu item " + String(MorsePreferences::prefs.menuPtr));
-
     MorseDisplay::getConfig()->autoFlush = true;
 
     Koch::setKochActive(false);
@@ -357,7 +339,7 @@ boolean internal::menuExec()
 
     if (getCurrentMenuItem()->mode != 0)
     {
-        Serial.println("Running alternative menu selection.");
+        MORSELOGLN("Running alternative menu selection.");
         String fxParam = menuItems[MorsePreferences::prefs.menuPtr].menufxParam;
         return getCurrentMenuItem()->mode->menuExec(fxParam);
     }
@@ -375,11 +357,9 @@ boolean internal::menuExec()
 
 void MorseMenu::cleanStartSettings()
 {
-//    MorseEchoTrainer::setState(MorseEchoTrainer::START_ECHO);
     MorseGenerator::generatorState = MorseGenerator::KEY_UP;
     MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
-//    MorseGenerator::setStart();
     MorseDisplay::displayTopLine();
 }
 

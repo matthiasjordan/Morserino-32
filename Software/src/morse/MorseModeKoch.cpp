@@ -51,7 +51,6 @@ boolean MorseModeKoch::menuExec(String mode)
     }
 
     generatorConfig->wordEndMethod = MorseGenerator::LF;
-//    generatorConfig->printSpaceAfterWord = true;
 
     return true;
 }

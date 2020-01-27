@@ -52,8 +52,8 @@ void MorseSound::pwmTone(unsigned int frequency, unsigned int volume, boolean li
     const uint16_t vol[] =
         {0, 1, 2, 3, 16, 150, 380, 580, 700, 880, 1023};
     int i = uconstrain(volume / 10, 10);
-    //Serial.println(vol[i]);
-    //Serial.println(frequency);
+    //MORSELOGLN(vol[i]);
+    //MORSELOGLN(frequency);
     if (lineOut)
     {
         ledcWriteTone(lineOutChannel, (double) frequency);

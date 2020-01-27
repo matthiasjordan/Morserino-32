@@ -23,7 +23,6 @@ namespace MorseLoRa
     void cwForLora(int element);
     void sendWithLora();
     boolean loRaBuReady();
-//    uint8_t decodePacket(int* rssi, int* wpm, String* cwword);
     Packet decodePacket();
     void receive();
 }

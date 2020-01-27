@@ -112,7 +112,7 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
         atStart = true;
 
     repository.toCharArray(repName, l);
-    // Serial.println("Reading from repository: " + String(repName));
+    // MORSELOGLN("Reading from repository: " + String(repName));
     // read preferences from non-volatile storage
     // if version cannot be read, we have a new ESP32 and need to write the preferences first
 
@@ -254,7 +254,7 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
 
     if ((temp = pref.getUChar("lastExecuted")))
         p.menuPtr = temp;
-    //Serial.println("read: p.menuPtr = " + String(p.menuPtr));
+    //MORSELOGLN("read: p.menuPtr = " + String(p.menuPtr));
 
     if ((temp = pref.getUChar("timeOut")))
         p.timeOut = temp;
@@ -318,7 +318,7 @@ void MorsePreferences::writePreferences(String repository)
 
     if (repository == "morserino")
         morserino = true;
-//Serial.println("Writing to repository: " + repository);
+//MORSELOGLN("Writing to repository: " + repository);
     repository.toCharArray(repName, l);
 
     pref.begin(repName, false);                // open namespace in read/write mode
@@ -428,7 +428,7 @@ void MorsePreferences::writePreferences(String repository)
     if (!morserino)
     {
         pref.putUChar("lastExecuted", p.menuPtr);   // store last executed command in snapshots
-        //Serial.println("write: last executed: " + String(p.menuPtr));
+        //MORSELOGLN("write: last executed: " + String(p.menuPtr));
     }
 
     pref.end();
@@ -443,17 +443,17 @@ boolean MorsePreferences::recallSnapshot()
     MorsePreferencesMenu::displayKeyerPreferencesMenu(posSnapRecall);
     if (!MorsePreferencesMenu::adjustKeyerPreference(posSnapRecall))
     {
-        //Serial.println("recall memPtr: " + String(memPtr));
+        //MORSELOGLN("recall memPtr: " + String(memPtr));
         text = "Snap " + String(memories[memPtr] + 1) + " RECALLD";
         if (memCounter)
         {
             if (memPtr != memCounter)
             {
                 snapname = "snap" + String(memories[memPtr]);
-                //Serial.println("recall snapname: " + snapname);
+                //MORSELOGLN("recall snapname: " + snapname);
                 readPreferences(snapname);
                 MorseDisplay::printOnScroll(2, BOLD, 0, text);
-                //Serial.println("after recall - p.menuPtr: " + String(p.menuPtr));
+                //MORSELOGLN("after recall - p.menuPtr: " + String(p.menuPtr));
                 delay(1000);
                 return true;
             }
@@ -474,20 +474,20 @@ boolean MorsePreferences::storeSnapshot(uint8_t menu)
     MorsePreferencesMenu::displayKeyerPreferencesMenu(posSnapStore);
     MorsePreferencesMenu::adjustKeyerPreference(posSnapStore);
     MorseUI::volButton.Update();
-    //Serial.println("store memPtr: " + String(memPtr));
+    //MORSELOGLN("store memPtr: " + String(memPtr));
     if (memPtr != 8)
     {
         MorsePreferences::prefs.menuPtr = menu;     // also store last menu selection
-        //Serial.println("menu: " + String(p.menuPtr));
+        //MORSELOGLN("menu: " + String(p.menuPtr));
         text = "Snap " + String(memPtr + 1) + " STORED ";
         snapname = "snap" + String(memPtr);
-        //Serial.println("store snapname: " + snapname);
-        //Serial.println("store: p.menuPtr = " + String(p.menuPtr));
+        //MORSELOGLN("store snapname: " + snapname);
+        //MORSELOGLN("store: p.menuPtr = " + String(p.menuPtr));
         writePreferences(snapname);
         /// insert the correct bit into p.snapShots & update memory variables
         mask = mask << memPtr;
         prefs.snapShots = MorsePreferences::prefs.snapShots | mask;
-        //Serial.println("store p.snapShots: " + String(p.snapShots));
+        //MORSELOGLN("store p.snapShots: " + String(p.snapShots));
         MorseDisplay::printOnScroll(2, BOLD, 0, text);
         updateMemory(MorsePreferences::prefs.snapShots);
         delay(1000);
@@ -576,7 +576,7 @@ void MorsePreferences::writeWifiInfo(String SSID, String passwd)
 {
     MorsePreferences::prefs.wlanSSID = SSID;
     MorsePreferences::prefs.wlanPassword = passwd;
-    //Serial.println("SSID: " + MorsePreferences::prefs.wlanSSID + " Password: " + MorsePreferences::prefs.wlanPassword);
+    //MORSELOGLN("SSID: " + MorsePreferences::prefs.wlanSSID + " Password: " + MorsePreferences::prefs.wlanPassword);
     pref.begin("morserino", false);             // open the namespace as read/write
     pref.putString("wlanSSID", MorsePreferences::prefs.wlanSSID);
     pref.putString("wlanPassword", MorsePreferences::prefs.wlanPassword);

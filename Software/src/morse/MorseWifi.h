@@ -2,20 +2,13 @@
 #define MORSEWIFI_H_
 
 #include <Arduino.h>
-//#include <Wire.h>          // Only needed for Arduino 1.6.5 and earlier
-//#include "ClickButton.h"   // button control library
-//#include <SPI.h>           // library for SPI interface
-//#include <LoRa.h>          // library for LoRa transceiver
 #include <WiFi.h>          // basic WiFi functionality
 #include <WebServer.h>     // simple web sever
-//#include "FS.h"
 #include "SPIFFS.h"
 
 namespace MorseWifi
 {
     ////////////////// Variables for file handling and WiFi functions
-
-//    File file;
 
     extern WebServer server;    // Create a webserver object that listens for HTTP request on port 80
 

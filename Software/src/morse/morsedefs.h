@@ -5,6 +5,16 @@ const String PROJECTNAME = "Morselino-32";
 
 #include <Arduino.h>
 
+//#define DEBUG
+
+#ifdef DEBUG
+#define MORSELOGLN(x) Serial.println(x)
+#define MORSELOG(x) Serial.print(x)
+#else
+#define MORSELOGLN(x) ;
+#define MORSELOG(x) ;
+#endif
+
 //////// Program Version
 #define BETA false
 

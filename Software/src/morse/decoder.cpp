@@ -110,7 +110,6 @@ boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
 void (*Decoder::storeCharInResponse)(String);
 
-
 DECODER_STATES Decoder::decoderState = LOW_;
 
 unsigned long Decoder::ditAvg, Decoder::dahAvg; /// average values of dit and dah lengths to decode as dit or dah and to adapt to speed change
@@ -290,23 +289,18 @@ boolean internal::checkTone()
 ///// check straight key first before you check audio in.... (unless we are in transceiver mode)
 ///// straight key is connected to external paddle connector (tip), i.e. the same as the left pin (dit normally)
 
-//    Serial.println("Decoder::checkTone() 1");
-
     if (straightKey())
     {
-        Serial.println("Decoder::checkTone() 2");
         realstate = true;
-        //Serial.println("Straight Key!");
         //keyTx = true;
     }
     else
     {
-//        Serial.println("Decoder::checkTone() 3");
         realstate = false;
         //keyTx = false;
         for (int index = 0; index < Decoder::goertzel_n; index++)
             testData[index] = analogRead(audioInPin);
-        //Serial.println("Read and stored analog values!");
+        //MORSELOGLN("Read and stored analog values!");
         for (int index = 0; index < Decoder::goertzel_n; index++)
         {
             float Q0;
@@ -314,14 +308,14 @@ boolean internal::checkTone()
             Q2 = Q1;
             Q1 = Q0;
         }
-        //Serial.println("Calculated Q1 and Q2!");
+        //MORSELOGLN("Calculated Q1 and Q2!");
 
         float magnitudeSquared = (Q1 * Q1) + (Q2 * Q2) - (Q1 * Q2 * coeff); // we do only need the real part //
         magnitude = sqrt(magnitudeSquared);
         Q2 = 0;
         Q1 = 0;
 
-        //Serial.println("Magnitude: " + String(magnitude) + " Limit: " + String(magnitudelimit));   //// here you can measure magnitude for setup..
+        //MORSELOGLN("Magnitude: " + String(magnitude) + " Limit: " + String(magnitudelimit));   //// here you can measure magnitude for setup..
 
         ///////////////////////////////////////////////////////////
         // here we will try to set the magnitude limit automatic //
@@ -360,16 +354,13 @@ boolean internal::checkTone()
         }
     }
     realstatebefore = realstate;
-    Serial.println("Decoder::checkTone() 10");
 
-
-    if (Decoder::filteredState == Decoder::filteredStateBefore) {
-        Serial.println("Decoder::checkTone() 11");
+    if (Decoder::filteredState == Decoder::filteredStateBefore)
+    {
         return false;                                 // no change detected in filteredState
     }
     else
     {
-        Serial.println("Decoder::checkTone() 12");
         Decoder::filteredStateBefore = Decoder::filteredState;
         return true;                                // change detected in filteredState
     }
@@ -380,7 +371,7 @@ void internal::doDecode()
     float lacktime;
     int wpm;
 
-//    Serial.println("Decoder::doDecode() 1");
+//    MORSELOGLN("Decoder::doDecode() 1");
     switch (decoderState)
     {
         case INTERELEMENT_:
@@ -475,8 +466,6 @@ void internal::OFF_()
     unsigned long timeNow = millis();
     unsigned int threshold = (int) (Decoder::ditAvg * sqrt(Decoder::dahAvg / Decoder::ditAvg));
 
-    //Serial.print("threshold: ");
-    //Serial.println(threshold);
     highDuration = timeNow - startTimeHigh;
     startTimeLow = timeNow;
 
@@ -485,13 +474,11 @@ void internal::OFF_()
         if (highDuration < threshold)
         { /// we got a dit -
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
-            //Serial.print(".");
             internal::recalculateDit(highDuration);
         }
         else
         {        /// we got a dah
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
-            //Serial.print("-");
             internal::recalculateDah(highDuration);
         }
     }
@@ -503,23 +490,24 @@ void internal::OFF_()
 
 }
 
+/*
+ * recalculate the average dit length
+ */
 void internal::recalculateDit(unsigned long duration)
-{       /// recalculate the average dit length
+{
     Decoder::ditAvg = (4 * Decoder::ditAvg + duration) / 5;
-    //Serial.print("ditAvg: ");
-    //Serial.println(ditAvg);
     //nbtime =ditLength / 5;
     nbtime = constrain(Decoder::ditAvg / 5, 7, 20);
-    //Serial.println(nbtime);
 }
 
+/*
+ * recalculate the average dah length
+ */
 void internal::recalculateDah(unsigned long duration)
-{       /// recalculate the average dah length
-    //static uint8_t rot = 0;
-    //static unsigned long collector;
-
+{
     if (duration > 2 * Decoder::dahAvg)
-    {                       /// very rapid decrease in speed!
+    {
+        // very rapid decrease in speed!
         Decoder::dahAvg = (Decoder::dahAvg + 2 * duration) / 3;            /// we adjust faster, ditAvg as well!
         Decoder::ditAvg = Decoder::ditAvg / 2 + Decoder::dahAvg / 6;
     }
@@ -527,9 +515,6 @@ void internal::recalculateDah(unsigned long duration)
     {
         Decoder::dahAvg = (3 * Decoder::ditAvg + Decoder::dahAvg + duration) / 3;
     }
-    //Serial.print("dahAvg: ");
-    //Serial.println(dahAvg);
-
 }
 
 /// display decoded morse code (and store it in echoTrainer
@@ -538,11 +523,13 @@ void Decoder::displayMorse()
     String symbol;
     symbol.reserve(6);
     if (treeptr == 0)
+    {
         return;
+    }
     symbol = CWtree[treeptr].symb;
-    //Serial.println("Symbol: " + symbol + " treeptr: " + String(treeptr));
     MorseDisplay::printToScroll(REGULAR, symbol);
-    if (storeCharInResponse != 0) {
+    if (storeCharInResponse != 0)
+    {
         storeCharInResponse(symbol);
     }
     treeptr = 0;                                    // reset tree pointer
@@ -553,8 +540,11 @@ void Decoder::interWordTimerOff()
     interWordTimer = 4294967000;                   /// interword timer should not trigger something now
 }
 
+/*
+ * decode the Morse code character in cwword to clear text
+ */
 String Decoder::CWwordToClearText(String cwword)
-{             // decode the Morse code character in cwword to clear text
+{
     int ptr = 0;
     String result;
     result.reserve(40);
@@ -582,7 +572,6 @@ String Decoder::CWwordToClearText(String cwword)
         }
     }
     symbol = CWtree[ptr].symb;
-    //Serial.println("Symbol: " + symbol + " ptr: " + String(ptr));
     result += symbol;
     return internal::encodeProSigns(result);
 }
@@ -598,7 +587,6 @@ String internal::encodeProSigns(String &input)
     input.replace("<ch>", "H");
     input.replace("<err>", "E");
     input.replace("¬", "U");
-    //Serial.println(input);
     return input;
 }
 

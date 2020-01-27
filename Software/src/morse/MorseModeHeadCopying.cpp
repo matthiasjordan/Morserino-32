@@ -6,11 +6,7 @@
 #include "MorseModeHeadCopying.h"
 #include "MorsePlayerFile.h"
 
-
 MorseModeHeadCopying morseModeHeadCopying;
-
-
-
 
 MorseModeHeadCopying::AutoStopState autoStopState;
 
@@ -19,7 +15,6 @@ void MorseModeHeadCopying::setup()
 
 }
 
-
 boolean MorseModeHeadCopying::menuExec(String mode)
 {
     startTrainer();
@@ -27,15 +22,14 @@ boolean MorseModeHeadCopying::menuExec(String mode)
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
     genCon->effectiveTrainerDisplay = DISPLAY_BY_CHAR;
     genCon->wordEndMethod = MorseModeHeadCopying::wordEndMethod;
-    genCon->onGeneratorWordEnd = [](){ return morseModeHeadCopying.onGeneratorWordEnd();};
+    genCon->onGeneratorWordEnd = []()
+    {   return morseModeHeadCopying.onGeneratorWordEnd();};
 
     if (mode == "a")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::headOptions;
     }
     else if (mode == "player")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::headOptions;
         MorsePlayerFile::openAndSkip();
     }
 
@@ -60,7 +54,6 @@ void MorseModeHeadCopying::startTrainer()
     MorseDisplay::clearScroll();      // clear the buffer
 }
 
-
 unsigned long MorseModeHeadCopying::onGeneratorWordEnd()
 {
     autoStopState = stop1;
@@ -76,13 +69,13 @@ boolean MorseModeHeadCopying::loop()
 
         if (MorseKeyer::leftKey)
         {
-            Serial.println("MG::loop() 3 replast");
             MorseText::setRepeatLast();
             MorseDisplay::clearScrollBuffer();
             MorseGenerator::getConfig()->wordEndMethod = MorseGenerator::nothing;
             autoStopState = off;
         }
-        else {
+        else
+        {
             MorseGenerator::getConfig()->wordEndMethod = MorseModeHeadCopying::wordEndMethod;
         }
 
@@ -143,11 +136,12 @@ boolean MorseModeHeadCopying::loop()
     return false;
 }
 
-
-void MorseModeHeadCopying::onPreferencesChanged() {
+void MorseModeHeadCopying::onPreferencesChanged()
+{
 
 }
 
-boolean MorseModeHeadCopying::togglePause() {
+boolean MorseModeHeadCopying::togglePause()
+{
     return false;
 }

@@ -258,7 +258,6 @@ void loop()
             case MorseMachine::volumeSettingMode:
                 MorsePreferences::prefs.sidetoneVolume += (t * 10) + 11;
                 MorsePreferences::prefs.sidetoneVolume = constrain(MorsePreferences::prefs.sidetoneVolume, 11, 111) - 11;
-                //Serial.println(MorsePreferences::prefs.sidetoneVolume);
                 MorseDisplay::displayVolume();
                 break;
             case MorseMachine::scrollMode:

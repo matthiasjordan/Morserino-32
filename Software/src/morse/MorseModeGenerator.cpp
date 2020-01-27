@@ -35,11 +35,9 @@ boolean MorseModeGenerator::menuExec(String mode)
 {
     if (mode == "a")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::generatorOptions;
     }
     else if (mode == "player")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::playerOptions;                  // list of available options in player mode
         MorsePlayerFile::openAndSkip();
     }
 
@@ -67,11 +65,8 @@ void MorseModeGenerator::startTrainer()
 
 void MorseModeGenerator::onPreferencesChanged()
 {
-    Serial.println("MorseGen::oPC 1");
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
-
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
-
 }
 
 boolean MorseModeGenerator::togglePause()
@@ -109,12 +104,12 @@ boolean MorseModeGenerator::loop()
         }
         else
         {
-            //cleanStartSettings();
             MorseGenerator::generatorState = MorseGenerator::KEY_UP;
             MorseGenerator::genTimer = millis() - 1; // we will be at end of KEY_DOWN when called the first time, so we can fetch a new word etc...
             MorseDisplay::displayTopLine();
         }
     }
+
     if (active)
     {
         MorseGenerator::generateCW();

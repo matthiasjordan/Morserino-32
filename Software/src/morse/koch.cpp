@@ -40,7 +40,6 @@ void Koch::setup()
     createKochAbbr(MorsePreferences::prefs.abbrevLength, MorsePreferences::prefs.kochFilter);
 }
 
-
 boolean Koch::isKochActive()
 {
     return kochActive;
@@ -61,7 +60,9 @@ uint8_t Koch::wordIsKoch(String thisWord)
     uint8_t thisKoch = 0;
     uint8_t l = thisWord.length();
     for (int i = 0; i < l; ++i)
+    {
         thisKoch = _max(thisKoch, kochChars.indexOf(thisWord.charAt(i)) + 1);
+    }
     return thisKoch;
 }
 
@@ -72,16 +73,19 @@ String Koch::getChar(uint8_t maxKochLevel)
 
 String Koch::getRandomChars(int maxLength)
 {
-    Serial.println("Koch:gRC " + String(maxLength));
     String result;
     int endk = MorsePreferences::prefs.kochFilter;                        //              1   5    1    5    2    5    3    5    4    5    5
     for (int i = 0; i < maxLength; ++i)
     {
-        Serial.println("Koch:gRC " + String(maxLength) + " " + String(i));
-        if (random(2))                                    // in Koch mode, we generate the last third of the chars learned  a bit more often
+        if (random(2))
+        {
+            // in Koch mode, we generate the last third of the chars learned  a bit more often
             result += kochChars.charAt(random(2 * endk / 3, endk));
+        }
         else
+        {
             result += kochChars.charAt(random(endk));
+        }
     }
     return result;
 }
@@ -89,13 +93,18 @@ String Koch::getRandomChars(int maxLength)
 String kochWords[EnglishWords::WORDS_NUMBER_OF_ELEMENTS];
 int numberOfWords;
 
+/*
+ * this function creates an array of words that are compliant to Koch filter and max word length
+ */
 void Koch::createKochWords(uint8_t maxl, uint8_t koch)
-{                  // this function creates an array of words that are compliant to Koch filter and max word length
+{
     numberOfWords = 0;
     for (int i = EnglishWords::WORDS_POINTER[maxl]; i < EnglishWords::WORDS_NUMBER_OF_ELEMENTS; ++i)
     {     // do this for all words with max length maxl
         if (wordIsKoch(EnglishWords::words[i]) <= koch)
+        {
             kochWords[numberOfWords++] = EnglishWords::words[i];
+        }
     }
 }
 
@@ -107,13 +116,18 @@ String Koch::getRandomWord()
 String kochAbbr[Abbrev::ABBREV_NUMBER_OF_ELEMENTS];
 int numberOfAbbr;
 
+/*
+ * this function creates an array of words that are compliant to Koch filter and max word length
+ */
 void Koch::createKochAbbr(uint8_t maxl, uint8_t koch)
-{                  // this function creates an array of words that are compliant to Koch filter and max word length
+{
     numberOfAbbr = 0;
     for (int i = Abbrev::ABBREV_POINTER[maxl]; i < Abbrev::ABBREV_NUMBER_OF_ELEMENTS; ++i)
     {     // do this for all words with max length maxl
         if (Koch::wordIsKoch(Abbrev::abbreviations[i]) <= koch)
+        {
             kochAbbr[numberOfAbbr++] = Abbrev::abbreviations[i];
+        }
     }
 }
 
@@ -124,7 +138,8 @@ String Koch::getRandomAbbrev()
 
 String Koch::filterNonKoch(String w)
 {
-    if (!isKochActive()) {
+    if (!isKochActive())
+    {
         return w;
     }
 
@@ -134,7 +149,9 @@ String Koch::filterNonKoch(String w)
     for (unsigned int i = 0; i < w.length(); ++i)
     {
         if (kochChars.indexOf(c = w.charAt(i)) != -1)
+        {
             result += c;
+        }
     }
     return result;
 }

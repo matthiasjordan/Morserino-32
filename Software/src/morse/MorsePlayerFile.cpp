@@ -39,11 +39,11 @@ void MorsePlayerFile::setup()
 
     if (!SPIFFS.begin(FORMAT_SPIFFS_IF_FAILED))
     {     ///// if SPIFFS cannot be mounted, it does not exist. So create  (format) it, and mount it
-          //Serial.println("SPIFFS Mount Failed");
+          //MORSELOGLN("SPIFFS Mount Failed");
         return;
     }
 
-    Serial.println("Initializing player file");
+    MORSELOGLN("Initializing player file");
 
     //////////////////////// create file player.txt if it does not exist|
     const char * defaultFile =
@@ -55,7 +55,7 @@ void MorsePlayerFile::setup()
         File file = MorsePlayerFile::openForWriting();
         if (!file)
         {
-            Serial.println("- failed to open file for writing");
+            MORSELOGLN("- failed to open file for writing");
             return;
         }
         if (file.print(defaultFile))
@@ -64,7 +64,7 @@ void MorsePlayerFile::setup()
         }
         else
         {
-            Serial.println("- write failed");
+            MORSELOGLN("- write failed");
         }
         file.close();
     }
@@ -126,9 +126,7 @@ String MorsePlayerFile::getWord()
     {
         internal::reopen();
     }
-    Serial.println("file read " + result);
     result = internal::cleanUpText(result);
-    Serial.println("file c/up " + result);
 
     return result;                                    // at eof
 }

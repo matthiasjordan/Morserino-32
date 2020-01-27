@@ -58,7 +58,6 @@ namespace MorseKeyer
     extern boolean (*onWordEnd)();
     extern void (*onWordEndDitDah)();
     extern void (*onWordEndNDitDah)();
-//    extern OnWordEndHandler *onWordEndHandler;
 
     void setup();
 

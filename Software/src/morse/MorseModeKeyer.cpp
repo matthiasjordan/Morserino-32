@@ -23,51 +23,14 @@
 #include "MorseModeEchoTrainer.h"
 #include "MorseSound.h"
 
-//using namespace MorseKeyer;
-//
-//namespace internal
-//{
-//
-//    void updatePaddleLatch(boolean dit, boolean dah);
-//    void setDITstate();
-//    void setDAHstate();
-//    boolean doPaddleIambic(boolean dit, boolean dah);
-//    uint8_t readSensors(int left, int right);
-//    void initSensors();
-//
-//}
-//
-//unsigned char MorseKeyer::keyerControl = 0; // this holds the latches for the paddles and the DIT_LAST latch, see above
-//KSTYPE MorseKeyer::keyerState;
-//
-//uint8_t MorseKeyer::sensor;                 // what we read from checking the touch sensors
-//boolean MorseKeyer::leftKey, MorseKeyer::rightKey;
-//
-//boolean MorseKeyer::DIT_FIRST = false; // first latched was dit?
-//unsigned int MorseKeyer::ditLength;        // dit length in milliseconds - 100ms = 60bpm = 12 wpm
-//unsigned int MorseKeyer::dahLength;        // dahs are 3 dits long
-//boolean MorseKeyer::keyTx = false;
-//unsigned int MorseKeyer::interCharacterSpace;
-//unsigned int MorseKeyer::interWordSpace;   // need to be properly initialised!
-//unsigned int MorseKeyer::effWpm;                                // calculated effective speed in WpM
-//
-//unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
-//unsigned int rUntouched = 0;
-
-//void MorseModeKeyer::setup()
-//{
-//}
-
 MorseModeKeyer morseModeKeyer;
 
 boolean MorseModeKeyer::menuExec(String mode)
 {
-    Serial.println("MorseModeKeyer::menuExec");
     MorseKeyer::setup();
 
     if (mode == "a")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::keyerOptions;
         MorseMachine::morseState = MorseMachine::morseKeyer;
         MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer");
@@ -82,7 +45,6 @@ boolean MorseModeKeyer::menuExec(String mode)
     }
     else if (mode == "trx")
     {
-//        MorsePreferences::currentOptions = MorsePreferences::extTrxOptions;                 // list of available options in ext trx mode
         MorseMachine::morseState = MorseMachine::morseTrx;
         MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx");
@@ -95,7 +57,6 @@ boolean MorseModeKeyer::menuExec(String mode)
 
 boolean MorseModeKeyer::loop()
 {
-    Serial.println("MorseModeKeyer::loop");
     return MorseKeyer::doPaddleIambic();
 }
 
@@ -103,7 +64,6 @@ void MorseModeKeyer::onPreferencesChanged()
 {
     if (MorseMachine::morseState == MorseMachine::morseKeyer)
     {
-        Serial.println("MorseModeKeyer::onPreferencesChanged");
         unsigned char mode = MorsePreferences::prefs.keyTrainerMode;
         MorseKeyer::keyTx = (mode == 1 || mode == 2);
     }

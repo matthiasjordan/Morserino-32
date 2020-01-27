@@ -29,7 +29,6 @@
 
 using namespace MorseDisplay;
 
-
 MorseDisplay::Config displayConfig;
 
 ////////////////////////////// New scrolling display
@@ -50,8 +49,7 @@ uint8_t linePointer = 0;    /// defines the current bottom line
 
 #define lora_width 6        /// a simple logo that shows when we operate with loRa, stored in XBM format
 #define lora_height 11
-static unsigned char lora_bits[] =
-    {0x0f, 0x18, 0x33, 0x24, 0x29, 0x2b, 0x29, 0x24, 0x33, 0x18, 0x0f};
+static unsigned char lora_bits[] = {0x0f, 0x18, 0x33, 0x24, 0x29, 0x2b, 0x29, 0x24, 0x33, 0x18, 0x0f};
 
 // define OLED display and its address - the Heltec ESP32 LoRA uses its display on 0x3c
 SSD1306 display(0x3c, OLED_SDA, OLED_SCL, OLED_RST);
@@ -90,12 +88,13 @@ void MorseDisplay::displayStartUp()
     MorseDisplay::vprintOnScroll(0, REGULAR, 0, "Ver. %1i.%1i.%1i", VERSION_MAJOR, VERSION_MINOR, VERSION_BUGFIX);
 
     if (BETA)
+    {
         printOnScroll(0, REGULAR, 10, "beta");
+    }
 
     printOnScroll(1, REGULAR, 0, "© 2018-2020");
 
     uint16_t volt = MorseSystem::batteryVoltage();
-    //Serial.println(volt);
 
     if (volt < 3150)
     {
@@ -113,7 +112,8 @@ void MorseDisplay::displayStartUp()
     delay(3000);
 }
 
-MorseDisplay::Config* MorseDisplay::getConfig() {
+MorseDisplay::Config* MorseDisplay::getConfig()
+{
     return &displayConfig;
 }
 
@@ -164,7 +164,6 @@ void MorseDisplay::clearStatusLine()
     display.display();
 }
 
-
 void MorseDisplay::printOnStatusLine(boolean strong, uint8_t xpos, String string)
 {    // place a string onto the status line; chars are 7px wide = 18 chars per line
     if (strong)
@@ -196,8 +195,6 @@ FONT_ATTRIB printToScroll_lastStyle = REGULAR;
 
 void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
 {
-    Serial.printf("printToScroll(%s)\n", text.c_str());
-
     String SP = " ";
     String SL = "/";
 
@@ -205,7 +202,6 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     boolean lengthExceeded = printToScroll_buffer.length() + text.length() > 10;
     if (styleChanged || lengthExceeded)
     {
-        //Serial.print("style/length " + styleChanged + SL + lengthExceeded + SP);
         flushScroll();
     }
 
@@ -213,67 +209,55 @@ void MorseDisplay::printToScroll(FONT_ATTRIB style, String text)
     printToScroll_lastStyle = style;
 
     boolean linebreak = (text.indexOf("\n") != -1);
-//    boolean isHeadCopyMode = MorseGenerator::effectiveAutoStop;
-//    boolean printToScroll_autoflush = !(MorseMachine::isMode(MorseMachine::morseGenerator) && isHeadCopyMode);
 
-    //Serial.println("AUTO: " + String(printToScroll_autoflush));
-    //((Serial.println("morseState: " + String(morseState));
     if (displayConfig.autoFlush || linebreak)
     {
-        Serial.println("auto/line " + String(displayConfig.autoFlush) + SP + linebreak + SP);
         flushScroll();
     }
 }
 
 void MorseDisplay::clearScrollBuffer()
 {
-    //Serial.println("clear 1 " + printToScroll_buffer);
     printToScroll_buffer = "";
     printToScroll_lastStyle = REGULAR;
-    //Serial.println("clear 2 " + printToScroll_buffer);
 }
 
 void MorseDisplay::flushScroll()
 {
-//    printToScroll_buffer.replace("\n", "");
     uint8_t len = printToScroll_buffer.length();
     if (len != 0)
     {
-        //Serial.print("flush: ");
         for (int i = 0; (i < len); i++)
         {
             String t = printToScroll_buffer.substring(i, i + 1);
-            //Serial.printf(" flushing %d<%s> ", i, t.c_str());
+            //MORSELOGf(" flushing %d<%s> ", i, t.c_str());
             printToScroll_internal(printToScroll_lastStyle, t);
         }
         clearScrollBuffer();
     }
-    else
-    {
-        //Serial.println("(flush)");
-    }
 }
 
+/*
+ * store text in textBuffer, if it fits the screen line; otherwise scroll up, clear bottom buffer, store in new buffer, print on new lien
+ */
 void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
 {
-/// store text in textBuffer, if it fits the screen line; otherwise scroll up, clear bottom buffer, store in new buffer, print on new lien
-    //Serial.println("printToScroll_internal: " + text);
-
     static uint8_t pos = 0;
     static uint8_t screenPos = 0;
-//uint8_t printedChars;
-//Serial.println("printToScroll_internal: " + text);
+
     static FONT_ATTRIB lastStyle = REGULAR;
     uint8_t l = text.length();
     if (l == 0)
-    {                               // an empty string signals we should clear the buffer
-        //Serial.println("printToScroll_internal clearing buffer");
+    {
+        // an empty string signals we should clear the buffer
         for (int i = 0; i < NoOfLines; ++i)
         {
-            textBuffer[i][0] = (char) 0;                    /// empty this line
+            /// empty this line
+            textBuffer[i][0] = (char) 0;
         }
         refreshScrollArea((NoOfLines + bottomLine - 2) % NoOfLines);
-        pos = screenPos = 0;                                // reset the position pointers
+        // reset the position pointers
+        pos = screenPos = 0;
         return;
     }
 
@@ -281,7 +265,8 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
     int textTooLong = (screenPos + l > NoOfCharsPerLine);
 
     if (linebreak || textTooLong)
-    {                 // we need to scroll up and start a new line
+    {
+        // we need to scroll up and start a new line
         newLine();
         pos = 0;
         screenPos = 0;
@@ -327,7 +312,7 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
         printOnScroll(2, style, screenPos, text);               // these characters are 9 pixels wide,
     }
     display.setFont(DialogInput_plain_15);
-    ;
+
     screenPos += (display.getStringWidth(text) / 9);
 }
 
@@ -335,29 +320,44 @@ void MorseDisplay::newLine()
 {
     linePointer = (linePointer + 1) % NoOfLines;
     if (relPos && relPos != maxPos)
+    {
         --relPos;
+    }
     bottomLine = linePointer;
     textBuffer[bottomLine][0] = (char) 0;               /// and empty the bottom line
-    if (!relPos)                                      /// screen ptr already on top, we need to move the whole screen one line
+    if (!relPos)
+    {
+        /// screen ptr already on top, we need to move the whole screen one line
         refreshScrollArea((bottomLine + 1) % NoOfLines);
+    }
     else if (relPos == maxPos)
+    {
         refreshScrollArea((NoOfLines + bottomLine - 2) % NoOfLines);
+    }
+
     if (MorseMachine::isEncoderMode(MorseMachine::scrollMode))
+    {
         displayScrollBar(true);
+    }
 
 }
 
+/*
+ * refresh all three lines from buffer in scroll area; pos is topmost buffer line
+ */
 void MorseDisplay::refreshScrollArea(int pos)
-{                                  /// refresh all three lines from buffer in scroll area; pos is topmost buffer line
+{
     refreshScrollLine(pos, 0);           /// refresh all three lines
     refreshScrollLine((pos + 1) % NoOfLines, 1);
-    //unsigned int t = pos % 15;
     refreshScrollLine((pos + 2) % NoOfLines, 2);
     display.display();
 }
 
+/*
+ * print a line to the screen
+ */
 void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
-{   /// print a line to the screen
+{
     String temp;
     temp.reserve(16);
     temp = "";
@@ -371,7 +371,6 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
     display.fillRect(0, SCROLL_TOP + displayLine * LINE_HEIGHT, 127, LINE_HEIGHT + 1);   // black out the line on screen
     for (int i = 0; (c = textBuffer[bufferLine][i]); ++i)
     {
-//Serial.print(String(c,HEX) + " ");
         if (c < 4)
         {           /// a flag
             if (irFlag)         /// at the end of an emphasized string
@@ -400,9 +399,11 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
             temp += c;
         }
     }
-//Serial.println("temp: " + temp);
+
     if (temp.length())
+    {
         printOnScroll(displayLine, style, pos, temp);
+    }
 }
 
 uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, const char* format, ...)
@@ -419,14 +420,22 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
     uint8_t w;
 
     if (how > BOLD)
+    {
         display.setColor(WHITE);
+    }
     else
+    {
         display.setColor(BLACK);
+    }
 
     if (how & BOLD)
+    {
         display.setFont(DialogInput_bold_15);
+    }
     else
+    {
         display.setFont(DialogInput_plain_15);
+    }
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     // convert the array characters into a String object
@@ -439,9 +448,13 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
     display.fillRect(xpos * 9, SCROLL_TOP + line * LINE_HEIGHT, w, LINE_HEIGHT + 1);
 
     if (how > BOLD)
+    {
         display.setColor(BLACK);
+    }
     else
+    {
         display.setColor(WHITE);
+    }
 
     display.drawString(xpos * 9, SCROLL_TOP + line * LINE_HEIGHT, mystring);
     display.display();
@@ -471,23 +484,30 @@ void MorseDisplay::clearScroll()
     clearLine(0);
     clearLine(1);
     clearLine(2);
-    //Serial.println("clearScroll()");
 }
 
 void MorseDisplay::drawVolumeCtrl(boolean inverse, uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t volume)
 {
 
     if (inverse)
+    {
         display.setColor(BLACK);
+    }
     else
+    {
         display.setColor(WHITE);
+    }
 
     display.fillRect(x, y, width, height);
 
     if (!inverse)
+    {
         display.setColor(BLACK);
+    }
     else
+    {
         display.setColor(WHITE);
+    }
 
     display.fillRect(x + 2, y + 4, (width - 4) * volume / 100, height - 8);
     display.drawHorizontalLine(x + 2, y + height / 2, width - 4);
@@ -532,7 +552,6 @@ void MorseDisplay::displayBatteryStatus(int v)
     double d;
     d = v / 50;
     c = round(d) * 50;
-// Serial.println("v: " + String (v) + " c: " + String(c));
     a = c / 1000;
     b = (c - 1000 * a) / 100;
     s = "U: " + String(a) + "." + String(b);
@@ -569,14 +588,16 @@ void MorseDisplay::updateSMeter(int rssi)
 
     static boolean wasZero = false;
 
-    if (rssi == 0)
-        if (wasZero)
+    if (rssi == 0) {
+        if (wasZero) {
             return;
+        }
         else
         {
             MorseDisplay::drawVolumeCtrl(false, 93, 0, 28, 15, 0);
             wasZero = true;
         }
+    }
     else
     {
         MorseDisplay::drawVolumeCtrl(false, 93, 0, 28, 15, constrain(map(rssi, -150, -20, 0, 100), 0, 100));
@@ -587,10 +608,12 @@ void MorseDisplay::updateSMeter(int rssi)
 
 void MorseDisplay::drawInputStatus(boolean on)
 {
-    if (on)
+    if (on) {
         display.setColor(BLACK);
-    else
+    }
+    else {
         display.setColor(WHITE);
+    }
     display.fillRect(1, 1, 20, 13);
     display.display();
 }
@@ -605,31 +628,37 @@ void MorseDisplay::displayTopLine()
     MorseDisplay::clearStatusLine();
 
     // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
-    if (MorseMachine::isMode(MorseMachine::morseGenerator))
+    if (MorseMachine::isMode(MorseMachine::morseGenerator)) {
         MorseDisplay::printOnStatusLine(true, 1, MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
+    }
     else
     {
         switch (MorsePreferences::prefs.keyermode)
         {
-            case IAMBICA:
+            case IAMBICA: {
                 MorseDisplay::printOnStatusLine(false, 2, "A ");
                 break;          // Iambic A (no paddle eval during dah)
-            case IAMBICB:
+            }
+            case IAMBICB: {
                 MorseDisplay::printOnStatusLine(false, 2, "B ");
                 break;          // orig Curtis B mode: paddle eval during element
-            case ULTIMATIC:
+            }
+            case ULTIMATIC: {
                 MorseDisplay::printOnStatusLine(false, 2, "U ");
                 break;          // Ultimatic Mode
-            case NONSQUEEZE:
+            }
+            case NONSQUEEZE: {
                 MorseDisplay::printOnStatusLine(false, 2, "N ");
                 break;         // Non-squeeze mode
+            }
         }
     }
 
     displayCWspeed();                                     // update display of CW speed
     if ((MorseMachine::isMode(MorseMachine::loraTrx))
-            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == true))
+            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == true)) {
         dispLoraLogo();
+    }
 
     MorseDisplay::displayVolume();                                     // sidetone volume
     MorseDisplay::displayDisplay();

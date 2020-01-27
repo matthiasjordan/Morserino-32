@@ -22,7 +22,6 @@ namespace MorseText
             GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
     } Config;
 
-//    extern const String CWchars;
     extern const MorseChar morseChars[];
 
     extern void (*onGeneratorNewWord)(String);

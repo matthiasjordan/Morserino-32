@@ -130,7 +130,6 @@ void MorseText::setNextWordIsEndSequence()
 
 void MorseText::setRepeatEach(uint8_t n)
 {
-    Serial.println("MorseText::setRepEach " + String(n));
     config.repeatEach = n;
 }
 
@@ -163,13 +162,11 @@ String MorseText::generateWord()
         result = "vvvA";
         config.generateStartSequence = false;
         repetitionsLeft = 0;
-        Serial.println("genWord(): generating 1 start sequence");
     }
     else if (nextWordIsEndSequence)
     {
         result = "+";
         nextWordIsEndSequence = false;
-        Serial.println("genWord(): generating end sequence");
     }
     else if (repeatLast)
     {
@@ -178,24 +175,20 @@ String MorseText::generateWord()
     }
     else if ((config.repeatEach == MorsePreferences::REPEAT_FOREVER) || repetitionsLeft)
     {
-        Serial.println("genWord(): repeating last word - reps left: " + String(repetitionsLeft));
         result = lastGeneratedWord;
         if (repetitionsLeft > 0)
         {
             repetitionsLeft -= 1;
-            Serial.println("genWord(): decreased reps left - now: " + String(repetitionsLeft));
         }
     }
     else
     {
-        Serial.println("genWord(): generating new word");
         repetitionsLeft = config.repeatEach - 1;
         result = internal::fetchRandomWord();
         MorseText::onGeneratorNewWord(result);
     }       /// end if else - we either already had something in trainer mode, or we got a new word
 
     lastGeneratedWord = result;
-    Serial.println("genWord(): returning " + result);
     return result;
 
 }
@@ -208,9 +201,7 @@ String internal::fetchRandomWord()
     {
         case RANDOMS:
         {
-            Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength));
             word = internal::getRandomChars(MorsePreferences::prefs.randomLength, MorsePreferences::prefs.randomOption);
-            Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength) + " -> " + word);
             break;
         }
         case CALLS:
@@ -282,7 +273,6 @@ String internal::fetchRandomWord()
             break;
         }
     } // end switch (generatorMode)
-    Serial.println("internal::fRW " + String(MorsePreferences::prefs.randomLength) + " -> returning " + word);
     return word;
 }
 
@@ -489,7 +479,6 @@ String MorseText::internalToProSigns(String &input)
         input.replace(m.internal, m.prosign);
         i += 1;
     }
-    //Serial.println(input);
     return input;
 }
 
