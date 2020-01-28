@@ -274,21 +274,19 @@ void MorseGenerator::generateCW()
                 keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
             }
 
+            unsigned long deltaMs;
+
             if (CWword.length() == 1)
             {
                 // we just ended the the word
 
                 internal::dispGeneratedChar();
 
-                unsigned long delta = generatorConfig.onGeneratorWordEnd();
+                deltaMs = generatorConfig.onGeneratorWordEnd();
 
-                if (delta != -1)
+                if (deltaMs == -1)
                 {
-                    genTimer = millis() + delta;
-                }
-                else
-                {
-                    genTimer = millis() + internal::getInterwordSpace(&generatorConfig);
+                    deltaMs = internal::getInterwordSpace(&generatorConfig);
                     if (generatorConfig.sendCWToLoRa)
                     {                                   // in generator mode and we want to send with LoRa
                         MorseLoRa::cwForLora(0);
@@ -302,12 +300,13 @@ void MorseGenerator::generateCW()
             {
                 // we are at end of character
                 internal::dispGeneratedChar();
-                genTimer = millis() + internal::getIntercharSpace(&generatorConfig);
+                deltaMs = internal::getIntercharSpace(&generatorConfig);
             }
             else
             {                                                                                     // we are in the middle of a character
-                genTimer = millis() + internal::getInterelementSpace(&generatorConfig);
+                deltaMs = internal::getInterelementSpace(&generatorConfig);
             }
+            genTimer = millis() + deltaMs;
             generatorState = KEY_UP;                               // next state = key up = pause
             break;
         }
