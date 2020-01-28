@@ -41,7 +41,7 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-    Decoder::storeCharInResponse = [](String r)
+    Decoder::onCharacter = [](String r)
     {   morseModeEchoTrainer.storeCharInResponse(r);};
 
     MorseText::proceed();

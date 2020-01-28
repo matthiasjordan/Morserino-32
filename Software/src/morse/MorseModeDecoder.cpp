@@ -38,7 +38,7 @@ boolean MorseModeDecoder::menuExec(String mode)
 
 void MorseModeDecoder::startDecoder()
 {
-    Decoder::storeCharInResponse = 0;
+    Decoder::onCharacter = [](String s){};
     Decoder::speedChanged = true;
     delay(650);
     MorseDisplay::clear();
