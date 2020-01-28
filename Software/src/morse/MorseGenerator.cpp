@@ -287,13 +287,6 @@ void MorseGenerator::generateCW()
                 if (deltaMs == -1)
                 {
                     deltaMs = internal::getInterwordSpace(&generatorConfig);
-                    if (generatorConfig.sendCWToLoRa)
-                    {                                   // in generator mode and we want to send with LoRa
-                        MorseLoRa::cwForLora(0);
-                        MorseLoRa::cwForLora(3);                           // as we have just finished a word
-                        MorseLoRa::sendWithLora();                         // finalise the string and send it to LoRA
-                        delay(MorseKeyer::interCharacterSpace + MorseKeyer::ditLength); // we need a slightly longer pause otherwise the receiving end might fall too far behind...
-                    }
                 }
             }
             else if (CWword[0] == '0')
