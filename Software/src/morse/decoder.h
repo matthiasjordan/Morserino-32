@@ -54,7 +54,10 @@ namespace Decoder
     void drawInputStatus(boolean on);
     void interWordTimerOff();
     String CWwordToClearText(String cwword);
-    String displayMorse();
+    /**
+     * Merely returns the last character decoded.
+     */
+    String getMorsedChar();
     uint8_t getDecodedWpm();
 
 }

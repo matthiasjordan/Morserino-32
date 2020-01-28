@@ -9,12 +9,6 @@
 namespace MorseKeyer
 {
 
-    struct OnWordEndHandler
-    {
-            virtual ~OnWordEndHandler() = default;
-            virtual boolean handle() = 0;
-    };
-
 #define    IAMBICA      1
 // Curtis Mode A
 #define    IAMBICB      2
@@ -56,6 +50,7 @@ namespace MorseKeyer
     extern boolean keyTx;             // we use this to decide if Tx should be keyed or not
 
     extern boolean (*onWordEnd)();
+    extern void (*onCharacter)(String keyed);
     extern void (*onWordEndDitDah)();
     extern void (*onWordEndNDitDah)();
 
