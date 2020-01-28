@@ -119,11 +119,6 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             // display the interword space, if necessary
             if (millis() > Decoder::interWordTimer)
             {
-                if (MorseMachine::isMode(MorseMachine::loraTrx))
-                {                    // when in Trx mode
-                    MorseLoRa::cwForLora(3);
-                    MorseLoRa::sendWithLora();                        // finalise the string and send it to LoRA
-                }
                 MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
                 Decoder::interWordTimer = 4294967000;  // almost the biggest possible unsigned long number :-) - do not output extra spaces!
                 if (MorseKeyer::onWordEnd())
