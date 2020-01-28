@@ -353,7 +353,9 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
                              * display the decoded morse character(s)
                              */
                             String symbol = Decoder::getMorsedChar();
-                            onCharacter(symbol);
+                            if (symbol != "") {
+                                onCharacter(symbol);
+                            }
 
                             if (MorseMachine::isMode(MorseMachine::loraTrx))
                             {

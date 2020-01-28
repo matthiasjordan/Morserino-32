@@ -393,7 +393,9 @@ void internal::doDecode()
                      * decode the Morse character and display it
                      */
                     String symbol = getMorsedChar();
-                    onCharacter(symbol);
+                    if (symbol != "") {
+                        onCharacter(symbol);
+                    }
 
                     wpm = (wpmDecoded + (int) (7200 / (dahAvg + 3 * ditAvg))) / 2;     //// recalculate speed in wpm
                     if (wpmDecoded != wpm)
