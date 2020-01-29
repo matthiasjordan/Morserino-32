@@ -86,6 +86,7 @@ void MorseGenerator::setStart()
     generatorConfig.printChar = true;
     generatorConfig.onFetchNewWord = &voidFunction;
     generatorConfig.onGeneratorWordEnd = &uLongFunctionMinus1;
+    generatorConfig.onCWElement = [](char c){};
     generatorConfig.onLastWord = &voidFunction;
 
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
@@ -233,22 +234,11 @@ void MorseGenerator::generateCW()
             char c = CWword[0];
             CWword.remove(0, 1);
 
-            if ((c == '0'))
-            {                      // a character just had been finished
-                if (generatorConfig.sendCWToLoRa)
-                {
-                    MorseLoRa::cwForLora(0);
-                }
-            }
-            else
+            generatorConfig.onCWElement(c);
+
+            if (c != '0')
             {
                 genTimer = millis() + internal::getCharTiming(&generatorConfig, c);
-
-                if (generatorConfig.sendCWToLoRa)
-                {
-                    // send the element to LoRa
-                    c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
-                }
 
                 /// if Koch learn character we show dit or dah
                 if (generatorConfig.printDitDah)

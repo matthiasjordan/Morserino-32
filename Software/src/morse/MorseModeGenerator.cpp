@@ -59,10 +59,10 @@ void MorseModeGenerator::startTrainer()
 void MorseModeGenerator::onPreferencesChanged()
 {
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
-    MorseGenerator::getConfig()->sendCWToLoRa = (MorsePreferences::prefs.loraTrainerMode == 1);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
 
-    MorseGenerator::getConfig()->onGeneratorWordEnd = []()
+    MorseGenerator::Config *genCon = MorseGenerator::getConfig();
+    genCon->onGeneratorWordEnd = []()
     {
         if (MorsePreferences::prefs.loraTrainerMode == 1)
         {
@@ -74,6 +74,28 @@ void MorseModeGenerator::onPreferencesChanged()
         }
         return -1ul;
     };
+    genCon->onCWElement = [](char c){
+        if (MorsePreferences::prefs.loraTrainerMode == 1)
+        {
+            int e;
+            switch (c) {
+                case '0': {
+                    e = 0;
+                    break;
+                }
+                case '1': {
+                    e = 1;
+                    break;
+                }
+                default: {
+                    e = 2;
+                    break;
+                }
+            }
+            MorseLoRa::cwForLora(e);
+        }
+    };
+
 }
 
 boolean MorseModeGenerator::togglePause()
