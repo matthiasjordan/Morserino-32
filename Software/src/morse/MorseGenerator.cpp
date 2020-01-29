@@ -188,7 +188,7 @@ void MorseGenerator::generateCW()
                     MorseGenerator::CWword = internal::textToCWword(newWord);
                 }
 
-                if (CWword.length() == 0)
+                if (clearText == "")
                 {
                     // we really should have something here - unless in trx mode; in this case return
                     return;
