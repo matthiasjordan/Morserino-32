@@ -58,6 +58,7 @@ void MorseModeGenerator::startTrainer()
 void MorseModeGenerator::onPreferencesChanged()
 {
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
+    MorseGenerator::getConfig()->sendCWToLoRa = (MorsePreferences::prefs.loraTrainerMode == 1);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
 }
 
