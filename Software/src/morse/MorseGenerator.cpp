@@ -188,7 +188,7 @@ void MorseGenerator::generateCW()
                     MorseGenerator::CWword = internal::textToCWword(newWord);
                 }
 
-                if (CWword.length() == 0)
+                if (clearText == "")
                 {
                     // we really should have something here - unless in trx mode; in this case return
                     return;
@@ -289,7 +289,7 @@ void MorseGenerator::generateCW()
                 else
                 {
                     genTimer = millis() + internal::getInterwordSpace(&generatorConfig);
-                    if (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == 1)
+                    if (generatorConfig.sendCWToLoRa)
                     {                                   // in generator mode and we want to send with LoRa
                         MorseLoRa::cwForLora(0);
                         MorseLoRa::cwForLora(3);                           // as we have just finished a word
