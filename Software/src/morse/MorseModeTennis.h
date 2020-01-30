@@ -47,6 +47,9 @@ class MorseModeTennis: public MorseMode
         String received;
 
         void switchToState(State *newState);
+        void send(String message);
+        void receive();
+        void receive(String message);
 };
 
 extern MorseModeTennis morseModeTennis;

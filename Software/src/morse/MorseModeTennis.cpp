@@ -9,7 +9,7 @@
 #include "MorseMachine.h"
 #include "MorseDisplay.h"
 #include "MorseKeyer.h"
-#include "MorseLoRa.h"
+//#include "MorseLoRa.h"
 
 MorseModeTennis morseModeTennis;
 
@@ -31,11 +31,13 @@ boolean MorseModeTennis::menuExec(String mode)
     {
         morseModeTennis.currentState->onMessageTransmit(morseModeTennis.toSend);
         morseModeTennis.toSend = "";
+        MorseDisplay::printToScroll(BOLD, "\n");
         return false;
     };
 
     MorseKeyer::onCharacter = [](String c)
     {
+        MorseDisplay::printToScroll(BOLD, c);
         morseModeTennis.toSend += c;
     };
 
@@ -50,11 +52,7 @@ boolean MorseModeTennis::menuExec(String mode)
 
 boolean MorseModeTennis::loop()
 {
-    if (Serial.available())
-    {
-        String inMsg = Serial.readString();
-        currentState->onMessageReceive(inMsg);
-    }
+    receive();
     return currentState->loop();
 }
 
@@ -73,10 +71,43 @@ void MorseModeTennis::switchToState(State *newState)
     if (currentState != 0)
     {
         currentState->onLeave();
+        delay(1000);
     }
     newState->onEnter();
+    delay(1000);
     currentState = newState;
 }
+
+/**
+ * We call this to send a message.
+ */
+void MorseModeTennis::send(String message)
+{
+    Serial.println("SEND " + message);
+}
+
+void MorseModeTennis::receive()
+{
+    if (Serial.available())
+    {
+        String inMsg = Serial.readString();
+        receive(inMsg);
+    }
+}
+
+/**
+ * Something calls this so we receive a message.
+ */
+void MorseModeTennis::receive(String message)
+{
+    MorseDisplay::printToScroll(REGULAR, "< " + message + "\n");
+    currentState->onMessageReceive(message);
+}
+
+/*****************************************************************************
+ *
+ *  State: INITIAL
+ */
 
 void MorseModeTennis::StateInitial::onEnter()
 {
@@ -110,12 +141,19 @@ void MorseModeTennis::StateInitial::onMessageTransmit(String message)
     if (message == "cq")
     {
         MorseDisplay::printToScroll(REGULAR, "Initial sent cq - off to end state\n");
+        morseModeTennis.send(message);
         morseModeTennis.switchToState(&morseModeTennis.stateEnd);
     }
-    else {
+    else
+    {
         MorseDisplay::printToScroll(REGULAR, "Send cq to continue!\n");
     }
 }
+
+/*****************************************************************************
+ *
+ *  State: END
+ */
 
 void MorseModeTennis::StateEnd::onEnter()
 {
