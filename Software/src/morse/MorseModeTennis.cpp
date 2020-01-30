@@ -29,8 +29,8 @@ boolean MorseModeTennis::menuExec(String mode)
 
     MorseKeyer::onWordEnd = []()
     {
-        morseModeTennis.currentState->onMessageTransmit(morseModeTennis.toSend);
-        morseModeTennis.toSend = "";
+        morseModeTennis.sendBuffer.endWord();
+        morseModeTennis.currentState->onMessageTransmit(morseModeTennis.sendBuffer);
         MorseDisplay::printToScroll(BOLD, "\n");
         return false;
     };
@@ -38,7 +38,7 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseKeyer::onCharacter = [](String c)
     {
         MorseDisplay::printToScroll(BOLD, c);
-        morseModeTennis.toSend += c;
+        morseModeTennis.sendBuffer.addChar(c);
     };
 
     MorseDisplay::getConfig()->autoFlush = true;
@@ -136,12 +136,13 @@ void MorseModeTennis::StateInitial::onMessageReceive(String message)
     MorseDisplay::printToScroll(REGULAR, "Initial received " + message + "\n");
 }
 
-void MorseModeTennis::StateInitial::onMessageTransmit(String message)
+void MorseModeTennis::StateInitial::onMessageTransmit(WordBuffer &message)
 {
-    if (message == "cq")
+    MORSELOGLN("message: " + message.get());
+    if (message >= "cq")
     {
         MorseDisplay::printToScroll(REGULAR, "Initial sent cq - off to end state\n");
-        morseModeTennis.send(message);
+        morseModeTennis.send(message.getAndClear());
         morseModeTennis.switchToState(&morseModeTennis.stateEnd);
     }
     else
@@ -169,7 +170,6 @@ void MorseModeTennis::StateEnd::onMessageReceive(String message)
     }
 }
 
-void MorseModeTennis::StateEnd::onMessageTransmit(String message)
+void MorseModeTennis::StateEnd::onMessageTransmit(WordBuffer &message)
 {
-    MorseDisplay::printToScroll(REGULAR, "End would transmit " + message + "\n");
 }

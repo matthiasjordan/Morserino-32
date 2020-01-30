@@ -2,6 +2,7 @@
 #define MORSEMODETENNIS_H_
 
 #include "MorseMode.h"
+#include "WordBuffer.h"
 
 class MorseModeTennis: public MorseMode
 {
@@ -16,7 +17,7 @@ class MorseModeTennis: public MorseMode
         struct State
         {
                 virtual void onMessageReceive(String message);
-                virtual void onMessageTransmit(String message);
+                virtual void onMessageTransmit(WordBuffer &message);
                 virtual void onEnter() {};
                 virtual boolean loop() {return false;};
                 virtual void onLeave() {};
@@ -25,7 +26,7 @@ class MorseModeTennis: public MorseMode
         struct StateInitial: public State
         {
                 void onMessageReceive(String message);
-                void onMessageTransmit(String message);
+                void onMessageTransmit(WordBuffer &message);
                 void onEnter();
                 boolean loop();
                 void onLeave();
@@ -34,7 +35,7 @@ class MorseModeTennis: public MorseMode
         struct StateEnd: public State
         {
                 void onMessageReceive(String message);
-                void onMessageTransmit(String message);
+                void onMessageTransmit(WordBuffer &message);
                 void onEnter();
         };
 
@@ -42,9 +43,8 @@ class MorseModeTennis: public MorseMode
         StateInitial stateInitial;
         StateEnd stateEnd;
 
-        String toSend;
-        String receiveBuffer;
-        String received;
+        WordBuffer sendBuffer;
+        WordBuffer receiveBuffer;
 
         void switchToState(State *newState);
         void send(String message);
