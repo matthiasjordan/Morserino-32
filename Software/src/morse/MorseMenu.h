@@ -48,6 +48,7 @@ namespace MorseMenu
         _headCalls,
         _headMixed,
         _headPlayer,
+        _tennis,
         _trx,
         _trxLora,
         _trxIcw,

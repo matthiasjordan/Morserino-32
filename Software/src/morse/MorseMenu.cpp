@@ -32,6 +32,7 @@
 #include "MorseModeDecoder.h"
 #include "MorseModeGenerator.h"
 #include "MorseModeKoch.h"
+#include "MorseModeTennis.h"
 
 using namespace MorseMenu;
 
@@ -118,7 +119,7 @@ const MenuItem menuItems[] = {
         {"Mixed", _kochEchoMixed, {2, _kochEchoWords, _kochEchoRand, _kochEcho, 0}, MorseText::MIXED,
                 MorsePreferences::kochEchoOptions, true, 0, "echo", &morseModeKoch}, //
 
-        {"Head Copying", _head, {0, _koch, _trx, _dummy, _headRand}, MorseText::NA, MorsePreferences::headOptions, true,
+        {"Head Copying", _head, {0, _koch, _tennis, _dummy, _headRand}, MorseText::NA, MorsePreferences::headOptions, true,
                 &internal::nothing, "", 0}, //
         {"Random", _headRand, {1, _headPlayer, _headAbb, _head, 0}, MorseText::RANDOMS, MorsePreferences::headOptions, true,
                 0, "a", &morseModeHeadCopying}, //
@@ -133,7 +134,10 @@ const MenuItem menuItems[] = {
         {"File Player", _headPlayer, {1, _headMixed, _headRand, _head, 0}, MorseText::PLAYER, MorsePreferences::headOptions, true,
                 0, "player", &morseModeHeadCopying}, //
 
-        {"Transceiver", _trx, {0, _head, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
+        {"Morse Tennis", _tennis, {0, _head, _trx, _dummy, 0}, MorseText::NA, MorsePreferences::headOptions, true,
+               &internal::nothing, "", &morseModeTennis}, //
+
+        {"Transceiver", _trx, {0, _tennis, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
                 &internal::nothing, "", 0}, //
         {"LoRa Trx", _trxLora, {1, _trxIcw, _trxIcw, _trx, 0}, MorseText::NA, MorsePreferences::loraTrxOptions, true,
                 0, "trx", &morseModeLoRa}, //
