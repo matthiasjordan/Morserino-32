@@ -15,11 +15,12 @@
 #include <Arduino.h>
 
 #include "MorseModeGenerator.h"
+#include "MorseGenerator.h"
 #include "MorseDisplay.h"
 #include "MorseMachine.h"
 #include "MorseKeyer.h"
+#include "MorseText.h"
 #include "MorsePlayerFile.h"
-#include "MorseModeHeadCopying.h"
 
 MorseModeGenerator morseModeGenerator;
 
@@ -60,6 +61,7 @@ void MorseModeGenerator::onPreferencesChanged()
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
     MorseGenerator::getConfig()->sendCWToLoRa = (MorsePreferences::prefs.loraTrainerMode == 1);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
+    MorseText::getConfig()->repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
 }
 
 boolean MorseModeGenerator::togglePause()

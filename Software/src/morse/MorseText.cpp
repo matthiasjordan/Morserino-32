@@ -106,8 +106,7 @@ uint8_t OPT_PRO_end = MorseText::findChar('R');
 uint8_t OPT_ALPHA_start = MorseText::findChar('a');
 uint8_t OPT_ALPHA_end = MorseText::findChar('z');
 
-
-MorseText::Config config;
+MorseText::Config MorseText::config;
 
 uint8_t repetitionsLeft = 0;
 String lastGeneratedWord = "";
@@ -115,23 +114,16 @@ boolean nextWordIsEndSequence;
 boolean repeatLast;
 void (*MorseText::onGeneratorNewWord)(String);
 
-
 void MorseText::start(GEN_TYPE genType)
 {
     onGeneratorNewWord = &voidFunction;
     config.generateStartSequence = true;
     config.generatorMode = genType;
-    MorseText::onPreferencesChanged();
 }
 
-void MorseText::setGenerateStartSequence(boolean newValue)
+MorseText::Config* MorseText::getConfig()
 {
-    config.generateStartSequence = newValue;
-}
-
-void MorseText::setTextSource(GEN_TYPE genType)
-{
-    config.generatorMode = genType;
+    return &MorseText::config;
 }
 
 void MorseText::setNextWordIsEndSequence()
@@ -139,19 +131,9 @@ void MorseText::setNextWordIsEndSequence()
     nextWordIsEndSequence = true;
 }
 
-void MorseText::setRepeatEach(uint8_t n)
-{
-    config.repeatEach = n;
-}
-
 void MorseText::setRepeatLast()
 {
     repeatLast = true;
-}
-
-void MorseText::onPreferencesChanged()
-{
-    config.repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
 }
 
 String MorseText::getCurrentWord()

@@ -22,18 +22,15 @@ namespace MorseText
             GEN_TYPE generatorMode;          // trainer: what symbol (groups) are we going to send?            0 -  5
     } Config;
 
+    extern Config config;
+
     extern const MorseChar morseChars[];
 
     extern void (*onGeneratorNewWord)(String);
 
     void start(GEN_TYPE genType);
-    void start(MorseText::Config *config);
+    Config* getConfig();
 
-    void setTextSource(GEN_TYPE genType);
-    void setGenerateStartSequence(boolean newValue);
-    void setRepeatEach(uint8_t n);
-
-    void onPreferencesChanged();
     void proceed();
     String getCurrentWord();
     String generateWord();

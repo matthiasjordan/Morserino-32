@@ -62,7 +62,8 @@ void MorseModeEchoTrainer::startEcho()
 
     metConfig.showFailedWord = !MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     metConfig.generateStartSequence = false;
-    MorseText::setGenerateStartSequence(metConfig.generateStartSequence);
+
+    MorseText::getConfig()->generateStartSequence = metConfig.generateStartSequence;
     if (metConfig.generateStartSequence)
     {
         echoTrainerState = START_ECHO;
@@ -118,7 +119,8 @@ void MorseModeEchoTrainer::onPreferencesChanged()
 {
     metConfig.showPrompt = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
 
-    MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
+    MorseText::Config *texCon = MorseText::getConfig();
+    texCon->repeatEach = MorsePreferences::prefs.echoRepeats;
 
     MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
     generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
