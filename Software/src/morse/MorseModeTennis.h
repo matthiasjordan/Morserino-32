@@ -3,6 +3,7 @@
 
 #include "MorseMode.h"
 #include "WordBuffer.h"
+#include "TennisMachine.h"
 
 class MorseModeTennis: public MorseMode
 {
@@ -13,43 +14,12 @@ class MorseModeTennis: public MorseMode
         void onPreferencesChanged();
 
     private:
-
-        struct State
-        {
-                virtual void onMessageReceive(String message);
-                virtual void onMessageTransmit(WordBuffer &message);
-                virtual void onEnter() {};
-                virtual boolean loop() {return false;};
-                virtual void onLeave() {};
-        };
-
-        struct StateInitial: public State
-        {
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-                boolean loop();
-                void onLeave();
-        };
-
-        struct StateEnd: public State
-        {
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-        };
-
-        State *currentState = 0;
-        StateInitial stateInitial;
-        StateEnd stateEnd;
-
         WordBuffer sendBuffer;
-        WordBuffer receiveBuffer;
+        TennisMachine machine;
 
-        void switchToState(State *newState);
-        void send(String message);
         void receive();
         void receive(String message);
+        void send(String message);
 };
 
 extern MorseModeTennis morseModeTennis;

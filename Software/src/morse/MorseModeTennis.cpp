@@ -27,10 +27,16 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseKeyer::clearPaddleLatches();
     MorseKeyer::keyTx = false;
 
+    TennisMachine::Client client;
+    client.print = [](FONT_ATTRIB a, String m) { MorseDisplay::printToScroll(a, m);};
+    client.send = [](String m){ morseModeTennis.send(m);};
+    machine.setClient(client);
+
     MorseKeyer::onWordEnd = []()
     {
         morseModeTennis.sendBuffer.endWord();
-        morseModeTennis.currentState->onMessageTransmit(morseModeTennis.sendBuffer);
+        morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
+        MORSELOGLN("onWordEnd lamda");
         MorseDisplay::printToScroll(BOLD, "\n");
         return false;
     };
@@ -43,17 +49,23 @@ boolean MorseModeTennis::menuExec(String mode)
 
     MorseDisplay::getConfig()->autoFlush = true;
 
+
 //    MorseLoRa::receive();
 
-    switchToState(&stateInitial);
-
+    machine.start();
     return true;
 }
 
 boolean MorseModeTennis::loop()
 {
     receive();
-    return currentState->loop();
+    if (MorseKeyer::doPaddleIambic())
+    {
+        return true;
+    }
+
+    machine.loop();
+    return false;
 }
 
 boolean MorseModeTennis::togglePause()
@@ -66,17 +78,6 @@ void MorseModeTennis::onPreferencesChanged()
 
 }
 
-void MorseModeTennis::switchToState(State *newState)
-{
-    if (currentState != 0)
-    {
-        currentState->onLeave();
-        delay(1000);
-    }
-    newState->onEnter();
-    delay(1000);
-    currentState = newState;
-}
 
 /**
  * We call this to send a message.
@@ -101,75 +102,6 @@ void MorseModeTennis::receive()
 void MorseModeTennis::receive(String message)
 {
     MorseDisplay::printToScroll(REGULAR, "< " + message + "\n");
-    currentState->onMessageReceive(message);
+    machine.onMessageReceive(message);
 }
 
-/*****************************************************************************
- *
- *  State: INITIAL
- */
-
-void MorseModeTennis::StateInitial::onEnter()
-{
-    MorseDisplay::printToScroll(REGULAR, "Initial entered\n");
-
-}
-
-boolean MorseModeTennis::StateInitial::loop()
-{
-    if (MorseKeyer::doPaddleIambic())
-    {
-        return true;
-    }
-
-    return false;
-}
-
-void MorseModeTennis::StateInitial::onLeave()
-{
-    MorseDisplay::printToScroll(REGULAR, "Initial left\n");
-
-}
-
-void MorseModeTennis::StateInitial::onMessageReceive(String message)
-{
-    MorseDisplay::printToScroll(REGULAR, "Initial received " + message + "\n");
-}
-
-void MorseModeTennis::StateInitial::onMessageTransmit(WordBuffer &message)
-{
-    MORSELOGLN("message: " + message.get());
-    if (message >= "cq")
-    {
-        MorseDisplay::printToScroll(REGULAR, "Initial sent cq - off to end state\n");
-        morseModeTennis.send(message.getAndClear());
-        morseModeTennis.switchToState(&morseModeTennis.stateEnd);
-    }
-    else
-    {
-        MorseDisplay::printToScroll(REGULAR, "Send cq to continue!\n");
-    }
-}
-
-/*****************************************************************************
- *
- *  State: END
- */
-
-void MorseModeTennis::StateEnd::onEnter()
-{
-    MorseDisplay::printToScroll(REGULAR, "End - send k on Serial to restart!\n");
-}
-
-void MorseModeTennis::StateEnd::onMessageReceive(String message)
-{
-    MorseDisplay::printToScroll(REGULAR, "End received " + message + "\n");
-    if (message == "k")
-    {
-        morseModeTennis.switchToState(&morseModeTennis.stateInitial);
-    }
-}
-
-void MorseModeTennis::StateEnd::onMessageTransmit(WordBuffer &message)
-{
-}

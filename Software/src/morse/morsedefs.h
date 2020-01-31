@@ -1,9 +1,9 @@
 #ifndef MORSEDEFS_H
 #define MORSEDEFS_H
 
-const String PROJECTNAME = "Morselino-32";
-
 #include <Arduino.h>
+
+const String PROJECTNAME = "Morselino-32";
 
 #define DEBUG
 
@@ -162,7 +162,6 @@ const int lineOutPin = 17; // for NF line out
 const int modeButtonPin = 37;    // input pin for mode button - needs external pullup!
 
 ///////////////////////////////////////// END OF HARDWARE DEFS ////////////////////////////////////////////////////////////////////
-
 
 #define SizeOfArray(x)       (sizeof(x) / sizeof(x[0]))
 
