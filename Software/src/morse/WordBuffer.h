@@ -8,7 +8,7 @@
 #ifndef WORDBUFFER_H_
 #define WORDBUFFER_H_
 
-#include <Arduino.h>
+#include "arduino.h"
 
 class WordBuffer
 {

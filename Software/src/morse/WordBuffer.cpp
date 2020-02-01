@@ -43,6 +43,7 @@ String WordBuffer::getAndClear()
 {
     String tmp = buffer;
     buffer = "";
+    wordEnd = false;
     return tmp;
 }
 
