@@ -88,9 +88,28 @@ void test_WordBuffer_matches_2() {
     assertEquals("matches 2", "", sut.matches("cq cq de # #"));
 }
 
+void test_WordBuffer_matches_2a() {
+    WordBuffer sut;
+    sut.addWord(String("cq"));
+    sut.addWord(String("cq"));
+    sut.addWord(String("di"));
+    sut.addWord(String("w1aw"));
+    sut.addWord(String("w1aw"));
+
+    assertEquals("matches 2a", "", sut.matches("cq cq de # #"));
+}
+
+void test_WordBuffer_matches_3() {
+    WordBuffer sut;
+    sut.addWord(String("cq"));
+
+    assertEquals("matches 3", "", sut.matches("cq de #"));
+}
+
 
 void test_WordBuffer()
 {
+    printf("Testing WordBuffer\n");
     test_WordBuffer_addChar();
     test_WordBuffer_addWord();
     test_WordBuffer_getAndClear();
@@ -98,5 +117,7 @@ void test_WordBuffer()
     test_WordBuffer_equals();
     test_WordBuffer_matches_1();
     test_WordBuffer_matches_2();
+    test_WordBuffer_matches_2a();
+    test_WordBuffer_matches_3();
 }
 

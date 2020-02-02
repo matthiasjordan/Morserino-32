@@ -99,13 +99,23 @@ String WordBuffer::matches(String buffer, const char *pattern)
                 wildcardContent = wcc;
             }
             else if (wcc != wildcardContent){
+                // Repeat wildcard mismatch
                 return "";
             }
+        }
+        else if (p[1] != b[1]) {
+            // word mismatch
+            return "";
         }
         tmppat = *p;
         tmpbuf = *b;
     }
     while ((tmppat != "") && (tmpbuf != ""));
+
+    if ((tmppat != "") && (tmpbuf == "")) {
+        wildcardContent = "";
+    }
+
     return wildcardContent;
 }
 
