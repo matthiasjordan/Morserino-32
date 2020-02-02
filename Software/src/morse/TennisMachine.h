@@ -16,6 +16,7 @@ class TennisMachine
         void setClient(Client &c) {client = c;};
 
         void start();
+        const char* getState();
         void loop();
         void onMessageReceive(String message);
         void onMessageTransmit(WordBuffer &message);
@@ -25,6 +26,7 @@ class TennisMachine
         struct State
         {
                 State(TennisMachine *m) : machine{m} {};
+                virtual const char* getName();
                 virtual void onMessageReceive(String message);
                 virtual void onMessageTransmit(WordBuffer &message);
                 virtual void onEnter() {};
@@ -37,6 +39,7 @@ class TennisMachine
         struct StateInitial: public State
         {
                 using State::State;
+                const char* getName();
                 void onMessageReceive(String message);
                 void onMessageTransmit(WordBuffer &message);
                 void onEnter();
@@ -46,6 +49,7 @@ class TennisMachine
         struct StateEnd: public State
         {
                 using State::State;
+                const char* getName();
                 void onMessageReceive(String message);
                 void onMessageTransmit(WordBuffer &message);
                 void onEnter();

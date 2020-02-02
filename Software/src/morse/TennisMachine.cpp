@@ -1,12 +1,10 @@
 /*
- * MorseModeTennis.cpp
+ * TennisMachine.cpp
  *
  *  Created on: 28.01.2020
  *      Author: mj
  */
 #include "TennisMachine.h"
-
-#include "MorseDisplay.h"
 
 void TennisMachine::start()
 {
@@ -42,6 +40,10 @@ void TennisMachine::switchToState(State *newState)
     currentState = newState;
 }
 
+const char* TennisMachine::getState() {
+    return currentState->getName();
+}
+
 /**
  * We call this to send a message.
  */
@@ -68,6 +70,9 @@ void TennisMachine::print(FONT_ATTRIB a, String message)
  *
  *  State: INITIAL
  */
+const char* TennisMachine::StateInitial::getName() {
+    return "initial";
+}
 
 void TennisMachine::StateInitial::onEnter()
 {
@@ -109,6 +114,10 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
  *
  *  State: END
  */
+
+const char* TennisMachine::StateEnd::getName() {
+    return "end";
+}
 
 void TennisMachine::StateEnd::onEnter()
 {
