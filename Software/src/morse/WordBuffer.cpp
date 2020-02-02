@@ -57,6 +57,11 @@ String WordBuffer::get()
     return buffer;
 }
 
+String WordBuffer::matches(String pattern) {
+
+    return "";
+}
+
 boolean WordBuffer::operator==(String other)
 {
     return buffer == other;

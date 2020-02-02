@@ -23,15 +23,21 @@ TennisMachine createSUT() {
     return sut;
 }
 
-void test_TennisMachine_1()
+void test_TennisMachine()
 {
     TennisMachine sut = createSUT();
     WordBuffer buf;
 
     sut.start();
-    assertEquals("initial", "initial", sut.getState());
+    assertEquals("StateInitial", "StateInitial", sut.getState());
 
     buf.addWord("cq");
     sut.onMessageTransmit(buf);
-    assertEquals("end", "end", sut.getState());
+    assertEquals("StateInitial", "StateInitial", sut.getState());
+
+    buf.addWord("cq");
+    buf.addWord("de");
+    buf.addWord("A");
+    sut.onMessageTransmit(buf);
+    assertEquals("StateInviteSent", "StateInviteSent", sut.getState());
 }

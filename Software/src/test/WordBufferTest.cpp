@@ -5,7 +5,6 @@
 
 #include "WordBuffer.h"
 
-
 void test_WordBuffer_addChar()
 {
     WordBuffer sut;
@@ -67,4 +66,12 @@ void test_WordBuffer_equals()
     assertEquals("test_WordBuffer_equals 2: ", false, sut == "x");
 }
 
+void test_WordBuffer()
+{
+    test_WordBuffer_addChar();
+    test_WordBuffer_addWord();
+    test_WordBuffer_getAndClear();
+    test_WordBuffer_get();
+    test_WordBuffer_equals();
+}
 

@@ -74,25 +74,25 @@ void TennisMachine::print(String message)
  */
 const char* TennisMachine::StateInitial::getName()
 {
-    return "initial";
+    return "StateInitial";
 }
 
 void TennisMachine::StateInitial::onEnter()
 {
     MORSELOGLN("TM:SI:oE machine: " + String((unsigned long ) machine));
-    machine->print("Initial entered\n");
+    machine->print("StateInitial entered\n");
 
 }
 
 void TennisMachine::StateInitial::onLeave()
 {
-    machine->print("Initial left\n");
+    machine->print("StateInitial left\n");
 
 }
 
 void TennisMachine::StateInitial::onMessageReceive(String message)
 {
-    machine->print("Initial received " + message + "\n");
+    machine->print("StateInitial received " + message + "\n");
     if (message == "cq de B") {
         machine->print("Received cq - off to invite received");
         machine->switchToState(&machine->stateInviteReceived);
@@ -103,7 +103,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
 {
     if (message >= "cq de A")
     {
-        machine->print("Initial sent cq - off to invite sent\n");
+        machine->print("StateInitial sent cq - off to invite sent\n");
         machine->send(message.getAndClear());
         machine->switchToState(&machine->stateInviteSent);
     }
