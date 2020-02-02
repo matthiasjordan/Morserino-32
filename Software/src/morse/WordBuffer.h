@@ -22,6 +22,7 @@ class WordBuffer
         String getAndClear();
         String get();
         String matches(String pattern);
+        static String matches(String buffer, const char* pattern);
         boolean operator==(String other);
         boolean operator>=(String other);
         void handleWordEnd();

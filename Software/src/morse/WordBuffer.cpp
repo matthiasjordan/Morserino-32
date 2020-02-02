@@ -80,7 +80,11 @@ String* split(String s) {
  * Buffer contains "cq de w1aw w1aw", pattern is cq de # #", returns "w1aw".
  * Buffer contains "cq de w1aw w1aa", pattern is cq de # #", returns "".
  */
-String WordBuffer::matches(String pattern)
+String WordBuffer::matches(String pattern) {
+    return matches(buffer, pattern.c_str());
+}
+
+String WordBuffer::matches(String buffer, const char *pattern)
 {
     String tmppat = pattern;
     String tmpbuf = buffer;
