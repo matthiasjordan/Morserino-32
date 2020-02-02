@@ -10,7 +10,8 @@ class TennisMachine
     public:
         struct Client {
             void (*send)(String s);
-            void (*print)(FONT_ATTRIB a, String s);
+            void (*print)(String s);
+            void (*printReceivedMessage)(String s);
         };
 
         void setClient(Client &c) {client = c;};
@@ -46,6 +47,116 @@ class TennisMachine
                 void onLeave();
         };
 
+        struct StateInviteReceived: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateInviteSent: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateInviteAnswered: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateInviteAccepted: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateStartRoundSender: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateStartRoundReceiver: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateChallengeReceived: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateChallengePassed: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateChallengeFailed: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateSendTestFailed: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateTestPassed: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
         struct StateEnd: public State
         {
                 using State::State;
@@ -67,7 +178,7 @@ class TennisMachine
 
         void switchToState(State *newState);
         void send(String message);
-        void print(FONT_ATTRIB a , String message);
+        void print(String message);
 };
 
 #endif /* MORSEMODETENNIS_H_ */

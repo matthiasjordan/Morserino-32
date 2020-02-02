@@ -28,7 +28,8 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseKeyer::keyTx = false;
 
     TennisMachine::Client client;
-    client.print = [](FONT_ATTRIB a, String m) { MorseDisplay::printToScroll(a, m);};
+    client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
+    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(REGULAR, "< " + m);};
     client.send = [](String m){ morseModeTennis.send(m);};
     machine.setClient(client);
 

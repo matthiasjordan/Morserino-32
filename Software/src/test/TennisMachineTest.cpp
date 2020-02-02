@@ -13,8 +13,10 @@
 TennisMachine createSUT() {
     TennisMachine sut;
     TennisMachine::Client client;
-    client.print = [](FONT_ATTRIB a, String m)
+    client.print = [](String m)
     {   TESTPR("DISPLAY: '%s'\n", m.c_str());};
+    client.printReceivedMessage = [](String m)
+    {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
     client.send = [](String m)
     {   TESTPR("> '%s'\n", m.c_str());};
     sut.setClient(client);

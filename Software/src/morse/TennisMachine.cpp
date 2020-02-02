@@ -24,7 +24,6 @@ void TennisMachine::onMessageTransmit(WordBuffer &message)
 
 void TennisMachine::onMessageReceive(String message)
 {
-    TennisMachine::print(REGULAR, "< " + message + "\n");
     currentState->onMessageReceive(message);
 }
 
@@ -54,11 +53,11 @@ void TennisMachine::send(String message)
     MORSELOGLN("TM:send() 2");
 }
 
-void TennisMachine::print(FONT_ATTRIB a, String message)
+void TennisMachine::print(String message)
 {
     MORSELOGLN("TM:print() 1 " );
     try {
-    client.print(a, message);
+    client.print(message);
     }
     catch (std::exception &e) {
         MORSELOGLN("TM:print() 2 " + String(e.what()));
@@ -77,19 +76,19 @@ const char* TennisMachine::StateInitial::getName() {
 void TennisMachine::StateInitial::onEnter()
 {
     MORSELOGLN("TM:SI:oE machine: " + String((unsigned long) machine));
-    machine->print(REGULAR, "Initial entered\n");
+    machine->print("Initial entered\n");
 
 }
 
 void TennisMachine::StateInitial::onLeave()
 {
-    machine->print(REGULAR, "Initial left\n");
+    machine->print("Initial left\n");
 
 }
 
 void TennisMachine::StateInitial::onMessageReceive(String message)
 {
-    machine->print(REGULAR, "Initial received " + message + "\n");
+    machine->print("Initial received " + message + "\n");
 }
 
 void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
@@ -98,17 +97,62 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     if (message >= "cq")
     {
         MORSELOGLN("message 2: " + message.get());
-        machine->print(REGULAR, "Initial sent cq - off to end state\n");
+        machine->print("Initial sent cq - off to end state\n");
         machine->send(message.getAndClear());
         machine->switchToState(&machine->stateEnd);
     }
     else
     {
         MORSELOGLN("message 3: " + message.get());
-        machine->print(REGULAR, "Send cq to continue!\n");
+        machine->print("Send cq to continue!\n");
     }
     MORSELOGLN("message 4: " + message.get());
 }
+
+/*****************************************************************************
+ *
+ *  State: INVITE RECEIVED
+ */
+const char* TennisMachine::StateInviteReceived::getName() {
+    return "InviteReceived";
+}
+
+void TennisMachine::StateInviteReceived::onEnter()
+{
+    MORSELOGLN("TM:SI:oE machine: " + String((unsigned long) machine));
+    machine->print("StateInviteReceived entered\n");
+
+}
+
+void TennisMachine::StateInviteReceived::onLeave()
+{
+    machine->print("StateInviteReceived left\n");
+
+}
+
+void TennisMachine::StateInviteReceived::onMessageReceive(String message)
+{
+    machine->print("StateInviteReceived received " + message + "\n");
+}
+
+void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
+{
+    MORSELOGLN("message: " + message.get());
+    if (message >= "cq")
+    {
+        MORSELOGLN("message 2: " + message.get());
+        machine->print("Initial sent cq - off to end state\n");
+        machine->send(message.getAndClear());
+        machine->switchToState(&machine->stateEnd);
+    }
+    else
+    {
+        MORSELOGLN("message 3: " + message.get());
+        machine->print("Send cq to continue!\n");
+    }
+    MORSELOGLN("message 4: " + message.get());
+}
+
 
 /*****************************************************************************
  *
@@ -121,12 +165,12 @@ const char* TennisMachine::StateEnd::getName() {
 
 void TennisMachine::StateEnd::onEnter()
 {
-    machine->print(REGULAR, "End - send k on Serial to restart!\n");
+    machine->print("End - send k on Serial to restart!\n");
 }
 
 void TennisMachine::StateEnd::onMessageReceive(String message)
 {
-    machine->print(REGULAR, "End received " + message + "\n");
+    machine->print("End received " + message + "\n");
     if (message == "k")
     {
         machine->switchToState(&machine->stateInitial);
