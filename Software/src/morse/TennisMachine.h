@@ -14,6 +14,15 @@ class TennisMachine
             void (*printReceivedMessage)(String s);
         };
 
+        struct Config {
+            uint8_t repeatCall = 2;
+        };
+
+        struct GameState {
+            String remoteStation;
+            String ourStation;
+        };
+
         void setClient(Client &c) {client = c;};
 
         void start();
@@ -183,6 +192,8 @@ class TennisMachine
         State *currentState = 0;
 
         Client client;
+        Config config;
+        GameState gameState;
 
         WordBuffer sendBuffer;
         WordBuffer receiveBuffer;

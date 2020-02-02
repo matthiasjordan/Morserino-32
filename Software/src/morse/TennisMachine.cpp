@@ -93,18 +93,24 @@ void TennisMachine::StateInitial::onLeave()
 void TennisMachine::StateInitial::onMessageReceive(String message)
 {
     machine->print("StateInitial received " + message + "\n");
-    if (message == "cq de B") {
+    String dxCall = WordBuffer::matches(message, "cq de #");
+    if (dxCall != "")
+    {
         machine->print("Received cq - off to invite received");
+        machine->gameState.remoteStation = dxCall;
         machine->switchToState(&machine->stateInviteReceived);
     }
 }
 
 void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
 {
-    if (message >= "cq de A")
+    String pattern = "cq de #";
+    String us = message.matches(pattern);
+    if (us != "")
     {
-        machine->print("StateInitial sent cq - off to invite sent\n");
+        machine->print("StateInitial sent cq - off to invite sent - our call: " + us + "\n");
         machine->send(message.getAndClear());
+        machine->gameState.ourStation = us;
         machine->switchToState(&machine->stateInviteSent);
     }
     else
@@ -141,10 +147,13 @@ void TennisMachine::StateInviteReceived::onMessageReceive(String message)
 
 void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
 {
-    if (message >= "B de A")
+    String pattern = machine->gameState.remoteStation + " de #";
+    String us = message.matches(pattern);
+    if (us != "")
     {
         machine->print("ACK sent - off to answered\n");
         machine->send(message.getAndClear());
+        machine->gameState.ourStation = us;
         machine->switchToState(&machine->stateInviteAnswered);
     }
     else
@@ -177,8 +186,10 @@ void TennisMachine::StateInviteAnswered::onLeave()
 void TennisMachine::StateInviteAnswered::onMessageReceive(String message)
 {
     machine->print("StateInviteAnswered received " + message + "\n");
-    if (message == "A de B") {
-        machine->print("The game commences\n");
+    String pattern = machine->gameState.remoteStation + " de " + machine->gameState.ourStation;
+    if (message == pattern)
+    {
+        machine->print("The game commences between " + machine->gameState.remoteStation + " and " + machine->gameState.ourStation + "\n");
         machine->switchToState(&machine->stateStartRoundReceiver);
     }
 }
@@ -212,8 +223,12 @@ void TennisMachine::StateInviteSent::onLeave()
 void TennisMachine::StateInviteSent::onMessageReceive(String message)
 {
     machine->print("StateInviteSent received " + message + "\n");
-    if (message == "A de B") {
-        machine->print("Received ACK - off to state invite accepted");
+    String pattern = machine->gameState.ourStation + " de #";
+    String dxCall = WordBuffer::matches(message, pattern.c_str());
+    if (dxCall != "")
+    {
+        machine->print("Received ACK from " + dxCall + " - off to state invite accepted");
+        machine->gameState.remoteStation = dxCall;
         machine->switchToState(&machine->stateInviteAccepted);
     }
 }
@@ -251,7 +266,8 @@ void TennisMachine::StateInviteAccepted::onMessageReceive(String message)
 
 void TennisMachine::StateInviteAccepted::onMessageTransmit(WordBuffer &message)
 {
-    if (message >= "B de A") {
+    if (message >= "B de A")
+    {
         machine->print("The game commences.");
         machine->switchToState(&machine->stateStartRoundSender);
     }
@@ -285,12 +301,14 @@ void TennisMachine::StateStartRoundSender::onMessageReceive(String message)
 
 void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message)
 {
-    if (message == "w w") {
+    if (message == "w w")
+    {
         // Send test passed
         machine->send("B de A w");
         machine->switchToState(&machine->stateStartRoundReceiver);
     }
-    else {
+    else
+    {
         // Send test failed
         machine->print("Sorry - try again to morse 'w' twice!");
     }
@@ -319,7 +337,8 @@ void TennisMachine::StateStartRoundReceiver::onLeave()
 void TennisMachine::StateStartRoundReceiver::onMessageReceive(String message)
 {
     machine->print("StateStartRoundReceiver received " + message + "\n");
-    if (message == "B de A w") {
+    if (message == "B de A w")
+    {
         machine->switchToState(&machine->stateChallengeReceived);
     }
 }
@@ -357,12 +376,14 @@ void TennisMachine::StateChallengeReceived::onMessageReceive(String message)
 
 void TennisMachine::StateChallengeReceived::onMessageTransmit(WordBuffer &message)
 {
-    if (message >= "w") {
+    if (message >= "w")
+    {
         // Challenge passed
         machine->print("OK");
         machine->send("Bob n+1");
     }
-    else {
+    else
+    {
         machine->print("ERR");
         machine->send("Bob n");
     }

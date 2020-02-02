@@ -25,19 +25,24 @@ TennisMachine createSUT() {
 
 void test_TennisMachine()
 {
+    printf("Testing TennisMachine\n");
+
     TennisMachine sut = createSUT();
     WordBuffer buf;
 
     sut.start();
-    assertEquals("StateInitial", "StateInitial", sut.getState());
+    assertEquals("StateInitial 1", "StateInitial", sut.getState());
 
     buf.addWord("cq");
     sut.onMessageTransmit(buf);
-    assertEquals("StateInitial", "StateInitial", sut.getState());
+    assertEquals("StateInitial 2", "StateInitial", sut.getState());
 
     buf.addWord("cq");
     buf.addWord("de");
-    buf.addWord("A");
+    buf.addWord("XX0YYY");
     sut.onMessageTransmit(buf);
     assertEquals("StateInviteSent", "StateInviteSent", sut.getState());
+
+    sut.onMessageReceive("XX0YYY de XX1aaa");
+    assertEquals("StateInviteAccepted", "StateInviteAccepted", sut.getState());
 }
