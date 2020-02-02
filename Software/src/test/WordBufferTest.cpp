@@ -66,6 +66,29 @@ void test_WordBuffer_equals()
     assertEquals("test_WordBuffer_equals 2: ", false, sut == "x");
 }
 
+void test_WordBuffer_matches_1() {
+    WordBuffer sut;
+    sut.addWord(String("cq"));
+    sut.addWord(String("cq"));
+    sut.addWord(String("de"));
+    sut.addWord(String("w1aw"));
+    sut.addWord(String("w1aw"));
+
+    assertEquals("matches 1", "w1aw", sut.matches("cq cq de # #"));
+}
+
+void test_WordBuffer_matches_2() {
+    WordBuffer sut;
+    sut.addWord(String("cq"));
+    sut.addWord(String("cq"));
+    sut.addWord(String("de"));
+    sut.addWord(String("w1aw"));
+    sut.addWord(String("w1aa"));
+
+    assertEquals("matches 2", "", sut.matches("cq cq de # #"));
+}
+
+
 void test_WordBuffer()
 {
     test_WordBuffer_addChar();
@@ -73,5 +96,7 @@ void test_WordBuffer()
     test_WordBuffer_getAndClear();
     test_WordBuffer_get();
     test_WordBuffer_equals();
+    test_WordBuffer_matches_1();
+    test_WordBuffer_matches_2();
 }
 

@@ -31,12 +31,14 @@ public:
 
 	void operator=(const char *a);
 	void operator=(std::string a);
-	String substring(unsigned int a);
+    String substring(unsigned int a);
+    String substring(unsigned int a, unsigned int b);
 	void operator+=(const char *b);
 	void operator+=(String b);
     bool operator==(String a);
     bool operator==(const char *a);
 	unsigned int length();
+	int lastIndexOf(char c);
 };
 
 

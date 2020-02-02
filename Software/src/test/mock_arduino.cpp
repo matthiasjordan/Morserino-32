@@ -37,12 +37,12 @@ void String::operator=(const char *b) {
 }
 
 void String::operator=(std::string b) {
-//	printf("=2 '%s'", b.c_str());
+//	printf("=2 '%s'\n", b.c_str());
 	std::string::operator=(b);
 }
 
 bool String::operator==(String b) {
-//  printf("'%s' == '%s'", c_str(), b.c_str());
+//  printf("'%s' == '%s'\n", c_str(), b.c_str());
     return  0 == strcmp(c_str(), b.c_str());
 }
 
@@ -56,10 +56,22 @@ unsigned int String::length() {
 }
 
 String String::substring(unsigned int a) {
-	return String(substr(a));
+    return String(substr(a));
 }
 
+String String::substring(unsigned int a, unsigned int b) {
+    return String(substr(a, b));
+}
 
+int String::lastIndexOf(char c) {
+    int res = -1;
+    for (unsigned int i = 0; (i < length()); i++) {
+        if (c_str()[i] == c) {
+            res = i;
+        }
+    }
+    return res;
+}
 
 void MockSerial::println(const char *a) {
 }
