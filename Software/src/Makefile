@@ -1,6 +1,8 @@
 SOURCES = main.cpp \
 	mock_arduino.cpp \
-	WordBuffer.cpp
+	TestSupport.cpp \
+	WordBuffer.cpp \
+	WordBufferTest.cpp
 
 OBJECTS := $(addsuffix .o, $(addprefix .build/, $(basename $(SOURCES))))
 DEPFILES := $(subst .o,.dep, $(subst .build/,.deps/, $(OBJECTS)))
@@ -8,7 +10,7 @@ TESTCPPFLAGS = -D_TEST_ -Itest -Iarduino
 CPPDEPFLAGS = -MMD -MP -MF .deps/$(subst .allsrc/,,$(basename $<)).dep
 RUNTEST := $(if $(COMSPEC), runtest.exe, runtest)
 
-all: runtests
+all: run
 
 .build/%.o: .allsrc/%.cpp
 	mkdir -p .deps/$(dir $<)
@@ -27,6 +29,10 @@ copy:
 runtests: compile
 	$(CC) $(OBJECTS) -lstdc++ -o $@
 
+run: runtests
+	./runtests
+	
+	
 clean:
 	@rm -rf .deps/ .build/ .allsrc $(RUNTEST)
 
