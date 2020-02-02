@@ -117,45 +117,45 @@ class TennisMachine
                 void onLeave();
         };
 
-        struct StateChallengePassed: public State
-        {
-                using State::State;
-                const char* getName();
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-                void onLeave();
-        };
+//        struct StateChallengePassed: public State
+//        {
+//                using State::State;
+//                const char* getName();
+//                void onMessageReceive(String message);
+//                void onMessageTransmit(WordBuffer &message);
+//                void onEnter();
+//                void onLeave();
+//        };
+//
+//        struct StateChallengeFailed: public State
+//        {
+//                using State::State;
+//                const char* getName();
+//                void onMessageReceive(String message);
+//                void onMessageTransmit(WordBuffer &message);
+//                void onEnter();
+//                void onLeave();
+//        };
 
-        struct StateChallengeFailed: public State
-        {
-                using State::State;
-                const char* getName();
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-                void onLeave();
-        };
-
-        struct StateSendTestFailed: public State
-        {
-                using State::State;
-                const char* getName();
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-                void onLeave();
-        };
-
-        struct StateTestPassed: public State
-        {
-                using State::State;
-                const char* getName();
-                void onMessageReceive(String message);
-                void onMessageTransmit(WordBuffer &message);
-                void onEnter();
-                void onLeave();
-        };
+//        struct StateSendTestFailed: public State
+//        {
+//                using State::State;
+//                const char* getName();
+//                void onMessageReceive(String message);
+//                void onMessageTransmit(WordBuffer &message);
+//                void onEnter();
+//                void onLeave();
+//        };
+//
+//        struct StateSendTestPassed: public State
+//        {
+//                using State::State;
+//                const char* getName();
+//                void onMessageReceive(String message);
+//                void onMessageTransmit(WordBuffer &message);
+//                void onEnter();
+//                void onLeave();
+//        };
 
         struct StateEnd: public State
         {
@@ -168,6 +168,17 @@ class TennisMachine
 
         StateInitial stateInitial{this};
         StateEnd stateEnd{this};
+        StateInviteReceived stateInviteReceived{this};
+        StateInviteAnswered stateInviteAnswered{this};
+        StateInviteSent stateInviteSent{this};
+        StateInviteAccepted stateInviteAccepted{this};
+        StateStartRoundSender stateStartRoundSender{this};
+        StateStartRoundReceiver stateStartRoundReceiver{this};
+//        StateSendTestFailed stateSendTestFailed{this};
+//        StateSendTestPassed stateSendTestPassed{this};
+        StateChallengeReceived stateChallengeReceived{this};
+//        StateChallengePassed stateChallengePassed{this};
+//        StateChallengeFailed stateChallengeFailed{this};
 
         State *currentState = 0;
 
