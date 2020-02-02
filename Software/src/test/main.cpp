@@ -11,7 +11,10 @@
 
 #include "TestSupport.h"
 
+#include "TestSupportTest.h"
+
 #include "WordBufferTest.h"
+#include "TennisMachineTest.h"
 
 
 int main()
@@ -24,6 +27,8 @@ int main()
     test_WordBuffer_get();
     test_WordBuffer_equals();
 
+    test_TennisMachine_1();
+
     printf("Failed tests: %lu\n", failedTests.size());
-    return 0;
+    return failedTests.size();
 }

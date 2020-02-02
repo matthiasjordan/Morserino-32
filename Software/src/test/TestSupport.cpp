@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <cstring>
 
 #include "TestSupport.h"
 
@@ -20,9 +21,14 @@ const char* toString(bool b)
 
 void assertEquals(const char* msg, std::string expected, std::string actual)
 {
-    if (expected != actual)
+    assertEquals(msg, expected.c_str(), actual.c_str());
+}
+
+void assertEquals(const char* msg, const char* expected, const char* actual)
+{
+    if (strcmp(expected, actual) != 0)
     {
-        printf("FAILED: %s - expected: %s, actual: %s\n", msg, expected.c_str(), actual.c_str());
+        printf("FAILED: %s - expected: %s, actual: %s\n", msg, expected, actual);
         failedTests.push_back(msg);
     }
 }
@@ -38,10 +44,6 @@ void assertEquals(const char* msg, bool expected, bool actual)
 
 void assertTrue(const char* msg, bool actual)
 {
-    if (!actual)
-    {
-        printf("FAILED: %s - expected: true, actual: false\n", msg);
-        failedTests.push_back(msg);
-    }
+    assertEquals(msg, true, actual);
 }
 

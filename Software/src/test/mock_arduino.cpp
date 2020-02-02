@@ -11,6 +11,12 @@
 
 #include "mock_arduino.h"
 
+
+void delay(unsigned long int) {
+
+}
+
+
 MockSerial Serial;
 
 
@@ -36,8 +42,13 @@ void String::operator=(std::string b) {
 }
 
 bool String::operator==(String b) {
-//	printf("'%s' == '%s'", c_str(), b.c_str());
-	return 	0 == strcmp(c_str(), b.c_str());
+//  printf("'%s' == '%s'", c_str(), b.c_str());
+    return  0 == strcmp(c_str(), b.c_str());
+}
+
+bool String::operator==(const char *b) {
+//  printf("'%s' == '%s'", c_str(), b.c_str());
+    return  0 == strcmp(c_str(), b);
 }
 
 unsigned int String::length() {
@@ -50,7 +61,7 @@ String String::substring(unsigned int a) {
 
 
 
-void MockSerial::println(char *a) {
+void MockSerial::println(const char *a) {
 }
 
 void MockSerial::println(String a) {

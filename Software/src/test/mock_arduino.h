@@ -8,11 +8,17 @@
 #ifndef MOCK_ARDUINO_H_
 #define MOCK_ARDUINO_H_
 
+#include <stdlib.h>
 #include <cstdio>
 #include <string>
 
 #define boolean bool
 
+#define T2 2
+#define T5 5
+
+
+void delay(unsigned long int);
 
 class String : public std::string {
 
@@ -21,13 +27,15 @@ public:
 	String(char *a) : std::string(a) {};
 	String(const char *a) : std::string(a) {};
 	String(std::string a) : std::string(a) {};
-//	using std::string::string;
+	String(unsigned long a) : std::string(std::to_string(a)) {};
+
 	void operator=(const char *a);
 	void operator=(std::string a);
 	String substring(unsigned int a);
 	void operator+=(const char *b);
 	void operator+=(String b);
-	bool operator==(String a);
+    bool operator==(String a);
+    bool operator==(const char *a);
 	unsigned int length();
 };
 
@@ -35,7 +43,7 @@ public:
 
 class MockSerial {
 public:
-	void println(char *a);
+	void println(const char *a);
 	void println(String a);
 	void println(std::__cxx11::basic_string<char>);
 };

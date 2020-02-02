@@ -14,6 +14,7 @@ class WordBuffer
 {
     public:
         WordBuffer();
+        WordBuffer(const char* initial);
         ~WordBuffer() = default;
         void addWord(String word);
         void addChar(String c);
@@ -26,7 +27,7 @@ class WordBuffer
 
     private:
         String buffer;
-        boolean wordEnd;
+        boolean wordEnd = false;
 
 };
 

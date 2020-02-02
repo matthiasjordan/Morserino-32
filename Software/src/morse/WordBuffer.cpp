@@ -12,6 +12,11 @@ WordBuffer::WordBuffer()
     getAndClear();
 }
 
+WordBuffer::WordBuffer(const char* initial) {
+    buffer += initial;
+    endWord();
+}
+
 void WordBuffer::handleWordEnd()
 {
     if (wordEnd)

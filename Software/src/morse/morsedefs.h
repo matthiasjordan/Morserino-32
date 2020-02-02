@@ -1,7 +1,7 @@
 #ifndef MORSEDEFS_H
 #define MORSEDEFS_H
 
-#include <Arduino.h>
+#include "arduino.h"
 
 const String PROJECTNAME = "Morselino-32";
 

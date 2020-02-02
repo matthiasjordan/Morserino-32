@@ -26,9 +26,9 @@ class TennisMachine
         struct State
         {
                 State(TennisMachine *m) : machine{m} {};
-                virtual const char* getName();
-                virtual void onMessageReceive(String message);
-                virtual void onMessageTransmit(WordBuffer &message);
+                virtual const char* getName() = 0;
+                virtual void onMessageReceive(String message) = 0;
+                virtual void onMessageTransmit(WordBuffer &message) = 0;
                 virtual void onEnter() {};
                 virtual boolean loop() {return false;};
                 virtual void onLeave() {};
