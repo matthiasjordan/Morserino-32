@@ -18,9 +18,15 @@ class TennisMachine
             uint8_t repeatCall = 2;
         };
 
+        struct Station {
+            String call;
+            uint16_t points = 0;
+        };
+
         struct GameState {
-            String remoteStation;
-            String ourStation;
+            Station dx;
+            Station us;
+            String challenge;
         };
 
         void setClient(Client &c) {client = c;};
@@ -30,6 +36,8 @@ class TennisMachine
         void loop();
         void onMessageReceive(String message);
         void onMessageTransmit(WordBuffer &message);
+        GameState getGameState();
+
 
     private:
 
@@ -97,6 +105,16 @@ class TennisMachine
         };
 
         struct StateStartRoundSender: public State
+        {
+                using State::State;
+                const char* getName();
+                void onMessageReceive(String message);
+                void onMessageTransmit(WordBuffer &message);
+                void onEnter();
+                void onLeave();
+        };
+
+        struct StateWaitForAnswer: public State
         {
                 using State::State;
                 const char* getName();
@@ -182,6 +200,7 @@ class TennisMachine
         StateInviteSent stateInviteSent{this};
         StateInviteAccepted stateInviteAccepted{this};
         StateStartRoundSender stateStartRoundSender{this};
+        StateWaitForAnswer stateWaitForAnswer{this};
         StateStartRoundReceiver stateStartRoundReceiver{this};
 //        StateSendTestFailed stateSendTestFailed{this};
 //        StateSendTestPassed stateSendTestPassed{this};
