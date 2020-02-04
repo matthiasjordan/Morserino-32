@@ -478,12 +478,12 @@ void TennisMachine::StateEnd::onEnter()
 void TennisMachine::StateEnd::onMessageReceive(String message)
 {
     machine->print("StateEnd received " + message + "\n");
-    if (message >= "<ka>")
-    {
-        machine->switchToState(&machine->stateInitial);
-    }
 }
 
 void TennisMachine::StateEnd::onMessageTransmit(WordBuffer &message)
 {
+    if (message.matches("<ka>"))
+    {
+        machine->switchToState(&machine->stateInitial);
+    }
 }

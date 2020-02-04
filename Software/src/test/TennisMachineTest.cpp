@@ -89,6 +89,11 @@ void test_TennisMachine_1()
     sut.onMessageTransmit(buf);
     // Managed to key same word twice - advance to next state
     assertEquals("18", "StateEnd", sut.getState());
+
+    WordBuffer wordBuffer = WordBuffer("<ka>");
+    sut.onMessageTransmit(wordBuffer);
+    assertEquals("19", "StateInitial", sut.getState());
+
 }
 
 void test_TennisMachine_2()
@@ -118,6 +123,12 @@ void test_TennisMachine_2()
 
     sut.onMessageReceive("<sk>");
     assertEquals("6", "StateEnd", sut.getState());
+
+    WordBuffer wordBuffer = WordBuffer("<ka>");
+    sut.onMessageTransmit(wordBuffer);
+    assertEquals("7", "StateInitial", sut.getState());
+
+
 }
 
 void test_TennisMachine()
