@@ -20,39 +20,39 @@ void test_WordBuffer_addWord()
 {
     WordBuffer sut;
     sut.addWord(String("abc"));
-    assertEquals("test_WordBuffer_addWord 1: ", "abc", sut.get());
+    assertEquals("test_WordBuffer_addWord 1", "abc", sut.get());
 
     sut.addWord("b");
-    assertEquals("test_WordBuffer_addWord 2: ", "abc b", sut.get());
+    assertEquals("test_WordBuffer_addWord 2", "abc b", sut.get());
 
     sut.addWord("cd");
-    assertEquals("test_WordBuffer_addWord 3: ", "abc b cd", sut.get());
+    assertEquals("test_WordBuffer_addWord 3", "abc b cd", sut.get());
 }
 
 void test_WordBuffer_getAndClear()
 {
     WordBuffer sut;
     sut.addWord(String("abc"));
-    assertEquals("test_WordBuffer_getAndClear 1: ", "abc", sut.get());
+    assertEquals("test_WordBuffer_getAndClear 1", "abc", sut.get());
 
     String actual1 = sut.getAndClear();
-    assertEquals("test_WordBuffer_getAndClear 2: ", "abc", actual1);
+    assertEquals("test_WordBuffer_getAndClear 2", "abc", actual1);
 
     String actual2 = sut.getAndClear();
-    assertEquals("test_WordBuffer_getAndClear 3: ", "", actual2);
+    assertEquals("test_WordBuffer_getAndClear 3", "", actual2);
 }
 
 void test_WordBuffer_get()
 {
     WordBuffer sut;
     sut.addWord(String("abc"));
-    assertEquals("test_WordBuffer_get 1: ", "abc", sut.get());
+    assertEquals("test_WordBuffer_get 1", "abc", sut.get());
 
     String actual1 = sut.get();
-    assertEquals("test_WordBuffer_get 2: ", "abc", actual1);
+    assertEquals("test_WordBuffer_get 2", "abc", actual1);
 
     String actual2 = sut.get();
-    assertEquals("test_WordBuffer_get 3: ", "abc", actual2);
+    assertEquals("test_WordBuffer_get 3", "abc", actual2);
 }
 
 void test_WordBuffer_equals()
@@ -60,10 +60,9 @@ void test_WordBuffer_equals()
     WordBuffer sut;
     sut.addWord(String("abc"));
 
-    assertEquals("test_WordBuffer_equals 1: ", true, sut == "abc");
+    assertEquals("test_WordBuffer_equals 1", true, sut == "abc");
 
-    String actual1 = sut.get();
-    assertEquals("test_WordBuffer_equals 2: ", false, sut == "x");
+    assertEquals("test_WordBuffer_equals 2", false, sut == "x");
 }
 
 void test_WordBuffer_matches_1() {
@@ -74,7 +73,8 @@ void test_WordBuffer_matches_1() {
     sut.addWord(String("w1aw"));
     sut.addWord(String("w1aw"));
 
-    assertEquals("matches 1", "w1aw", sut.matches("cq cq de # #"));
+    assertEquals("matches 1 1", true, sut.matches("cq cq de # #"));
+    assertEquals("matches 1 2", "w1aw", sut.getMatch());
 }
 
 void test_WordBuffer_matches_2() {
@@ -85,7 +85,7 @@ void test_WordBuffer_matches_2() {
     sut.addWord(String("w1aw"));
     sut.addWord(String("w1aa"));
 
-    assertEquals("matches 2", "", sut.matches("cq cq de # #"));
+    assertEquals("matches 2", false, sut.matches("cq cq de # #"));
 }
 
 void test_WordBuffer_matches_2a() {
@@ -96,14 +96,26 @@ void test_WordBuffer_matches_2a() {
     sut.addWord(String("w1aw"));
     sut.addWord(String("w1aw"));
 
-    assertEquals("matches 2a", "", sut.matches("cq cq de # #"));
+    assertEquals("matches 2a", false, sut.matches("cq cq de # #"));
 }
 
 void test_WordBuffer_matches_3() {
     WordBuffer sut;
     sut.addWord(String("cq"));
 
-    assertEquals("matches 3", "", sut.matches("cq de #"));
+    assertEquals("matches 3 1", false, sut.matches("cq de #"));
+
+    sut.addWord(String("de"));
+    assertEquals("matches 3 2", false, sut.matches("cq de #"));
+
+    sut.addWord(String("dx"));
+    assertEquals("matches 3 3", true, sut.matches("cq de #"));
+    assertEquals("matches 3 4", "dx", sut.getMatch());
+}
+
+void test_WordBuffer_matches_4() {
+    assertEquals("matches 4 1", true, WordBuffer("cq de dx").matches("cq de #"));
+    assertEquals("matches 4 2", false, WordBuffer("cq dx dx").matches("cq de #"));
 }
 
 
@@ -119,5 +131,6 @@ void test_WordBuffer()
     test_WordBuffer_matches_2();
     test_WordBuffer_matches_2a();
     test_WordBuffer_matches_3();
+    test_WordBuffer_matches_4();
 }
 

@@ -18,6 +18,12 @@ WordBuffer::WordBuffer(const char* initial)
     endWord();
 }
 
+WordBuffer::WordBuffer(String initial)
+{
+    buffer += initial;
+    endWord();
+}
+
 void WordBuffer::handleWordEnd()
 {
     if (wordEnd)
@@ -58,14 +64,16 @@ String WordBuffer::get()
     return buffer;
 }
 
-String* split(String s) {
+String* split(String s)
+{
     int i = s.lastIndexOf(' ');
-    if (i == -1) {
-        return new String[2] {"", s};
+    if (i == -1)
+    {
+        return new String[2]{"", s};
     }
-    String token = s.substring(i+1);
+    String token = s.substring(i + 1);
     String rest = s.substring(0, i);
-    String *r = new String[2] {rest, token};
+    String *r = new String[2]{rest, token};
     return r;
 }
 
@@ -80,11 +88,7 @@ String* split(String s) {
  * Buffer contains "cq de w1aw w1aw", pattern is cq de # #", returns "w1aw".
  * Buffer contains "cq de w1aw w1aa", pattern is cq de # #", returns "".
  */
-String WordBuffer::matches(String pattern) {
-    return matches(buffer, pattern.c_str());
-}
-
-String WordBuffer::matches(String buffer, const char *pattern)
+boolean WordBuffer::matches(String pattern)
 {
     String tmppat = pattern;
     String tmpbuf = buffer;
@@ -93,47 +97,47 @@ String WordBuffer::matches(String buffer, const char *pattern)
     {
         String *p = split(tmppat);
         String *b = split(tmpbuf);
-        if (p[1] == "#") {
+        if (p[1] == "#")
+        {
             String wcc = b[1];
-            if (wildcardContent == "") {
+            if (wildcardContent == "")
+            {
                 wildcardContent = wcc;
             }
-            else if (wcc != wildcardContent){
+            else if (wcc != wildcardContent)
+            {
                 // Repeat wildcard mismatch
-                return "";
+                return false;
             }
         }
-        else if (p[1] != b[1]) {
+        else if (p[1] != b[1])
+        {
             // word mismatch
-            return "";
+            return false;
         }
         tmppat = *p;
         tmpbuf = *b;
     }
     while ((tmppat != "") && (tmpbuf != ""));
 
-    if ((tmppat != "") && (tmpbuf == "")) {
+    if ((tmppat != "") && (tmpbuf == ""))
+    {
         wildcardContent = "";
+        return false;
     }
-
-    return wildcardContent;
+    else
+    {
+        match = wildcardContent;
+        return true;
+    }
 }
 
+String WordBuffer::getMatch()
+{
+    return match;
+}
 
 boolean WordBuffer::operator==(String other)
 {
     return buffer == other;
-}
-
-boolean WordBuffer::operator>=(String other)
-{
-    unsigned int ol = other.length();
-    unsigned int tl = buffer.length();
-    if (ol > tl)
-    {
-        return false;
-    }
-    String substring = buffer.substring(tl - ol);
-    Serial.println("Wordbuffer " + buffer + ">=" + other + " -> '" + substring + "'");
-    return substring == other;
 }

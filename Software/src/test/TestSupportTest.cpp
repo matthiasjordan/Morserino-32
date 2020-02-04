@@ -20,6 +20,7 @@ void test_TestSupport_aE1()
 
 void test_TestSupport_aE2()
 {
+    printf("equals m2 is supposed to fail!\n");
     failedTests.clear();
     assertEquals("equals m2", "a", "b");
     if (failedTests.size() != 1)
@@ -40,6 +41,7 @@ void test_TestSupport_aE3()
 
 void test_TestSupport_aE4()
 {
+    printf("equals m4 is supposed to fail!\n");
     failedTests.clear();
     assertEquals("equals m4", true, false);
     if (failedTests.size() != 1)
