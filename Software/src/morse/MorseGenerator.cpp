@@ -17,7 +17,7 @@
 #include "MorseGenerator.h"
 #include "MorseDisplay.h"
 #include "MorseMachine.h"
-#include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
 #include "decoder.h"
@@ -414,7 +414,7 @@ unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorCo
 
 String fetchNewWordFromLoRa()
 {
-    MorseLoRa::Packet packet = MorseLoRa::decodePacket();
+    MorseLoRaCW::Packet packet = MorseLoRaCW::decodePacket();
     if (!packet.valid)
     {
         return "";

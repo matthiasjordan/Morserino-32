@@ -16,7 +16,7 @@
 #include "MorseMachine.h"
 #include "MorseGenerator.h"
 #include "decoder.h"
-#include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseDisplay.h"
 #include "MorseSound.h"
 
@@ -359,7 +359,7 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
 
                             if (MorseMachine::isMode(MorseMachine::loraTrx))
                             {
-                                MorseLoRa::cwForLora(0);
+                                MorseLoRaCW::cwForLora(0);
                             }
 
                             MorsePreferences::fireCharSeen(false);
@@ -486,7 +486,7 @@ void internal::setDITstate()
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
     if (MorseMachine::isMode(MorseMachine::loraTrx))
     {
-        MorseLoRa::cwForLora(1);                         // build compressed string for LoRA
+        MorseLoRaCW::cwForLora(1);                         // build compressed string for LoRA
     }
 }
 
@@ -496,7 +496,7 @@ void internal::setDAHstate()
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
     if (MorseMachine::isMode(MorseMachine::loraTrx))
     {
-        MorseLoRa::cwForLora(2);
+        MorseLoRaCW::cwForLora(2);
     }
 }
 

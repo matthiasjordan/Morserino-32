@@ -16,6 +16,7 @@
 #include "MorseMachine.h"
 #include "MorseModeLoRa.h"
 #include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
 
@@ -42,8 +43,9 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseKeyer::onWordEnd = []()
         {
             /* finalise the string and send it to LoRA */
-            MorseLoRa::cwForLora(3);
-            MorseLoRa::sendWithLora();
+            MorseLoRaCW::cwForLora(3);
+            char *buf = MorseLoRaCW::getTxBuffer();
+            MorseLoRa::sendWithLora(buf);
             return false;
         };
 

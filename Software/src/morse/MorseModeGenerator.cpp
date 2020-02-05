@@ -20,7 +20,7 @@
 #include "MorseKeyer.h"
 #include "MorsePlayerFile.h"
 #include "MorseModeHeadCopying.h"
-#include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 
 MorseModeGenerator morseModeGenerator;
 
@@ -67,9 +67,10 @@ void MorseModeGenerator::onPreferencesChanged()
         if (MorsePreferences::prefs.loraTrainerMode == 1)
         {
             // in generator mode and we want to send with LoRa
-            MorseLoRa::cwForLora(0);
-            MorseLoRa::cwForLora(3);// as we have just finished a word
-            MorseLoRa::sendWithLora();// finalise the string and send it to LoRA
+            MorseLoRaCW::cwForLora(0);
+            MorseLoRaCW::cwForLora(3);// as we have just finished a word
+            char *buf = MorseLoRaCW::getTxBuffer();
+            MorseLoRa::sendWithLora(buf);// finalise the string and send it to LoRA
             delay(MorseKeyer::interCharacterSpace + MorseKeyer::ditLength);// we need a slightly longer pause otherwise the receiving end might fall too far behind...
         }
         return -1ul;
@@ -92,7 +93,7 @@ void MorseModeGenerator::onPreferencesChanged()
                     break;
                 }
             }
-            MorseLoRa::cwForLora(e);
+            MorseLoRaCW::cwForLora(e);
         }
     };
 
