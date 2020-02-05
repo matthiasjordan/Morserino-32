@@ -247,14 +247,17 @@ RawPacket MorseLoRa::decodePacket()
     uint8_t index = 0;
 
     l = internal::loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
-    rp.payloadLength = l - 1;
+    rp.payloadLength = l - 2;
     rp.payload = (uint8_t *) malloc(l);
     uint8_t *p = rp.payload;
 
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         c = loRaRxBuffer[index + i];
-
+        char buf[100];
+        sprintf(buf, "%x/binary"
+                "", c);
+Serial.println(">>> " + String(c) + " - " + buf);
         switch (i)
         {
             case 0:

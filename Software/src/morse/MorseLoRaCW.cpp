@@ -145,6 +145,9 @@ MorseLoRaCW::Packet internal::decodePacket(MorseLoRa::RawPacket &rp)
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         uint8_t c = rp.payload[i];
+        char buf[100];
+        sprintf(buf, "%x/binary", c);
+        Serial.println("payload>>> " + String(c) + " - " + buf);
 
         switch (i)
         {
@@ -153,7 +156,7 @@ MorseLoRaCW::Packet internal::decodePacket(MorseLoRa::RawPacket &rp)
                 p.rxWpm = (uint8_t) (c >> 2); // the first data byte contains the wpm info in the first six bits, and actual morse in the remaining two bits
                                            // now take remaining two bits and store them in CWword as ASCII
                 char cx = (char) ((c & B011) + 48);
-                p.payload += cx;
+                p.payload = cx;
                 break;
             }
             default:
