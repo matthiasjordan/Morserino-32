@@ -62,6 +62,8 @@ void MorseModeGenerator::onPreferencesChanged()
     MorseGenerator::getConfig()->sendCWToLoRa = (MorsePreferences::prefs.loraTrainerMode == 1);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
     MorseText::getConfig()->repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+    MorseGenerator::Config *genCon = MorseGenerator::getConfig();
+    genCon->maxWords = MorsePreferences::prefs.maxSequence;
 }
 
 boolean MorseModeGenerator::togglePause()
