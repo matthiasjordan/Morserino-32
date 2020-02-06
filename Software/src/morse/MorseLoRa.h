@@ -14,6 +14,13 @@ namespace MorseLoRa
         uint16_t payloadLength;
 
         uint8_t protocolVersion() { return header >> 6;};
+        String payloadAsString() {
+            String message;
+            for (int i = 0; (i < payloadLength); i++) {
+                message += (char) payload[i];
+            }
+            return message;
+        }
     };
 
 

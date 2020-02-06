@@ -9,7 +9,7 @@
 #include "MorseMachine.h"
 #include "MorseDisplay.h"
 #include "MorseKeyer.h"
-//#include "MorseLoRa.h"
+#include "MorseLoRa.h"
 
 MorseModeTennis morseModeTennis;
 
@@ -51,7 +51,7 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseDisplay::getConfig()->autoFlush = true;
 
 
-//    MorseLoRa::receive();
+    MorseLoRa::receive();
 
     machine.start();
     return true;
@@ -85,15 +85,16 @@ void MorseModeTennis::onPreferencesChanged()
  */
 void MorseModeTennis::send(String message)
 {
-    Serial.println("SEND " + message);
+    Serial.println("MMT::send " + message);
+    MorseLoRa::sendWithLora((const char*) message.c_str());
 }
 
 void MorseModeTennis::receive()
 {
-    if (Serial.available())
+    if (MorseLoRa::loRaBuReady())
     {
-        String inMsg = Serial.readString();
-        receive(inMsg);
+        MorseLoRa::RawPacket rp = MorseLoRa::decodePacket();
+        receive(rp.payloadAsString());
     }
 }
 
