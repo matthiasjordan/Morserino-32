@@ -45,9 +45,7 @@ boolean MorseModeLoRa::menuExec(String mode)
             /* finalise the string and send it to LoRA */
             MorseLoRaCW::cwForLora(3);
             char *buf = MorseLoRaCW::getTxBuffer();
-            Serial.println("MMLR buf 1: " + String(buf));
             MorseLoRa::sendWithLora(buf);
-            Serial.println("MMLR buf 2: " + String(buf));
             return false;
         };
 

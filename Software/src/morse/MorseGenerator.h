@@ -34,6 +34,7 @@ namespace MorseGenerator
             boolean printSpaceAfterChar;
             FONT_ATTRIB printCharStyle;
             uint8_t effectiveTrainerDisplay;
+            uint8_t maxWords = 0;
 
             void (*onFetchNewWord)(); // Called when the generator fetches a new word from MorseText
             unsigned long (*onGeneratorWordEnd)(); // Called when the generator just sent the last character of the word

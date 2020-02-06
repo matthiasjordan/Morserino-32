@@ -5,11 +5,9 @@ namespace MorseLoRa
 {
 
     struct RawPacket {
-            ~RawPacket() {
-                Serial.println("~RawPacket 1");
-                delete payload;
-                Serial.println("~RawPacket 2");
-            }
+        ~RawPacket() {
+            delete payload;
+        }
         uint8_t header;
         int rssi;
         uint8_t* payload;

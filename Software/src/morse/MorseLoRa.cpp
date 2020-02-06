@@ -254,10 +254,6 @@ RawPacket MorseLoRa::decodePacket()
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         c = loRaRxBuffer[index + i];
-        char buf[100];
-        sprintf(buf, "%x/binary"
-                "", c);
-Serial.println(">>> " + String(c) + " - " + buf);
         switch (i)
         {
             case 0:

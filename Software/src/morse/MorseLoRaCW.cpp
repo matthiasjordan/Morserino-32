@@ -145,9 +145,6 @@ MorseLoRaCW::Packet internal::decodePacket(MorseLoRa::RawPacket &rp)
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         uint8_t c = rp.payload[i];
-        char buf[100];
-        sprintf(buf, "%x/binary", c);
-        Serial.println("payload>>> " + String(c) + " - " + buf);
 
         switch (i)
         {

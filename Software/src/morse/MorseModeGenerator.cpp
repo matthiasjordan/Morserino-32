@@ -62,6 +62,7 @@ void MorseModeGenerator::onPreferencesChanged()
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
 
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
+    genCon->maxWords = MorsePreferences::prefs.maxSequence;
     genCon->onGeneratorWordEnd = []()
     {
         if (MorsePreferences::prefs.loraTrainerMode == 1)

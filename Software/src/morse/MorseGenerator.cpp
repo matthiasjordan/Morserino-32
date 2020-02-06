@@ -31,14 +31,15 @@ unsigned long MorseGenerator::genTimer;                         // timer used fo
 
 String MorseGenerator::CWword = "";
 String MorseGenerator::clearText = "";
+
 uint8_t MorseGenerator::wordCounter = 0;                          // for maxSequence
+boolean MorseGenerator::stopFlag = false;                         // for maxSequence
 
 int rxDitLength = 0;                    // set new value for length of dits and dahs and other timings
 int rxDahLength = 0;
 int rxInterCharacterSpace = 0;
 int rxInterWordSpace = 0;
 
-boolean MorseGenerator::stopFlag = false;                         // for maxSequence
 
 namespace MorseGenerator
 {
@@ -88,6 +89,7 @@ void MorseGenerator::setStart()
     generatorConfig.onGeneratorWordEnd = &uLongFunctionMinus1;
     generatorConfig.onCWElement = [](char c){};
     generatorConfig.onLastWord = &voidFunction;
+    generatorConfig.maxWords = 0;
 
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
 
@@ -166,14 +168,13 @@ void MorseGenerator::generateCW()
 
                 String newWord = "";
 
-                uint8_t max = MorsePreferences::prefs.maxSequence;
-                if (max && MorseGenerator::wordCounter == (max - 1))
+                if (generatorConfig.maxWords && MorseGenerator::wordCounter == (generatorConfig.maxWords - 1))
                 {
                     // last word;
                     MorseText::setNextWordIsEndSequence();
                     generatorConfig.onLastWord();
                 }
-                else if (max && MorseGenerator::wordCounter >= max)
+                else if (generatorConfig.maxWords && MorseGenerator::wordCounter >= generatorConfig.maxWords)
                 {
                     // stop
                     MorseGenerator::stopFlag = true;
