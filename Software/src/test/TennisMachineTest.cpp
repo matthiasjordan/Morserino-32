@@ -10,6 +10,8 @@
 
 #define TESTPR(m,v) printf(m, v)
 
+String lastSent;
+
 TennisMachine createSUT() {
     TennisMachine sut;
     TennisMachine::Client client;
@@ -18,12 +20,12 @@ TennisMachine createSUT() {
     client.printReceivedMessage = [](String m)
     {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
     client.send = [](String m)
-    {   TESTPR("> '%s'\n", m.c_str());};
+    {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
     sut.setClient(client);
     return sut;
 }
 
-void test_TennisMachine_1()
+void test_TennisMachine_1_we_initiate()
 {
     printf("Testing TennisMachine 1\n");
     TennisMachine sut = createSUT();
@@ -127,14 +129,93 @@ void test_TennisMachine_2()
     WordBuffer wordBuffer = WordBuffer("<ka>");
     sut.onMessageTransmit(wordBuffer);
     assertEquals("7", "StateInitial", sut.getState());
-
-
 }
+
+
+void test_TennisMachine_3_with_typos()
+{
+    printf("Testing TennisMachine 3\n");
+    TennisMachine sut = createSUT();
+    WordBuffer buf;
+
+    sut.start();
+    assertEquals("1", "StateInitial", sut.getState());
+
+    buf.addWord("cq");
+    sut.onMessageTransmit(buf);
+    assertEquals("2", "StateInitial", sut.getState());
+
+    buf.addWord("cq de xx0yyy");
+    sut.onMessageTransmit(buf);
+    assertEquals("3", "StateInviteSent", sut.getState());
+
+    sut.onMessageReceive("xx0yyy de xx1dx");
+    assertEquals("4", "StateInviteAccepted", sut.getState());
+
+    buf.getAndClear();
+    buf.addWord("err err xx1dx de xx0yyy");
+    sut.onMessageTransmit(buf);
+    assertEquals("5", "StateStartRoundSender", sut.getState());
+
+    sut.onMessageReceive("<sk>");
+    assertEquals("6", "StateEnd", sut.getState());
+
+    WordBuffer wordBuffer = WordBuffer("<ka>");
+    sut.onMessageTransmit(wordBuffer);
+    assertEquals("7", "StateInitial", sut.getState());
+}
+
+
+void test_TennisMachine_4_we_get_invited()
+{
+    printf("Testing TennisMachine 4\n");
+    TennisMachine sut = createSUT();
+    WordBuffer buf;
+
+    sut.start();
+    assertEquals("1", "StateInitial", sut.getState());
+
+    sut.onMessageReceive("cq de xx1dx");
+    assertEquals("2", "StateInviteReceived", sut.getState());
+
+    buf.addWord("err");
+    sut.onMessageTransmit(buf);
+    assertEquals("3a", "StateInviteReceived", sut.getState());
+
+    buf.addWord("err xx1d de xx0yyy");
+    sut.onMessageTransmit(buf);
+    assertEquals("3b", "StateInviteReceived", sut.getState());
+
+    buf.addWord("xx1dx de xx0yyy");
+    sut.onMessageTransmit(buf);
+    assertEquals("3c", "StateInviteAnswered", sut.getState());
+    assertEquals("3d", "x1dx de xx0yyy", lastSent);
+
+
+//    sut.onMessageReceive("xx0yyy de xx1dx");
+//    assertEquals("4", "StateInviteAccepted", sut.getState());
+//
+//    buf.getAndClear();
+//    buf.addWord("err err xx1dx de xx0yyy");
+//    sut.onMessageTransmit(buf);
+//    assertEquals("5", "StateStartRoundSender", sut.getState());
+//
+//    sut.onMessageReceive("<sk>");
+//    assertEquals("6", "StateEnd", sut.getState());
+//
+//    WordBuffer wordBuffer = WordBuffer("<ka>");
+//    sut.onMessageTransmit(wordBuffer);
+//    assertEquals("7", "StateInitial", sut.getState());
+}
+
 
 void test_TennisMachine()
 {
     printf("Testing TennisMachine\n");
 
-    test_TennisMachine_1();
+    test_TennisMachine_1_we_initiate();
     test_TennisMachine_2();
+    test_TennisMachine_3_with_typos();
+    test_TennisMachine_4_we_get_invited();
+
 }

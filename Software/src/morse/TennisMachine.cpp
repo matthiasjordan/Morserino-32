@@ -118,8 +118,8 @@ void TennisMachine::StateInitial::onMessageReceive(String message)
     if (msgBuf.matches("cq de #"))
     {
         String dxCall = msgBuf.getMatch();
-        machine->print("Received cq - off to invite received");
         machine->gameState.dx.call = dxCall;
+        machine->print("Received cq from " + dxCall);
         machine->switchToState(&machine->stateInviteReceived);
     }
 }
@@ -147,7 +147,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
  */
 const char* TennisMachine::StateInviteReceived::getName()
 {
-    return "InviteReceived";
+    return "StateInviteReceived";
 }
 
 void TennisMachine::StateInviteReceived::onEnter()
