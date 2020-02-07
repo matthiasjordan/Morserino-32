@@ -133,6 +133,13 @@ void test_WordBuffer_fullPatternMatch_1()
     assertEquals("matches 5 1", "cq de dx", sut.getFullPatternMatch());
 
     sut.getAndClear();
+    sut.addWord("cq");
+    sut.addWord("de");
+    sut.addWord("m");
+    sut.matches("cq de #");
+    assertEquals("matches 5 1a", "cq de m", sut.getFullPatternMatch());
+
+    sut.getAndClear();
     sut.addWord("cq cq cq de dx");
     sut.matches("cq de #");
     assertEquals("matches 5 2", "cq de dx", sut.getFullPatternMatch());

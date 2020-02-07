@@ -189,7 +189,7 @@ void test_TennisMachine_4_we_get_invited()
     buf.addWord("xx1dx de xx0yyy");
     sut.onMessageTransmit(buf);
     assertEquals("3c", "StateInviteAnswered", sut.getState());
-    assertEquals("3d", "x1dx de xx0yyy", lastSent);
+    assertEquals("3d", "xx1dx de xx0yyy", lastSent);
 
 
 //    sut.onMessageReceive("xx0yyy de xx1dx");
