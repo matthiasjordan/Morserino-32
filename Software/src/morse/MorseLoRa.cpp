@@ -19,7 +19,6 @@
 
 #include "MorseDisplay.h"
 #include "MorsePreferencesMenu.h"
-#include "MorseMachine.h"
 #include "MorseLoRa.h"
 
 using namespace MorseLoRa;
@@ -111,10 +110,7 @@ void MorseLoRa::sendWithLora(const char loraTxBuffer[])
     LoRa.beginPacket();
     LoRa.print(loraTxBuffer);
     LoRa.endPacket();
-    if (MorseMachine::isMode(MorseMachine::loraTrx))
-    {
-        LoRa.receive();
-    }
+    LoRa.receive();
 }
 
 void internal::onReceive(int packetSize)
