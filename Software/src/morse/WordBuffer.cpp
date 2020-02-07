@@ -128,13 +128,31 @@ boolean WordBuffer::matches(String pattern)
     else
     {
         match = wildcardContent;
+        fullPatternMatch = trim(buffer.substring(tmpbuf.length()));
         return true;
     }
+}
+
+String WordBuffer::trim(String in) {
+    String out = in;
+    while ((out.length() != 0) && (out.substring(0, 1) == " ")) {
+        out = out.substring(1);
+    }
+    unsigned int l = out.length();
+    while (((l = out.length()) != 0) && (out.substring(l-1, l) == " ")) {
+        out = out.substring(0, l-1);
+    }
+    return out;
 }
 
 String WordBuffer::getMatch()
 {
     return match;
+}
+
+String WordBuffer::getFullPatternMatch()
+{
+    return fullPatternMatch;
 }
 
 boolean WordBuffer::operator==(String other)

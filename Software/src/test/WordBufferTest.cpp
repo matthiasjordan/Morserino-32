@@ -65,7 +65,8 @@ void test_WordBuffer_equals()
     assertEquals("test_WordBuffer_equals 2", false, sut == "x");
 }
 
-void test_WordBuffer_matches_1() {
+void test_WordBuffer_matches_1()
+{
     WordBuffer sut;
     sut.addWord(String("cq"));
     sut.addWord(String("cq"));
@@ -77,7 +78,8 @@ void test_WordBuffer_matches_1() {
     assertEquals("matches 1 2", "w1aw", sut.getMatch());
 }
 
-void test_WordBuffer_matches_2() {
+void test_WordBuffer_matches_2()
+{
     WordBuffer sut;
     sut.addWord(String("cq"));
     sut.addWord(String("cq"));
@@ -88,7 +90,8 @@ void test_WordBuffer_matches_2() {
     assertEquals("matches 2", false, sut.matches("cq cq de # #"));
 }
 
-void test_WordBuffer_matches_2a() {
+void test_WordBuffer_matches_2a()
+{
     WordBuffer sut;
     sut.addWord(String("cq"));
     sut.addWord(String("cq"));
@@ -99,7 +102,8 @@ void test_WordBuffer_matches_2a() {
     assertEquals("matches 2a", false, sut.matches("cq cq de # #"));
 }
 
-void test_WordBuffer_matches_3() {
+void test_WordBuffer_matches_3()
+{
     WordBuffer sut;
     sut.addWord(String("cq"));
 
@@ -113,11 +117,31 @@ void test_WordBuffer_matches_3() {
     assertEquals("matches 3 4", "dx", sut.getMatch());
 }
 
-void test_WordBuffer_matches_4() {
+void test_WordBuffer_matches_4()
+{
     assertEquals("matches 4 1", true, WordBuffer("cq de dx").matches("cq de #"));
     assertEquals("matches 4 2", false, WordBuffer("cq dx dx").matches("cq de #"));
 }
 
+void test_WordBuffer_fullPatternMatch_1()
+{
+    WordBuffer sut;
+
+    sut.getAndClear();
+    sut.addWord("cq de dx");
+    sut.matches("cq de #");
+    assertEquals("matches 5 1", "cq de dx", sut.getFullPatternMatch());
+
+    sut.getAndClear();
+    sut.addWord("cq cq cq de dx");
+    sut.matches("cq de #");
+    assertEquals("matches 5 2", "cq de dx", sut.getFullPatternMatch());
+
+    sut.getAndClear();
+    sut.addWord("err err dx de me k");
+    sut.matches("dx de # k");
+    assertEquals("matches 5 3", "dx de me k", sut.getFullPatternMatch());
+}
 
 void test_WordBuffer()
 {
@@ -132,5 +156,6 @@ void test_WordBuffer()
     test_WordBuffer_matches_2a();
     test_WordBuffer_matches_3();
     test_WordBuffer_matches_4();
+    test_WordBuffer_fullPatternMatch_1();
 }
 

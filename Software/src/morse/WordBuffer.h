@@ -24,13 +24,16 @@ class WordBuffer
         String get();
         boolean matches(String pattern);
         String getMatch();
+        String getFullPatternMatch();
         boolean operator==(String other);
 
     private:
         String buffer;
         String match;
+        String fullPatternMatch;
         boolean wordEnd = false;
         void handleWordEnd();
+        String trim(String in);
 };
 
 #endif /* WORDBUFFER_H_ */

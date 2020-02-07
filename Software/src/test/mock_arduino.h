@@ -38,6 +38,7 @@ public:
     bool operator==(String a);
     bool operator==(const char *a);
 	unsigned int length();
+	void trim();
 	int lastIndexOf(char c);
 };
 
