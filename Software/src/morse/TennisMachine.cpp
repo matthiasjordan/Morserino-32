@@ -1,9 +1,16 @@
-/*
- * TennisMachine.cpp
+/******************************************************************************************************************************
+ *  morse_3 Software for the Morserino-32 multi-functional Morse code machine, based on the Heltec WiFi LORA (ESP32) module ***
+ *  Copyright (C) 2020  Matthias Jordan, DL4MAT
  *
- *  Created on: 28.01.2020
- *      Author: mj
- */
+ *  This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *  of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along with this program.
+ *  If not, see <https://www.gnu.org/licenses/>.
+ *****************************************************************************************************************************/
 #include "TennisMachine.h"
 
 void TennisMachine::start()
@@ -23,6 +30,7 @@ void TennisMachine::onMessageTransmit(WordBuffer &message)
     {
         MORSELOGLN("TM::oMT got <sk>");
         message.getAndClear();
+        client.send("<sk>");
         switchToState(&stateEnd);
     }
     else
@@ -100,7 +108,6 @@ const char* TennisMachine::StateInitial::getName()
 
 void TennisMachine::StateInitial::onEnter()
 {
-    MORSELOGLN("TM:SI:oE machine: " + String((unsigned long ) machine));
     MORSELOGLN("StateInitial entered\n");
 
 }
@@ -138,7 +145,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     }
     else
     {
-        machine->print("Send cq to continue!\n");
+        machine->print("Send cq to continue!");
     }
 }
 
@@ -211,18 +218,17 @@ void TennisMachine::StateInviteAnswered::onMessageReceive(String message)
 {
     MORSELOGLN("StateInviteAnswered received '" + message + "'\n");
     String pattern = machine->gameState.us.call + " de " + machine->gameState.dx.call;
-    MORSELOGLN("pattern '" + pattern + "'\n");
     if (message == pattern)
     {
-        MORSELOGLN("The game commences between " + machine->gameState.dx.call + " and " + machine->gameState.us.call + "\n");
-        machine->print(message + " GO!");
+        MORSELOGLN("Game between " + machine->gameState.dx.call + " and " + machine->gameState.us.call + "\n");
+        machine->print("The game commences.");
         machine->switchToState(&machine->stateStartRoundReceiver);
     }
 }
 
 void TennisMachine::StateInviteAnswered::onMessageTransmit(WordBuffer &message)
 {
-    machine->print("Wait for DX to continue!\n");
+    machine->print("Wait for DX to continue!");
 }
 
 /*****************************************************************************
@@ -318,7 +324,7 @@ const char* TennisMachine::StateStartRoundSender::getName()
 void TennisMachine::StateStartRoundSender::onEnter()
 {
     MORSELOGLN("StateStartRoundSender entered\n");
-    machine->print("Give a word twice to send!\n");
+    machine->print("Give a word twice to send!");
 }
 
 void TennisMachine::StateStartRoundSender::onLeave()
@@ -340,7 +346,7 @@ void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message
         String challenge = message.getMatch();
         String pattern = machine->gameState.dx.call + " de " + machine->gameState.us.call;
         machine->gameState.challenge = challenge;
-        machine->send(message.getFullPatternMatch());
+        machine->send(message.getMatch());
         message.getAndClear();
         machine->switchToState(&machine->stateWaitForAnswer);
     }
@@ -376,7 +382,7 @@ void TennisMachine::StateWaitForAnswer::onMessageReceive(String message)
     if (message == machine->gameState.challenge)
     {
         machine->gameState.dx.points += 1;
-        machine->print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points) + "\n");
+        machine->print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points));
     }
     machine->switchToState(&machine->stateStartRoundReceiver);
 }
@@ -480,7 +486,9 @@ const char* TennisMachine::StateEnd::getName()
 
 void TennisMachine::StateEnd::onEnter()
 {
-    machine->print("StateEnd - send <ka> to restart!\n");
+    machine->print("Game ended");
+    machine->print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points));
+    machine->print("Send <ka> to restart!\n");
 }
 
 void TennisMachine::StateEnd::onMessageReceive(String message)
