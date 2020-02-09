@@ -12,6 +12,8 @@ class TennisMachine
             void (*send)(String s);
             void (*print)(String s);
             void (*printReceivedMessage)(String s);
+            void (*printSentMessage)(String s);
+            void (*challengeSound) (boolean ok);
         };
 
         struct Config {
@@ -144,46 +146,6 @@ class TennisMachine
                 void onLeave();
         };
 
-//        struct StateChallengePassed: public State
-//        {
-//                using State::State;
-//                const char* getName();
-//                void onMessageReceive(String message);
-//                void onMessageTransmit(WordBuffer &message);
-//                void onEnter();
-//                void onLeave();
-//        };
-//
-//        struct StateChallengeFailed: public State
-//        {
-//                using State::State;
-//                const char* getName();
-//                void onMessageReceive(String message);
-//                void onMessageTransmit(WordBuffer &message);
-//                void onEnter();
-//                void onLeave();
-//        };
-
-//        struct StateSendTestFailed: public State
-//        {
-//                using State::State;
-//                const char* getName();
-//                void onMessageReceive(String message);
-//                void onMessageTransmit(WordBuffer &message);
-//                void onEnter();
-//                void onLeave();
-//        };
-//
-//        struct StateSendTestPassed: public State
-//        {
-//                using State::State;
-//                const char* getName();
-//                void onMessageReceive(String message);
-//                void onMessageTransmit(WordBuffer &message);
-//                void onEnter();
-//                void onLeave();
-//        };
-
         struct StateEnd: public State
         {
                 using State::State;
@@ -202,11 +164,7 @@ class TennisMachine
         StateStartRoundSender stateStartRoundSender{this};
         StateWaitForAnswer stateWaitForAnswer{this};
         StateStartRoundReceiver stateStartRoundReceiver{this};
-//        StateSendTestFailed stateSendTestFailed{this};
-//        StateSendTestPassed stateSendTestPassed{this};
         StateChallengeReceived stateChallengeReceived{this};
-//        StateChallengePassed stateChallengePassed{this};
-//        StateChallengeFailed stateChallengeFailed{this};
 
         State *currentState = 0;
 
@@ -218,8 +176,8 @@ class TennisMachine
         WordBuffer receiveBuffer;
 
         void switchToState(State *newState);
-        void send(String message);
-        void print(String message);
+//        void send(String message);
+//        void print(String message);
 };
 
 #endif /* MORSEMODETENNIS_H_ */

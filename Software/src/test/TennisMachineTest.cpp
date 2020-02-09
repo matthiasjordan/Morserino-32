@@ -11,6 +11,7 @@
 #define TESTPR(m,v) printf(m, v)
 
 String lastSent;
+boolean lastChallenge;
 
 TennisMachine createSUT() {
     TennisMachine sut;
@@ -19,8 +20,13 @@ TennisMachine createSUT() {
     {   TESTPR("DISPLAY: '%s'\n", m.c_str());};
     client.printReceivedMessage = [](String m)
     {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
+    client.printSentMessage = [](String m)
+    {   TESTPR("DISPLAY: '> %s'\n", m.c_str());};
     client.send = [](String m)
     {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
+    client.challengeSound = [](boolean ok)
+    { TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR"); lastChallenge = ok; };
+
     sut.setClient(client);
     return sut;
 }

@@ -17,6 +17,7 @@
 #include "MorseDisplay.h"
 #include "MorseKeyer.h"
 #include "MorseLoRa.h"
+#include "MorseSound.h"
 
 MorseModeTennis morseModeTennis;
 
@@ -38,6 +39,9 @@ boolean MorseModeTennis::menuExec(String mode)
     client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
     client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(REGULAR, "< " + m);};
     client.send = [](String m){ morseModeTennis.send(m);};
+    client.printSentMessage = [](String m) {MorseDisplay::printToScroll(REGULAR, "> " + m);};
+    client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
+
     machine.setClient(client);
 
     MorseKeyer::onWordEnd = []()
