@@ -38,7 +38,6 @@ namespace internal
     uint8_t loRaBuRead(uint8_t* buIndex);
     uint8_t loRaBuWrite(int rssi, String packet);
     void loraSystemSetup();
-    RawPacket decodePacket();
 }
 
 void MorseLoRa::setup()
@@ -107,6 +106,7 @@ void internal::loraSystemSetup()
 void MorseLoRa::sendWithLora(const char loraTxBuffer[])
 {           // hand this string over as payload to the LoRA transceiver
     // send packet
+    Serial.println("MLR:sWL '" + String(loraTxBuffer) + "'");
     LoRa.beginPacket();
     LoRa.print(loraTxBuffer);
     LoRa.endPacket();
@@ -243,23 +243,21 @@ RawPacket MorseLoRa::decodePacket()
     uint8_t index = 0;
 
     l = internal::loRaBuRead(&index);           // where are we in  the buffer, and how long is the total packet inkl. rssi byte?
-    rp.payloadLength = l - 2;
+    rp.payloadLength = l - 1;
     rp.payload = (uint8_t *) malloc(l);
     uint8_t *p = rp.payload;
+
+    Serial.println("\n\nDecoding packet");
 
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         c = loRaRxBuffer[index + i];
+        Serial.printf("%02d : %x\n", i, c);
         switch (i)
         {
             case 0:
             {
                 rp.rssi = (int) (-1 * c);    // the rssi byte
-                break;
-            }
-            case 1:
-            {
-                rp.header = c;
                 break;
             }
             default:

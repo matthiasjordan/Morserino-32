@@ -191,21 +191,13 @@ void test_TennisMachine_4_we_get_invited()
     assertEquals("3c", "StateInviteAnswered", sut.getState());
     assertEquals("3d", "xx1dx de xx0yyy", lastSent);
 
+    sut.onMessageReceive("xx0yyy de xx1dx");
+    assertEquals("4", "StateStartRoundReceiver", sut.getState());
 
-//    sut.onMessageReceive("xx0yyy de xx1dx");
-//    assertEquals("4", "StateInviteAccepted", sut.getState());
-//
-//    buf.getAndClear();
-//    buf.addWord("err err xx1dx de xx0yyy");
-//    sut.onMessageTransmit(buf);
-//    assertEquals("5", "StateStartRoundSender", sut.getState());
-//
-//    sut.onMessageReceive("<sk>");
-//    assertEquals("6", "StateEnd", sut.getState());
-//
-//    WordBuffer wordBuffer = WordBuffer("<ka>");
-//    sut.onMessageTransmit(wordBuffer);
-//    assertEquals("7", "StateInitial", sut.getState());
+    sut.onMessageReceive("vvv");
+    assertEquals("4", "StateChallengeReceived", sut.getState());
+
+
 }
 
 

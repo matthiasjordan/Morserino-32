@@ -108,7 +108,7 @@ MorseLoRaCW::Packet MorseLoRaCW::decodePacket()
     MorseLoRa::RawPacket rp = MorseLoRa::decodePacket();
     MorseLoRaCW::Packet packet = internal::decodePacket(rp);
 
-    if (packet.protocolVersion != CWLORAVERSION)
+    if (packet.protocolVersion() != CWLORAVERSION)
     {
         // invalid protocol version
         packet.valid = false;
@@ -138,7 +138,6 @@ MorseLoRaCW::Packet internal::decodePacket(MorseLoRa::RawPacket &rp)
 {
     MorseLoRaCW::Packet p;
     p.rssi = rp.rssi;
-    p.protocolVersion = rp.protocolVersion();
 
     uint8_t l = rp.payloadLength;
 
@@ -149,6 +148,11 @@ MorseLoRaCW::Packet internal::decodePacket(MorseLoRa::RawPacket &rp)
         switch (i)
         {
             case 0:
+            {
+                p.header = c;
+                break;
+            }
+            case 1:
             {
                 p.rxWpm = (uint8_t) (c >> 2); // the first data byte contains the wpm info in the first six bits, and actual morse in the remaining two bits
                                            // now take remaining two bits and store them in CWword as ASCII

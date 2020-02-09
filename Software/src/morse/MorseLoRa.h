@@ -8,12 +8,10 @@ namespace MorseLoRa
         ~RawPacket() {
             delete payload;
         }
-        uint8_t header;
         int rssi;
         uint8_t* payload;
         uint16_t payloadLength;
 
-        uint8_t protocolVersion() { return header >> 6;};
         String payloadAsString() {
             String message;
             for (int i = 0; (i < payloadLength); i++) {
