@@ -108,19 +108,19 @@ const char* TennisMachine::StateInitial::getName()
 
 void TennisMachine::StateInitial::onEnter()
 {
-    MORSELOGLN("StateInitial entered\n");
+    MORSELOGLN("StateInitial entered");
 
 }
 
 void TennisMachine::StateInitial::onLeave()
 {
-    MORSELOGLN("StateInitial left\n");
+    MORSELOGLN("StateInitial left");
 
 }
 
 void TennisMachine::StateInitial::onMessageReceive(String message)
 {
-    MORSELOGLN("StateInitial received " + message + "\n");
+    MORSELOGLN("StateInitial received " + message);
     WordBuffer msgBuf(message);
     if (msgBuf.matches("cq de #"))
     {
@@ -137,7 +137,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     if (message.matches(pattern))
     {
         String us = message.getMatch();
-        MORSELOGLN("StateInitial sent cq - off to invite sent - our call: '" + us + "'\n");
+        MORSELOGLN("StateInitial sent cq - off to invite sent - our call: '" + us + "'");
         machine->client.send(message.getFullPatternMatch());
         message.getAndClear();
         machine->gameState.us.call = us;
@@ -145,7 +145,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     }
     else
     {
-        machine->client.print("Send cq to continue!");
+//        machine->client.print("Send cq to continue!");
     }
 }
 
@@ -160,19 +160,19 @@ const char* TennisMachine::StateInviteReceived::getName()
 
 void TennisMachine::StateInviteReceived::onEnter()
 {
-    MORSELOGLN("StateInviteReceived entered - invited by '" + machine->gameState.dx.call + "'\n");
+    MORSELOGLN("StateInviteReceived entered - invited by '" + machine->gameState.dx.call + "'");
 
 }
 
 void TennisMachine::StateInviteReceived::onLeave()
 {
-    MORSELOGLN("StateInviteReceived left\n");
+    MORSELOGLN("StateInviteReceived left");
 
 }
 
 void TennisMachine::StateInviteReceived::onMessageReceive(String message)
 {
-    MORSELOGLN("StateInviteReceived received " + message + "\n");
+    MORSELOGLN("StateInviteReceived received " + message);
 }
 
 void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
@@ -181,7 +181,7 @@ void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
     if (message.matches(pattern))
     {
         String us = message.getMatch();
-        MORSELOGLN("ACK sent - off to answered\n");
+        MORSELOGLN("ACK sent - off to answered");
         machine->client.send(message.getFullPatternMatch());
         message.getAndClear();
         machine->gameState.us.call = us;
@@ -189,7 +189,7 @@ void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
     }
     else
     {
-        machine->client.print("Answer call to continue!\n");
+//        machine->client.print("Answer call to continue!\n");
     }
 }
 
@@ -210,25 +210,25 @@ void TennisMachine::StateInviteAnswered::onEnter()
 
 void TennisMachine::StateInviteAnswered::onLeave()
 {
-    MORSELOGLN("StateInviteAnswered left\n");
+    MORSELOGLN("StateInviteAnswered left");
 
 }
 
 void TennisMachine::StateInviteAnswered::onMessageReceive(String message)
 {
-    MORSELOGLN("StateInviteAnswered received '" + message + "'\n");
+    MORSELOGLN("StateInviteAnswered received '" + message + "'");
     String pattern = machine->gameState.us.call + " de " + machine->gameState.dx.call;
     if (message == pattern)
     {
-        MORSELOGLN("Game between " + machine->gameState.dx.call + " and " + machine->gameState.us.call + "\n");
-        machine->client.print("The game commences.");
+        MORSELOGLN("Game between " + machine->gameState.dx.call + " and " + machine->gameState.us.call);
+        machine->client.print("The game commences.\n");
         machine->switchToState(&machine->stateStartRoundReceiver);
     }
 }
 
 void TennisMachine::StateInviteAnswered::onMessageTransmit(WordBuffer &message)
 {
-    machine->client.print("Wait for DX to continue!");
+    machine->client.print("Wait for DX to continue!\n");
 }
 
 /*****************************************************************************
@@ -242,19 +242,19 @@ const char* TennisMachine::StateInviteSent::getName()
 
 void TennisMachine::StateInviteSent::onEnter()
 {
-    MORSELOGLN("StateInviteSent entered by '" + machine->gameState.us.call + "'\n");
+    MORSELOGLN("StateInviteSent entered by '" + machine->gameState.us.call + "'");
 
 }
 
 void TennisMachine::StateInviteSent::onLeave()
 {
-    MORSELOGLN("StateInviteSent left\n");
+    MORSELOGLN("StateInviteSent left");
 
 }
 
 void TennisMachine::StateInviteSent::onMessageReceive(String message)
 {
-    MORSELOGLN("StateInviteSent received '" + message + "'\n");
+    MORSELOGLN("StateInviteSent received '" + message + "'");
     String pattern = machine->gameState.us.call + " de #";
     WordBuffer msgBuf(message);
     if (msgBuf.matches(pattern.c_str()))
@@ -284,19 +284,19 @@ const char* TennisMachine::StateInviteAccepted::getName()
 void TennisMachine::StateInviteAccepted::onEnter()
 {
     MORSELOGLN("StateInviteAccepted entered dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call +
-            "'\n");
+            "'");
 
 }
 
 void TennisMachine::StateInviteAccepted::onLeave()
 {
-    MORSELOGLN("StateInviteAccepted left\n");
+    MORSELOGLN("StateInviteAccepted left");
 
 }
 
 void TennisMachine::StateInviteAccepted::onMessageReceive(String message)
 {
-    MORSELOGLN("StateInviteAccepted received " + message + "\n");
+    MORSELOGLN("StateInviteAccepted received " + message + "");
 }
 
 void TennisMachine::StateInviteAccepted::onMessageTransmit(WordBuffer &message)
@@ -305,7 +305,7 @@ void TennisMachine::StateInviteAccepted::onMessageTransmit(WordBuffer &message)
 
     if (message.matches(pattern))
     {
-        machine->client.print("The game commences.");
+        machine->client.print("The game commences.\n");
         machine->client.send(pattern);
         message.getAndClear();
         machine->switchToState(&machine->stateStartRoundSender);
@@ -323,19 +323,19 @@ const char* TennisMachine::StateStartRoundSender::getName()
 
 void TennisMachine::StateStartRoundSender::onEnter()
 {
-    MORSELOGLN("StateStartRoundSender entered\n");
-    machine->client.print("Give a word twice to send!");
+    MORSELOGLN("StateStartRoundSender entered");
+    machine->client.print("Give a word twice to send!\n");
 }
 
 void TennisMachine::StateStartRoundSender::onLeave()
 {
-    MORSELOGLN("StateStartRoundSender left\n");
+    MORSELOGLN("StateStartRoundSender left");
 
 }
 
 void TennisMachine::StateStartRoundSender::onMessageReceive(String message)
 {
-    MORSELOGLN("StateStartRoundSender received " + message + "\n");
+    MORSELOGLN("StateStartRoundSender received " + message + "");
 }
 
 void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message)
@@ -344,16 +344,17 @@ void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message
     {
         // Send test passed
         String challenge = message.getMatch();
-        String pattern = machine->gameState.dx.call + " de " + machine->gameState.us.call;
         machine->gameState.challenge = challenge;
-        machine->client.send(message.getMatch());
+        machine->client.send(challenge);
+        machine->client.printSentMessage(challenge);
+        machine->client.challengeSound(true);
         message.getAndClear();
         machine->switchToState(&machine->stateWaitForAnswer);
     }
     else
     {
         // Send test failed
-        machine->client.print("Try again to morse a word twice!");
+        machine->client.challengeSound(false);
     }
 }
 
@@ -368,21 +369,21 @@ const char* TennisMachine::StateWaitForAnswer::getName()
 
 void TennisMachine::StateWaitForAnswer::onEnter()
 {
-    MORSELOGLN("StateWaitForAnswer entered\n");
+    MORSELOGLN("StateWaitForAnswer entered");
 }
 
 void TennisMachine::StateWaitForAnswer::onLeave()
 {
-    MORSELOGLN("StateWaitForAnswer left\n");
+    MORSELOGLN("StateWaitForAnswer left");
 }
 
 void TennisMachine::StateWaitForAnswer::onMessageReceive(String message)
 {
-    MORSELOGLN("StateWaitForAnswer received " + message + "\n");
+    MORSELOGLN("StateWaitForAnswer received " + message);
     if (message == machine->gameState.challenge)
     {
         machine->gameState.dx.points += 1;
-        machine->client.print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points));
+        machine->client.print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points) + "\n");
     }
     machine->switchToState(&machine->stateStartRoundReceiver);
 }
@@ -403,18 +404,18 @@ const char* TennisMachine::StateStartRoundReceiver::getName()
 
 void TennisMachine::StateStartRoundReceiver::onEnter()
 {
-    MORSELOGLN("StateStartRoundReceiver entered\n");
+    MORSELOGLN("StateStartRoundReceiver entered");
 
 }
 
 void TennisMachine::StateStartRoundReceiver::onLeave()
 {
-    MORSELOGLN("StateStartRoundReceiver left\n");
+    MORSELOGLN("StateStartRoundReceiver left");
 }
 
 void TennisMachine::StateStartRoundReceiver::onMessageReceive(String message)
 {
-    MORSELOGLN("StateStartRoundReceiver received " + message + "\n");
+    MORSELOGLN("StateStartRoundReceiver received " + message);
     String pattern = "#";
     WordBuffer msgBuf(message);
     if (msgBuf.matches(pattern))
@@ -442,7 +443,7 @@ const char* TennisMachine::StateChallengeReceived::getName()
 
 void TennisMachine::StateChallengeReceived::onEnter()
 {
-    MORSELOGLN("StateChallengeReceived entered\n");
+    MORSELOGLN("StateChallengeReceived entered");
 
 }
 
@@ -454,7 +455,7 @@ void TennisMachine::StateChallengeReceived::onLeave()
 
 void TennisMachine::StateChallengeReceived::onMessageReceive(String message)
 {
-    MORSELOGLN("StateChallengeReceived received " + message + "\n");
+    MORSELOGLN("StateChallengeReceived received " + message);
 }
 
 void TennisMachine::StateChallengeReceived::onMessageTransmit(WordBuffer &message)

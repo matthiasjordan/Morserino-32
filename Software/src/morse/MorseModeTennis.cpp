@@ -37,7 +37,7 @@ boolean MorseModeTennis::menuExec(String mode)
 
     TennisMachine::Client client;
     client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
-    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(REGULAR, "< " + m);};
+    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(REGULAR, "< " + m + "\n");};
     client.send = [](String m){ morseModeTennis.send(m);};
     client.printSentMessage = [](String m) {MorseDisplay::printToScroll(REGULAR, "> " + m);};
     client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
@@ -49,7 +49,7 @@ boolean MorseModeTennis::menuExec(String mode)
         morseModeTennis.sendBuffer.endWord();
         morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
         MORSELOGLN("onWordEnd lamda");
-        MorseDisplay::printToScroll(BOLD, "\n");
+//        MorseDisplay::printToScroll(BOLD, " ");
         return false;
     };
 
@@ -114,7 +114,6 @@ void MorseModeTennis::receive()
  */
 void MorseModeTennis::receive(String message)
 {
-    MorseDisplay::printToScroll(REGULAR, "< " + message + "\n");
     machine.onMessageReceive(message);
 }
 
