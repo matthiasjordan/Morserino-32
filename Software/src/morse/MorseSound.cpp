@@ -93,3 +93,20 @@ void MorseSound::pwmClick(unsigned int volume)
     delay(5);
     pwmNoTone();
 }
+
+
+void MorseSound::soundSignalOK() {
+    MorseSound::pwmTone(440, MorsePreferences::prefs.sidetoneVolume, false);
+    delay(97);
+    MorseSound::pwmNoTone();
+    MorseSound::pwmTone(587, MorsePreferences::prefs.sidetoneVolume, false);
+    delay(193);
+    MorseSound::pwmNoTone();
+}
+
+
+void MorseSound::soundSignalERR() {
+    MorseSound::pwmTone(311, MorsePreferences::prefs.sidetoneVolume, false);
+    delay(193);
+    MorseSound::pwmNoTone();
+}
