@@ -247,12 +247,9 @@ RawPacket MorseLoRa::decodePacket()
     rp.payload = (uint8_t *) malloc(l);
     uint8_t *p = rp.payload;
 
-    Serial.println("\n\nDecoding packet");
-
     for (int i = 0; i < l; ++i)
     {     // decoding loop
         c = loRaRxBuffer[index + i];
-        Serial.printf("%02d : %x\n", i, c);
         switch (i)
         {
             case 0:
