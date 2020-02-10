@@ -56,10 +56,8 @@ void TennisMachine::switchToState(State *newState)
     if (currentState != 0)
     {
         currentState->onLeave();
-        delay(1000);
     }
     newState->onEnter();
-    delay(1000);
     currentState = newState;
 }
 
@@ -67,30 +65,6 @@ const char* TennisMachine::getState()
 {
     return currentState->getName();
 }
-
-///**
-// * We call this to send a message.
-// */
-//void TennisMachine::send(String message)
-//{
-//    MORSELOGLN("TM:send() 1");
-//    client.send(message);
-//    MORSELOGLN("TM:send() 2");
-//}
-//
-//void TennisMachine::print(String message)
-//{
-//    MORSELOGLN("TM:print() 1 ");
-//    try
-//    {
-//        client.print(message);
-//    }
-//    catch (std::exception &e)
-//    {
-//        MORSELOGLN("TM:print() 2 " + String(e.what()));
-//    }
-//    MORSELOGLN("TM:print() 2");
-//}
 
 TennisMachine::GameState TennisMachine::getGameState()
 {
