@@ -86,10 +86,10 @@ const MorseChar MorseText::morseChars[] = { //
                 {"A", "21212", "<ka>"},  //
                 {"N", "21221", "<kn>"},  //
                 {"K", "111212", "<sk>"},   //
-                {"E", "11121", "<ve>"},  //
+                {"V", "11121", "<ve>"},  //
                 {"H", "2222", "<ch>"},   //
                 {"X", "111222111", "<sos>"}, //
-                {"R", "11111111", "<err>"}, //
+                {"E", "11111111", "<err>"}, //
 
                 {"ä", "1212", ""},  // ae
                 {"ö", "2221", ""},  // oe
@@ -102,7 +102,7 @@ uint8_t OPT_NUM_end = MorseText::findChar('9');
 uint8_t OPT_PUNCT_start = MorseText::findChar('.');
 uint8_t OPT_PUNCT_end = MorseText::findChar('@');
 uint8_t OPT_PRO_start = MorseText::findChar('+');
-uint8_t OPT_PRO_end = MorseText::findChar('R');
+uint8_t OPT_PRO_end = MorseText::findChar('E');
 uint8_t OPT_ALPHA_start = MorseText::findChar('a');
 uint8_t OPT_ALPHA_end = MorseText::findChar('z');
 
@@ -475,7 +475,7 @@ int MorseText::findChar(char c)
 String MorseText::internalToProSigns(String &input)
 {
     /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch;
-    int i = 0;
+    int i = OPT_PRO_start;
     while (morseChars[i].prosign == "")
     {
         i += 1;
@@ -491,7 +491,7 @@ String MorseText::internalToProSigns(String &input)
 
 String MorseText::proSignsToInternal(String &input)
 {
-    int i = 0;
+    int i = OPT_PRO_start;
     while (morseChars[i].prosign == "")
     {
         i += 1;
