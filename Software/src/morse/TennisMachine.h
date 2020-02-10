@@ -29,7 +29,7 @@ class TennisMachine
             void (*printReceivedMessage)(String s);
             void (*printSentMessage)(String s);
             void (*printScore)(GameState *g);
-            void (*challengeSound) (boolean ok);
+            void (*challengeSound)(boolean ok);
         };
 
         void setClient(Client &c) {client = c;};
@@ -115,6 +115,9 @@ class TennisMachine
                 void onMessageTransmit(WordBuffer &message);
                 void onEnter();
                 void onLeave();
+
+            private:
+                boolean firstAttempt;
         };
 
         struct StateWaitForAnswer: public State

@@ -204,7 +204,8 @@ const char* TennisMachine::StateInviteAnswered::getName()
 
 void TennisMachine::StateInviteAnswered::onEnter()
 {
-    machine->client.print("StateInviteAnswered entered - dx: '" + machine->gameState.dx.call + "' us: '"+ machine->gameState.us.call+ "'\n");
+    machine->client.print(
+            "StateInviteAnswered entered - dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call + "'\n");
 
 }
 
@@ -283,8 +284,7 @@ const char* TennisMachine::StateInviteAccepted::getName()
 
 void TennisMachine::StateInviteAccepted::onEnter()
 {
-    MORSELOGLN("StateInviteAccepted entered dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call +
-            "'");
+    MORSELOGLN("StateInviteAccepted entered dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call + "'");
 }
 
 void TennisMachine::StateInviteAccepted::onLeave()
@@ -325,6 +325,7 @@ void TennisMachine::StateStartRoundSender::onEnter()
 {
     MORSELOGLN("StateStartRoundSender entered");
     machine->client.print("Give a word\ntwice to send!\n");
+    firstAttempt = true;
 }
 
 void TennisMachine::StateStartRoundSender::onLeave()
@@ -353,9 +354,14 @@ void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message
     }
     else
     {
-        // Send test failed
-        machine->client.challengeSound(false);
+        if (!firstAttempt)
+        {
+            // Send test failed
+            machine->client.challengeSound(false);
+        }
     }
+
+    firstAttempt = false;
 }
 
 /*****************************************************************************
