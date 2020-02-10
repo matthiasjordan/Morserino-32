@@ -243,7 +243,7 @@ const char* TennisMachine::StateInviteSent::getName()
 void TennisMachine::StateInviteSent::onEnter()
 {
     MORSELOGLN("StateInviteSent entered by '" + machine->gameState.us.call + "'");
-
+    machine->client.print("\n");
 }
 
 void TennisMachine::StateInviteSent::onLeave()
@@ -285,7 +285,6 @@ void TennisMachine::StateInviteAccepted::onEnter()
 {
     MORSELOGLN("StateInviteAccepted entered dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call +
             "'");
-
 }
 
 void TennisMachine::StateInviteAccepted::onLeave()
@@ -305,8 +304,9 @@ void TennisMachine::StateInviteAccepted::onMessageTransmit(WordBuffer &message)
 
     if (message.matches(pattern))
     {
-        machine->client.print("The game commences.\n");
+        machine->client.printSentMessage(pattern);
         machine->client.send(pattern);
+        machine->client.print("Game starts.\n");
         message.getAndClear();
         machine->switchToState(&machine->stateStartRoundSender);
     }
@@ -324,7 +324,7 @@ const char* TennisMachine::StateStartRoundSender::getName()
 void TennisMachine::StateStartRoundSender::onEnter()
 {
     MORSELOGLN("StateStartRoundSender entered");
-    machine->client.print("Give a word twice to send!\n");
+    machine->client.print("Give a word\ntwice to send!\n");
 }
 
 void TennisMachine::StateStartRoundSender::onLeave()
@@ -383,8 +383,8 @@ void TennisMachine::StateWaitForAnswer::onMessageReceive(String message)
     if (message == machine->gameState.challenge)
     {
         machine->gameState.dx.points += 1;
-        machine->client.print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points) + "\n");
     }
+    machine->client.printScore(&machine->gameState);
     machine->switchToState(&machine->stateStartRoundReceiver);
 }
 
@@ -463,16 +463,16 @@ void TennisMachine::StateChallengeReceived::onMessageTransmit(WordBuffer &messag
     if (message.matches(machine->gameState.challenge))
     {
         // Challenge passed
-        machine->client.print("OK");
+        machine->client.print(" OK\n");
         machine->client.challengeSound(true);
         machine->gameState.us.points += 1;
-        machine->client.print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points));
     }
     else
     {
-        machine->client.print("ERR");
+        machine->client.print(" ERR\n");
         machine->client.challengeSound(false);
     }
+    machine->client.printScore(&machine->gameState);
     machine->client.send(message.getAndClear());
     machine->switchToState(&machine->stateStartRoundSender);
 }
@@ -490,7 +490,7 @@ const char* TennisMachine::StateEnd::getName()
 void TennisMachine::StateEnd::onEnter()
 {
     machine->client.print("Game ended");
-    machine->client.print("us: " + String(machine->gameState.us.points) + " dx: " + String(machine->gameState.dx.points));
+    machine->client.printScore(&machine->gameState);
     machine->client.print("Send <ka> to restart!\n");
 }
 

@@ -26,6 +26,7 @@ TennisMachine createSUT() {
     {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
     client.challengeSound = [](boolean ok)
     { TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR"); lastChallenge = ok; };
+    client.printScore = [](TennisMachine::GameState *g) { TESTPR("%s", ("\nus: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n").c_str()); };
 
     sut.setClient(client);
     return sut;

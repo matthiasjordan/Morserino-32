@@ -8,14 +8,6 @@
 class TennisMachine
 {
     public:
-        struct Client {
-            void (*send)(String s);
-            void (*print)(String s);
-            void (*printReceivedMessage)(String s);
-            void (*printSentMessage)(String s);
-            void (*challengeSound) (boolean ok);
-        };
-
         struct Config {
             uint8_t repeatCall = 2;
         };
@@ -29,6 +21,15 @@ class TennisMachine
             Station dx;
             Station us;
             String challenge;
+        };
+
+        struct Client {
+            void (*send)(String s);
+            void (*print)(String s);
+            void (*printReceivedMessage)(String s);
+            void (*printSentMessage)(String s);
+            void (*printScore)(GameState *g);
+            void (*challengeSound) (boolean ok);
         };
 
         void setClient(Client &c) {client = c;};
