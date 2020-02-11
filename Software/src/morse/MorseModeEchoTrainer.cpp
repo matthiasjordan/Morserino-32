@@ -160,12 +160,7 @@ MorseModeEchoTrainer::echoStates MorseModeEchoTrainer::getState()
 
 void MorseModeEchoTrainer::storeCharInResponse(String symbol)
 {
-    symbol.replace("<as>", "S");
-    symbol.replace("<ka>", "A");
-    symbol.replace("<kn>", "N");
-    symbol.replace("<sk>", "K");
-    symbol.replace("<ve>", "V");
-    symbol.replace("<ch>", "H");
+    symbol = MorseText::proSignsToInternal(symbol);
     echoResponse.concat(symbol);
 }
 
@@ -206,6 +201,10 @@ void MorseModeEchoTrainer::echoTrainerEval()
                 MorseSound::pwmNoTone();
             }
         }
+        else {
+            MorseDisplay::printToScroll(REGULAR, "\n");
+        }
+
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
         {
