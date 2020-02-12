@@ -23,7 +23,7 @@ MorseModeTennis morseModeTennis;
 
 boolean MorseModeTennis::menuExec(String mode)
 {
-    MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
+    MorsePreferences::currentOptions = MorsePreferences::morseTennisOptions;               // list of available options in lora trx mode
     MorseMachine::morseState = MorseMachine::morseTennis;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 4, "Start");

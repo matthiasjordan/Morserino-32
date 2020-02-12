@@ -134,7 +134,7 @@ const MenuItem menuItems[] = {
         {"File Player", _headPlayer, {1, _headMixed, _headRand, _head, 0}, MorseText::PLAYER, MorsePreferences::headOptions, true,
                 0, "player", &morseModeHeadCopying}, //
 
-        {"Morse Tennis", _tennis, {0, _head, _trx, _dummy, 0}, MorseText::NA, MorsePreferences::headOptions, true,
+        {"Morse Tennis", _tennis, {0, _head, _trx, _dummy, 0}, MorseText::NA, MorsePreferences::morseTennisOptions, true,
                &internal::nothing, "", &morseModeTennis}, //
 
         {"Transceiver", _trx, {0, _tennis, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
