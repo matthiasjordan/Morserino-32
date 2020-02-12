@@ -50,7 +50,7 @@ unsigned int MorseKeyer::effWpm;                                // calculated ef
 unsigned int lUntouched = 0;                        // sensor values (in untouched state) will be stored here
 unsigned int rUntouched = 0;
 
-boolean (*MorseKeyer::onWordEnd)();
+void (*MorseKeyer::onWordEnd)();
 void (*MorseKeyer::onCharacter)(String keyed);
 void (*MorseKeyer::onWordEndDitDah)();
 void (*MorseKeyer::onWordEndNDitDah)();
@@ -60,13 +60,16 @@ void MorseKeyer::setup()
     // to calibrate sensors, we record the values in untouched state
     internal::initSensors();
     MorseKeyer::updateTimings();
-    onWordEnd = &booleanFunctionFalse;
     onCharacter = [](String s)
     {
         MorseDisplay::printToScroll(REGULAR, s);
     };
+    onWordEnd = []() {
+        MorseDisplay::printToScroll(REGULAR, " ");
+    };
     onWordEndDitDah = &voidFunction;
     onWordEndNDitDah = &voidFunction;
+    clearPaddleLatches();
 }
 
 void MorseKeyer::updateTimings()
@@ -124,12 +127,10 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             // display the interword space, if necessary
             if (millis() > Decoder::interWordTimer)
             {
-                MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
+//                MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
                 Decoder::interWordTimer = 4294967000;  // almost the biggest possible unsigned long number :-) - do not output extra spaces!
-                if (MorseKeyer::onWordEnd())
-                {
-                    return false;
-                }
+                MorseKeyer::onWordEnd();
+                return false;
             }
 
             // Was there a paddle press?

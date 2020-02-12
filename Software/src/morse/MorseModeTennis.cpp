@@ -18,6 +18,7 @@
 #include "MorseKeyer.h"
 #include "MorseLoRa.h"
 #include "MorseSound.h"
+#include "MorseInput.h"
 
 MorseModeTennis morseModeTennis;
 
@@ -46,20 +47,21 @@ boolean MorseModeTennis::menuExec(String mode)
 
     machine.setClient(client);
 
-    MorseKeyer::onWordEnd = []()
-    {
-        morseModeTennis.sendBuffer.endWord();
-        morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
-        MORSELOGLN("onWordEnd lamda");
-//        MorseDisplay::printToScroll(BOLD, " ");
-        return false;
-    };
+    MorseInput::start([](String c)
+        {
+            Serial.println("char " + c);
+            MorseDisplay::printToScroll(BOLD, c);
+            morseModeTennis.sendBuffer.addChar(c);
+        },
+        []()
+        {
+            MorseDisplay::printToScroll(BOLD, " ");
+            morseModeTennis.sendBuffer.endWord();
+            morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
+        }
+    );
 
-    MorseKeyer::onCharacter = [](String c)
-    {
-        MorseDisplay::printToScroll(BOLD, c);
-        morseModeTennis.sendBuffer.addChar(c);
-    };
+
 
     MorseDisplay::getConfig()->autoFlush = true;
 
@@ -73,7 +75,7 @@ boolean MorseModeTennis::menuExec(String mode)
 boolean MorseModeTennis::loop()
 {
     receive();
-    if (MorseKeyer::doPaddleIambic())
+    if (MorseInput::doInput())
     {
         return true;
     }

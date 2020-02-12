@@ -34,19 +34,8 @@ boolean MorseModeKeyer::menuExec(String mode)
         MorseDisplay::clear();
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-        MorseKeyer::clearPaddleLatches();
-        MorseKeyer::keyTx = true;
 
         MorseModeKeyer::onPreferencesChanged();
-    }
-    else if (mode == "trx")
-    {
-        MorseMachine::morseState = MorseMachine::morseTrx;
-        MorseDisplay::clear();
-        MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx");
-        MorseKeyer::clearPaddleLatches();
-        MorseKeyer::keyTx = true;
-        Decoder::startDecoder();
     }
     return true;
 }
@@ -58,11 +47,8 @@ boolean MorseModeKeyer::loop()
 
 void MorseModeKeyer::onPreferencesChanged()
 {
-    if (MorseMachine::morseState == MorseMachine::morseKeyer)
-    {
-        unsigned char mode = MorsePreferences::prefs.keyTrainerMode;
-        MorseKeyer::keyTx = (mode == 1 || mode == 2);
-    }
+    unsigned char mode = MorsePreferences::prefs.keyTrainerMode;
+    MorseKeyer::keyTx = (mode == 1 || mode == 2);
 }
 
 boolean MorseModeKeyer::togglePause()

@@ -19,6 +19,7 @@
 #include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
+#include "MorseInput.h"
 
 MorseModeLoRa morseModeLoRa;
 
@@ -37,17 +38,18 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
 
-        MorseKeyer::setup();
-        MorseKeyer::clearPaddleLatches();
         MorseKeyer::keyTx = false;
-        MorseKeyer::onWordEnd = []()
+        MorseInput::start([](String s){
+            MorseDisplay::printToScroll(REGULAR, s);
+        },
+        []()
         {
+            MorseDisplay::printToScroll(REGULAR, " ");
             /* finalise the string and send it to LoRA */
             MorseLoRaCW::cwForLora(3);
             char *buf = MorseLoRaCW::getTxBuffer();
             MorseLoRa::sendWithLora(buf);
-            return false;
-        };
+        });
 
         MorseGenerator::setStart();
         MorseGenerator::Config *genCon = MorseGenerator::getConfig();
@@ -65,7 +67,7 @@ boolean MorseModeLoRa::menuExec(String mode)
 
 boolean MorseModeLoRa::loop()
 {
-    if (MorseKeyer::doPaddleIambic())
+    if (MorseInput::doInput())
     {
         return true;                                                        // we are busy keying and so need a very tight loop !
     }

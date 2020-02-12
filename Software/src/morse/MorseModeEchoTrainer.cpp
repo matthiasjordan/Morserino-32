@@ -21,6 +21,7 @@
 #include "MorseMachine.h"
 #include "MorseMenu.h"
 #include "decoder.h"
+#include "MorseInput.h"
 
 MorseModeEchoTrainer morseModeEchoTrainer;
 
@@ -41,8 +42,33 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-    Decoder::onCharacter = [](String r)
-    {   morseModeEchoTrainer.storeCharInResponse(r);};
+//    Decoder::startDecoder();
+//    Decoder::onCharacter = [](String r)
+//    {
+//        MorseDisplay::printToScroll(REGULAR, r);
+//        morseModeEchoTrainer.storeCharInResponse(r);
+//    };
+//    Decoder::onWordEnd = []()
+//    {
+//        Serial.println("MMET:oWE");
+//        MorseDisplay::printToScroll(REGULAR, " ");
+//        morseModeEchoTrainer.onKeyerWordEndNDitDah();
+//    };
+//
+
+    MorseInput::useStraightKey = false;
+    MorseInput::start(
+    [](String r)
+    {
+        MorseDisplay::printToScroll(REGULAR, r);
+        morseModeEchoTrainer.storeCharInResponse(r);
+    },
+    []()
+    {
+        MorseDisplay::printToScroll(REGULAR, " ");
+        morseModeEchoTrainer.onKeyerWordEndNDitDah();
+    });
+
 
     MorseText::proceed();
     MorseText::onGeneratorNewWord = [](String r)
@@ -74,19 +100,19 @@ void MorseModeEchoTrainer::startEcho()
     }
     MorseModeEchoTrainer::active = false;
 
-    MorseKeyer::setup();
-    MorseKeyer::onWordEnd = []()
-    {
-        return morseModeEchoTrainer.onKeyerWordEnd();
-    };
-    MorseKeyer::onWordEndDitDah = []()
-    {
-        morseModeEchoTrainer.onKeyerWordEndDitDah();
-    };
-    MorseKeyer::onWordEndNDitDah = []()
-    {
-        morseModeEchoTrainer.onKeyerWordEndNDitDah();
-    };
+//    MorseKeyer::setup();
+//    MorseKeyer::onWordEnd = []()
+//    {
+//        return morseModeEchoTrainer.onKeyerWordEnd();
+//    };
+//    MorseKeyer::onWordEndDitDah = []()
+//    {
+//        morseModeEchoTrainer.onKeyerWordEndDitDah();
+//    };
+//    MorseKeyer::onWordEndNDitDah = []()
+//    {
+//        morseModeEchoTrainer.onKeyerWordEndNDitDah();
+//    };
 }
 
 boolean MorseModeEchoTrainer::onKeyerWordEnd()
@@ -101,10 +127,7 @@ boolean MorseModeEchoTrainer::onKeyerWordEnd()
 
 void MorseModeEchoTrainer::onKeyerWordEndDitDah()
 {
-    if (MorseMachine::isMode(MorseMachine::echoTrainer))
-    {      // change the state of the trainer at end of word
-        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::COMPLETE_ANSWER);
-    }
+    MorseModeEchoTrainer::setState(MorseModeEchoTrainer::COMPLETE_ANSWER);
 }
 
 void MorseModeEchoTrainer::onKeyerWordEndNDitDah()
@@ -194,7 +217,8 @@ void MorseModeEchoTrainer::echoTrainerEval()
                 MorseSound::soundSignalERR();
             }
         }
-        else {
+        else
+        {
             MorseDisplay::printToScroll(REGULAR, "\n");
         }
 
@@ -329,8 +353,10 @@ boolean MorseModeEchoTrainer::loop()
                 break;
             case MorseModeEchoTrainer::COMPLETE_ANSWER:
             case MorseModeEchoTrainer::GET_ANSWER:
-                if (MorseKeyer::doPaddleIambic())
-                    return true;                             // we are busy keying and so need a very tight loop !
+                if (MorseInput::doInput())
+                {
+                    return true;
+                }
                 break;
         }
     }

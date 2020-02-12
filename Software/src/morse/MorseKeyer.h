@@ -49,7 +49,7 @@ namespace MorseKeyer
 
     extern boolean keyTx;             // we use this to decide if Tx should be keyed or not
 
-    extern boolean (*onWordEnd)();
+    extern void (*onWordEnd)();
     extern void (*onCharacter)(String keyed);
     extern void (*onWordEndDitDah)();
     extern void (*onWordEndNDitDah)();
