@@ -62,7 +62,8 @@ void MorseModeEchoTrainer::startEcho()
 
     metConfig.showFailedWord = !MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     metConfig.generateStartSequence = false;
-    MorseText::setGenerateStartSequence(metConfig.generateStartSequence);
+
+    MorseText::getConfig()->generateStartSequence = metConfig.generateStartSequence;
     if (metConfig.generateStartSequence)
     {
         echoTrainerState = START_ECHO;
@@ -118,7 +119,8 @@ void MorseModeEchoTrainer::onPreferencesChanged()
 {
     metConfig.showPrompt = (MorsePreferences::prefs.echoDisplay != CODE_ONLY);
 
-    MorseText::setRepeatEach(MorsePreferences::prefs.echoRepeats);
+    MorseText::Config *texCon = MorseText::getConfig();
+    texCon->repeatEach = MorsePreferences::prefs.echoRepeats;
 
     MorseGenerator::Config *generatorConfig = MorseGenerator::getConfig();
     generatorConfig->key = (MorsePreferences::prefs.echoDisplay != DISP_ONLY);
@@ -158,12 +160,7 @@ MorseModeEchoTrainer::echoStates MorseModeEchoTrainer::getState()
 
 void MorseModeEchoTrainer::storeCharInResponse(String symbol)
 {
-    symbol.replace("<as>", "S");
-    symbol.replace("<ka>", "A");
-    symbol.replace("<kn>", "N");
-    symbol.replace("<sk>", "K");
-    symbol.replace("<ve>", "V");
-    symbol.replace("<ch>", "H");
+    symbol = MorseText::proSignsToInternal(symbol);
     echoResponse.concat(symbol);
 }
 
@@ -204,6 +201,10 @@ void MorseModeEchoTrainer::echoTrainerEval()
                 MorseSound::pwmNoTone();
             }
         }
+        else {
+            MorseDisplay::printToScroll(REGULAR, "\n");
+        }
+
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
         {

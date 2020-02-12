@@ -31,23 +31,24 @@ boolean MorseModeKoch::menuExec(String mode)
         morseModeEchoTrainer.startEcho();
         generatorConfig->printDitDah = true;
         generatorConfig->printChar = true;
-        generatorConfig->printSpaceAfterChar = true;
+        generatorConfig->printSpaceAfterChar = false;
         generatorConfig->clearBufferBeforPrintChar = true;
+        generatorConfig->wordEndMethod = MorseGenerator::nothing;
     }
     else if (mode == "trainer")
     {
         Koch::setKochActive(true);
         MorseGenerator::startTrainer();
         generatorConfig->printDitDah = false;
+        generatorConfig->wordEndMethod = MorseGenerator::spaceAndFlush;
     }
     else if (mode == "echo")
     {
         Koch::setKochActive(true);
         morseModeEchoTrainer.startEcho();
         generatorConfig->printDitDah = false;
+        generatorConfig->wordEndMethod = MorseGenerator::nothing;
     }
-
-    generatorConfig->wordEndMethod = MorseGenerator::LF;
 
     return true;
 }

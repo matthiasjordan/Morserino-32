@@ -21,6 +21,8 @@
 #include "MorseDisplay.h"
 #include "MorseModeEchoTrainer.h"
 #include "MorseSound.h"
+#include "MorseText.h"
+
 
 using namespace Decoder;
 
@@ -578,15 +580,6 @@ String Decoder::CWwordToClearText(String cwword)
 
 String internal::encodeProSigns(String &input)
 {
-    /// clean up clearText   -   S <as>,  - A <ka> - N <kn> - K <sk> - H ch - V <ve>;
-    input.replace("<as>", "S");
-    input.replace("<ka>", "A");
-    input.replace("<kn>", "N");
-    input.replace("<sk>", "K");
-    input.replace("<ve>", "V");
-    input.replace("<ch>", "H");
-    input.replace("<err>", "E");
-    input.replace("¬", "U");
-    return input;
+    return MorseText::proSignsToInternal(input);
 }
 

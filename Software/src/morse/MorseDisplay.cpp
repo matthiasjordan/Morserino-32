@@ -288,7 +288,9 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
     {
         if (style == lastStyle)
         {                                // not regular, but we have no change in style!
-            pos -= 1;                                               // go one pos back to overwrite style marker
+            if (textBuffer[bottomLine][pos-1] < 4) {
+                pos -= 1;                                               // go one pos back to overwrite style marker
+            }
             memcpy(&textBuffer[bottomLine][pos], text.c_str(), l);  // copy the string of characters
             pos += l;
             textBuffer[bottomLine][pos++] = (char) style;           // add the style marker
