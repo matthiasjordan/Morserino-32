@@ -4,27 +4,31 @@
 namespace MorseLoRa
 {
 
-    typedef struct
-    {
-            uint8_t protocolVersion;
-            int rssi;
-            int rxWpm;
-            String payload;
-            boolean valid = true;
+    struct RawPacket {
+        ~RawPacket() {
+            delete payload;
+        }
+        int rssi;
+        uint8_t* payload;
+        uint16_t payloadLength;
 
-            String toString() {
-                return String((valid ? "ok" : "err")) + String(" ") + String(protocolVersion) + " " + String(rssi) + " " + String(rxWpm) + " : " + payload;
+        String payloadAsString() {
+            String message;
+            for (int i = 0; (i < payloadLength); i++) {
+                message += (char) payload[i];
             }
-    } Packet;
+            return message;
+        }
+    };
+
 
     void setup();
     void idle();
 
-    void cwForLora(int element);
-    void sendWithLora();
+    void sendWithLora(const char loraTxBuffer[]);
     boolean loRaBuReady();
-    Packet decodePacket();
     void receive();
+    RawPacket decodePacket();
 }
 
 #endif /* MORSELORA_H_ */

@@ -25,7 +25,6 @@ namespace MorseGenerator
 
     typedef struct generator_config
     {
-            boolean sendCWToLoRa;
             WordEndMethod wordEndMethod;
             boolean printDitDah;
             boolean printChar;
@@ -39,6 +38,7 @@ namespace MorseGenerator
 
             void (*onFetchNewWord)(); // Called when the generator fetches a new word from MorseText
             unsigned long (*onGeneratorWordEnd)(); // Called when the generator just sent the last character of the word
+            void (*onCWElement) (char); // Called when the generator pulled the next morse element from the CWword
             void (*onLastWord)(); // Called when the generator finished the last word
     } Config;
 
@@ -61,7 +61,6 @@ namespace MorseGenerator
     void generateCW();
     void keyOut(boolean on, boolean fromHere, int f, int volume);
     void setNextWordvvvA(); // to indicate that we want vvvA
-    void setSendCWToLoRa(boolean mode);
     void handleEffectiveTrainerDisplay(uint8_t mode);
 
 }

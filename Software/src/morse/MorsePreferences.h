@@ -62,6 +62,7 @@ namespace MorsePreferences
     extern prefPos echoTrainerOptions[];
     extern prefPos kochGenOptions[];
     extern prefPos kochEchoOptions[];
+    extern prefPos morseTennisOptions[];
     extern prefPos loraTrxOptions[];
     extern prefPos extTrxOptions[];
     extern prefPos decoderOptions[];

@@ -16,6 +16,7 @@
 #include "MorseMachine.h"
 #include "MorseModeLoRa.h"
 #include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
 
@@ -35,16 +36,26 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseDisplay::clear();
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+
         MorseKeyer::setup();
         MorseKeyer::clearPaddleLatches();
         MorseKeyer::keyTx = false;
-        MorseGenerator::setStart();
+        MorseKeyer::onWordEnd = []()
+        {
+            /* finalise the string and send it to LoRA */
+            MorseLoRaCW::cwForLora(3);
+            char *buf = MorseLoRaCW::getTxBuffer();
+            MorseLoRa::sendWithLora(buf);
+            return false;
+        };
 
+        MorseGenerator::setStart();
         MorseGenerator::Config *genCon = MorseGenerator::getConfig();
         genCon->printChar = true;
         genCon->printCharStyle = BOLD;
         genCon->printSpaceAfterChar = false;
         genCon->timing = MorseGenerator::rx;
+
         MorseDisplay::getConfig()->autoFlush = true;
 
         MorseLoRa::receive();

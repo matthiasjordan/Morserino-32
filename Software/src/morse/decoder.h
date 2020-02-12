@@ -27,7 +27,7 @@ namespace Decoder
 
     extern boolean filteredState;
     extern boolean filteredStateBefore;
-    extern void (*storeCharInResponse)(String);
+    extern void (*onCharacter)(String);
 
     /// state machine for decoding CW
     enum DECODER_STATES
@@ -54,7 +54,10 @@ namespace Decoder
     void drawInputStatus(boolean on);
     void interWordTimerOff();
     String CWwordToClearText(String cwword);
-    void displayMorse();
+    /**
+     * Merely returns the last character decoded.
+     */
+    String getMorsedChar();
     uint8_t getDecodedWpm();
 
 }

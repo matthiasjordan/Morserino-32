@@ -21,6 +21,8 @@
 #include "MorseKeyer.h"
 #include "MorseText.h"
 #include "MorsePlayerFile.h"
+#include "MorseModeHeadCopying.h"
+#include "MorseLoRaCW.h"
 
 MorseModeGenerator morseModeGenerator;
 
@@ -59,11 +61,45 @@ void MorseModeGenerator::startTrainer()
 void MorseModeGenerator::onPreferencesChanged()
 {
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
-    MorseGenerator::getConfig()->sendCWToLoRa = (MorsePreferences::prefs.loraTrainerMode == 1);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
     MorseText::getConfig()->repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
     genCon->maxWords = MorsePreferences::prefs.maxSequence;
+    genCon->onGeneratorWordEnd = []()
+    {
+        if (MorsePreferences::prefs.loraTrainerMode == 1)
+        {
+            // in generator mode and we want to send with LoRa
+            MorseLoRaCW::cwForLora(0);
+            MorseLoRaCW::cwForLora(3);// as we have just finished a word
+            char *buf = MorseLoRaCW::getTxBuffer();
+            MorseLoRa::sendWithLora(buf);// finalise the string and send it to LoRA
+            delay(MorseKeyer::interCharacterSpace + MorseKeyer::ditLength);// we need a slightly longer pause otherwise the receiving end might fall too far behind...
+        }
+        return -1ul;
+    };
+    genCon->onCWElement = [](char c){
+        if (MorsePreferences::prefs.loraTrainerMode == 1)
+        {
+            int e;
+            switch (c) {
+                case '0': {
+                    e = 0;
+                    break;
+                }
+                case '1': {
+                    e = 1;
+                    break;
+                }
+                default: {
+                    e = 2;
+                    break;
+                }
+            }
+            MorseLoRaCW::cwForLora(e);
+        }
+    };
+
 }
 
 boolean MorseModeGenerator::togglePause()

@@ -110,7 +110,7 @@ uint8_t wpmDecoded;
 
 boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
-void (*Decoder::storeCharInResponse)(String);
+void (*Decoder::onCharacter)(String);
 
 DECODER_STATES Decoder::decoderState = LOW_;
 
@@ -204,7 +204,8 @@ void Decoder::setupGoertzel()
 
 void Decoder::startDecoder()
 {
-    Decoder::storeCharInResponse = 0;
+    Decoder::onCharacter = [](String s)
+    {   MorseDisplay::printToScroll(REGULAR, s);};
     Decoder::speedChanged = true;
     delay(650);
     MorseDisplay::clear();
@@ -390,7 +391,14 @@ void internal::doDecode()
                 //  else if (MorsePreferences::prefs.wpm > 30) lacktime = 2.6;
                 if (lowDuration > (lacktime * ditAvg))
                 {
-                    displayMorse();                                             /// decode the morse character and display it
+                    /*
+                     * decode the Morse character and display it
+                     */
+                    String symbol = getMorsedChar();
+                    if (symbol != "") {
+                        onCharacter(symbol);
+                    }
+
                     wpm = (wpmDecoded + (int) (7200 / (dahAvg + 3 * ditAvg))) / 2;     //// recalculate speed in wpm
                     if (wpmDecoded != wpm)
                     {
@@ -519,22 +527,17 @@ void internal::recalculateDah(unsigned long duration)
     }
 }
 
-/// display decoded morse code (and store it in echoTrainer
-void Decoder::displayMorse()
+String Decoder::getMorsedChar()
 {
     String symbol;
     symbol.reserve(6);
     if (treeptr == 0)
     {
-        return;
+        return "";
     }
     symbol = CWtree[treeptr].symb;
-    MorseDisplay::printToScroll(REGULAR, symbol);
-    if (storeCharInResponse != 0)
-    {
-        storeCharInResponse(symbol);
-    }
     treeptr = 0;                                    // reset tree pointer
+    return symbol;
 }   /// end of displayMorse()
 
 void Decoder::interWordTimerOff()

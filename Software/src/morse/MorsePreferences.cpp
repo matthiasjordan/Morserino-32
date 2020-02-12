@@ -67,6 +67,7 @@ prefPos MorsePreferences::kochEchoOptions[] =
     {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
             posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
+prefPos MorsePreferences::morseTennisOptions[] = {posLoraSyncW, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::loraTrxOptions[] =
     {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};

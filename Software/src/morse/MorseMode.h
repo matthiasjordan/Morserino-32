@@ -8,7 +8,7 @@
 #ifndef MORSEMODE_H_
 #define MORSEMODE_H_
 
-#include <Arduino.h>
+#include "arduino.h"
 
 class MorseMode
 {
@@ -20,7 +20,7 @@ class MorseMode
         virtual boolean loop() = 0;
 
         /**
-         * returns false, if the mode is paused now.
+         * returns false if the mode is paused now.
          */
         virtual boolean togglePause() = 0;
 

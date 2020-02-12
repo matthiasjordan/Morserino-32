@@ -41,7 +41,7 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-    Decoder::storeCharInResponse = [](String r)
+    Decoder::onCharacter = [](String r)
     {   morseModeEchoTrainer.storeCharInResponse(r);};
 
     MorseText::proceed();
@@ -174,12 +174,7 @@ void MorseModeEchoTrainer::echoTrainerEval()
         MorseDisplay::printToScroll(BOLD, "OK\n");
         if (MorsePreferences::prefs.echoConf)
         {
-            MorseSound::pwmTone(440, MorsePreferences::prefs.sidetoneVolume, false);
-            delay(97);
-            MorseSound::pwmNoTone();
-            MorseSound::pwmTone(587, MorsePreferences::prefs.sidetoneVolume, false);
-            delay(193);
-            MorseSound::pwmNoTone();
+            MorseSound::soundSignalOK();
         }
         delay(MorseKeyer::interWordSpace);
         if (MorsePreferences::prefs.speedAdapt)
@@ -196,9 +191,7 @@ void MorseModeEchoTrainer::echoTrainerEval()
             MorseDisplay::printToScroll(BOLD, "ERR\n");
             if (MorsePreferences::prefs.echoConf)
             {
-                MorseSound::pwmTone(311, MorsePreferences::prefs.sidetoneVolume, false);
-                delay(193);
-                MorseSound::pwmNoTone();
+                MorseSound::soundSignalERR();
             }
         }
         else {

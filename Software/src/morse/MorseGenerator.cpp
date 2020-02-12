@@ -17,7 +17,7 @@
 #include "MorseGenerator.h"
 #include "MorseDisplay.h"
 #include "MorseMachine.h"
-#include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseSound.h"
 #include "decoder.h"
@@ -87,6 +87,7 @@ void MorseGenerator::setStart()
     generatorConfig.printChar = true;
     generatorConfig.onFetchNewWord = &voidFunction;
     generatorConfig.onGeneratorWordEnd = &uLongFunctionMinus1;
+    generatorConfig.onCWElement = [](char c){};
     generatorConfig.onLastWord = &voidFunction;
     generatorConfig.maxWords = 0;
 
@@ -234,22 +235,11 @@ void MorseGenerator::generateCW()
             char c = CWword[0];
             CWword.remove(0, 1);
 
-            if ((c == '0'))
-            {                      // a character just had been finished
-                if (generatorConfig.sendCWToLoRa)
-                {
-                    MorseLoRa::cwForLora(0);
-                }
-            }
-            else
+            generatorConfig.onCWElement(c);
+
+            if (c != '0')
             {
                 genTimer = millis() + internal::getCharTiming(&generatorConfig, c);
-
-                if (generatorConfig.sendCWToLoRa)
-                {
-                    // send the element to LoRa
-                    c == '1' ? MorseLoRa::cwForLora(1) : MorseLoRa::cwForLora(2);
-                }
 
                 /// if Koch learn character we show dit or dah
                 if (generatorConfig.printDitDah)
@@ -275,40 +265,32 @@ void MorseGenerator::generateCW()
                 keyOut(false, (!MorseMachine::isMode(MorseMachine::loraTrx)), 0, 0);
             }
 
+            unsigned long deltaMs;
+
             if (CWword.length() == 1)
             {
                 // we just ended the the word
 
                 internal::dispGeneratedChar();
 
-                unsigned long delta = generatorConfig.onGeneratorWordEnd();
+                deltaMs = generatorConfig.onGeneratorWordEnd();
 
-                if (delta != -1)
+                if (deltaMs == -1)
                 {
-                    genTimer = millis() + delta;
-                }
-                else
-                {
-                    genTimer = millis() + internal::getInterwordSpace(&generatorConfig);
-                    if (generatorConfig.sendCWToLoRa)
-                    {                                   // in generator mode and we want to send with LoRa
-                        MorseLoRa::cwForLora(0);
-                        MorseLoRa::cwForLora(3);                           // as we have just finished a word
-                        MorseLoRa::sendWithLora();                         // finalise the string and send it to LoRA
-                        delay(MorseKeyer::interCharacterSpace + MorseKeyer::ditLength); // we need a slightly longer pause otherwise the receiving end might fall too far behind...
-                    }
+                    deltaMs = internal::getInterwordSpace(&generatorConfig);
                 }
             }
             else if (CWword[0] == '0')
             {
                 // we are at end of character
                 internal::dispGeneratedChar();
-                genTimer = millis() + internal::getIntercharSpace(&generatorConfig);
+                deltaMs = internal::getIntercharSpace(&generatorConfig);
             }
             else
             {                                                                                     // we are in the middle of a character
-                genTimer = millis() + internal::getInterelementSpace(&generatorConfig);
+                deltaMs = internal::getInterelementSpace(&generatorConfig);
             }
+            genTimer = millis() + deltaMs;
             generatorState = KEY_UP;                               // next state = key up = pause
             break;
         }
@@ -433,7 +415,7 @@ unsigned long internal::getInterelementSpace(MorseGenerator::Config *generatorCo
 
 String fetchNewWordFromLoRa()
 {
-    MorseLoRa::Packet packet = MorseLoRa::decodePacket();
+    MorseLoRaCW::Packet packet = MorseLoRaCW::decodePacket();
     if (!packet.valid)
     {
         return "";

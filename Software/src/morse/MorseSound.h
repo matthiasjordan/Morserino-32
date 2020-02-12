@@ -12,6 +12,8 @@ namespace MorseSound
     void pwmTone(unsigned int frequency, unsigned int volume, boolean lineOut);
     void pwmNoTone();
     void pwmClick(unsigned int volume);
+    void soundSignalOK();
+    void soundSignalERR();
 
 }
 

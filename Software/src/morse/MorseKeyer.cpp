@@ -16,7 +16,7 @@
 #include "MorseMachine.h"
 #include "MorseGenerator.h"
 #include "decoder.h"
-#include "MorseLoRa.h"
+#include "MorseLoRaCW.h"
 #include "MorseDisplay.h"
 #include "MorseSound.h"
 
@@ -51,6 +51,7 @@ unsigned int lUntouched = 0;                        // sensor values (in untouch
 unsigned int rUntouched = 0;
 
 boolean (*MorseKeyer::onWordEnd)();
+void (*MorseKeyer::onCharacter)(String keyed);
 void (*MorseKeyer::onWordEndDitDah)();
 void (*MorseKeyer::onWordEndNDitDah)();
 
@@ -60,6 +61,10 @@ void MorseKeyer::setup()
     internal::initSensors();
     MorseKeyer::updateTimings();
     onWordEnd = &booleanFunctionFalse;
+    onCharacter = [](String s)
+    {
+        MorseDisplay::printToScroll(REGULAR, s);
+    };
     onWordEndDitDah = &voidFunction;
     onWordEndNDitDah = &voidFunction;
 }
@@ -119,11 +124,6 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
             // display the interword space, if necessary
             if (millis() > Decoder::interWordTimer)
             {
-                if (MorseMachine::isMode(MorseMachine::loraTrx))
-                {                    // when in Trx mode
-                    MorseLoRa::cwForLora(3);
-                    MorseLoRa::sendWithLora();                        // finalise the string and send it to LoRA
-                }
                 MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
                 Decoder::interWordTimer = 4294967000;  // almost the biggest possible unsigned long number :-) - do not output extra spaces!
                 if (MorseKeyer::onWordEnd())
@@ -349,10 +349,17 @@ boolean internal::doPaddleIambic(boolean dit, boolean dah)
                         case 4:
                         {
                             keyerState = IDLE_STATE;               // we are at the end of the character and go back into IDLE STATE
-                            Decoder::displayMorse();                        // display the decoded morse character(s)
+                            /*
+                             * display the decoded morse character(s)
+                             */
+                            String symbol = Decoder::getMorsedChar();
+                            if (symbol != "") {
+                                onCharacter(symbol);
+                            }
+
                             if (MorseMachine::isMode(MorseMachine::loraTrx))
                             {
-                                MorseLoRa::cwForLora(0);
+                                MorseLoRaCW::cwForLora(0);
                             }
 
                             MorsePreferences::fireCharSeen(false);
@@ -455,11 +462,13 @@ boolean MorseKeyer::checkPaddles()
 // update the paddle latches in keyerControl
 void internal::updatePaddleLatch(boolean dit, boolean dah)
 {
-    if (dit) {
+    if (dit)
+    {
         MorseKeyer::keyerControl |= DIT_L;
     }
 
-    if (dah) {
+    if (dah)
+    {
         MorseKeyer::keyerControl |= DAH_L;
     }
 }
@@ -475,8 +484,9 @@ void internal::setDITstate()
 {
     keyerState = DIT;
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
-    if (MorseMachine::isMode(MorseMachine::loraTrx)) {
-        MorseLoRa::cwForLora(1);                         // build compressed string for LoRA
+    if (MorseMachine::isMode(MorseMachine::loraTrx))
+    {
+        MorseLoRaCW::cwForLora(1);                         // build compressed string for LoRA
     }
 }
 
@@ -484,8 +494,9 @@ void internal::setDAHstate()
 {
     keyerState = DAH;
     Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
-    if (MorseMachine::isMode(MorseMachine::loraTrx)) {
-        MorseLoRa::cwForLora(2);
+    if (MorseMachine::isMode(MorseMachine::loraTrx))
+    {
+        MorseLoRaCW::cwForLora(2);
     }
 }
 
@@ -500,22 +511,26 @@ uint8_t internal::readSensors(int left, int right)
     //static boolean first = true;
     uint8_t v, lValue, rValue;
 
-    while (!(v = touchRead(left))) {
+    while (!(v = touchRead(left)))
+    {
         ;                                       // ignore readings with value 0
     }
 
     lValue = v;
-    while (!(v = touchRead(right))) {
+    while (!(v = touchRead(right)))
+    {
         ;                                       // ignore readings with value 0
     }
 
     rValue = v;
-    while (!(v = touchRead(left))) {
+    while (!(v = touchRead(left)))
+    {
         ;                                       // ignore readings with value 0
     }
 
     lValue = (lValue + v) / 2;
-    while (!(v = touchRead(right))) {
+    while (!(v = touchRead(right)))
+    {
         ;                                       // ignore readings with value 0
     }
 
@@ -547,12 +562,14 @@ void internal::initSensors()
     lUntouched = rUntouched = 60;       /// new: we seek minimum
     for (int i = 0; i < 8; ++i)
     {
-        while (!(v = touchRead(LEFT))) {
+        while (!(v = touchRead(LEFT)))
+        {
             ;                                       // ignore readings with value 0
         }
         lUntouched += v;
         //lUntouched = _min(lUntouched, v);
-        while (!(v = touchRead(RIGHT))) {
+        while (!(v = touchRead(RIGHT)))
+        {
             ;                                       // ignore readings with value 0
         }
         rUntouched += v;
