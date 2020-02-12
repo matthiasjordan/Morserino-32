@@ -26,7 +26,8 @@ boolean MorseModeTennis::menuExec(String mode)
     MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
     MorseMachine::morseState = MorseMachine::morseTennis;
     MorseDisplay::clear();
-    MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Morse Tennis");
+    MorseDisplay::printOnScroll(0, REGULAR, 4, "Start");
+    MorseDisplay::printOnScroll(1, REGULAR, 1, "Morse Tennis");
     delay(600);
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
@@ -41,7 +42,7 @@ boolean MorseModeTennis::menuExec(String mode)
     client.send = [](String m){ morseModeTennis.send(m);};
     client.printSentMessage = [](String m) {MorseDisplay::printToScroll(REGULAR, "\n> " + m + "\n");};
     client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
-    client.printScore = [](TennisMachine::GameState *g) { MorseDisplay::printToScroll(BOLD, "us: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n"); };
+    client.printScore = [](TennisMachine::GameState *g) { MorseDisplay::printToScroll(BOLD, "u: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n"); };
 
     machine.setClient(client);
 

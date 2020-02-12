@@ -83,6 +83,7 @@ const char* TennisMachine::StateInitial::getName()
 void TennisMachine::StateInitial::onEnter()
 {
     MORSELOGLN("StateInitial entered");
+    machine->client.print("Send cq or\nwait for qso!\n");
 
 }
 
@@ -112,7 +113,9 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     {
         String us = message.getMatch();
         MORSELOGLN("StateInitial sent cq - off to invite sent - our call: '" + us + "'");
-        machine->client.send(message.getFullPatternMatch());
+        String msg = message.getFullPatternMatch();
+        machine->client.send(msg);
+        machine->client.printSentMessage(msg);
         message.getAndClear();
         machine->gameState.us.call = us;
         machine->switchToState(&machine->stateInviteSent);
@@ -178,8 +181,7 @@ const char* TennisMachine::StateInviteAnswered::getName()
 
 void TennisMachine::StateInviteAnswered::onEnter()
 {
-    machine->client.print(
-            "StateInviteAnswered entered - dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call + "'\n");
+    MORSELOGLN("StateInviteAnswered entered - dx: '" + machine->gameState.dx.call + "' us: '" + machine->gameState.us.call + "'\n");
 
 }
 
@@ -196,7 +198,7 @@ void TennisMachine::StateInviteAnswered::onMessageReceive(String message)
     if (message == pattern)
     {
         MORSELOGLN("Game between " + machine->gameState.dx.call + " and " + machine->gameState.us.call);
-        machine->client.print("The game commences.\n");
+        machine->client.print("Game starts.\n");
         machine->switchToState(&machine->stateStartRoundReceiver);
     }
 }
@@ -469,20 +471,21 @@ const char* TennisMachine::StateEnd::getName()
 
 void TennisMachine::StateEnd::onEnter()
 {
-    machine->client.print("Game ended");
+    machine->client.print("\nGame ended\n");
     machine->client.printScore(&machine->gameState);
     machine->client.print("Send <ka> to restart!\n");
 }
 
 void TennisMachine::StateEnd::onMessageReceive(String message)
 {
-    machine->client.print("StateEnd received " + message + "\n");
+    MORSELOGLN("StateEnd received " + message + "\n");
 }
 
 void TennisMachine::StateEnd::onMessageTransmit(WordBuffer &message)
 {
     if (message.matches("<ka>"))
     {
+        machine->client.print("\n");
         machine->switchToState(&machine->stateInitial);
     }
 }
