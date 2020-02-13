@@ -41,9 +41,6 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-    Decoder::onCharacter = [](String r)
-    {   morseModeEchoTrainer.storeCharInResponse(r);};
-
     MorseText::proceed();
     MorseText::onGeneratorNewWord = [](String r)
     {   morseModeEchoTrainer.onGeneratorNewWord(r);};
@@ -75,6 +72,10 @@ void MorseModeEchoTrainer::startEcho()
     MorseModeEchoTrainer::active = false;
 
     MorseKeyer::setup();
+    MorseKeyer::onCharacter = [](String r)
+    {
+        morseModeEchoTrainer.storeCharInResponse(r);
+    };
     MorseKeyer::onWordEnd = []()
     {
         return morseModeEchoTrainer.onKeyerWordEnd();
@@ -194,7 +195,8 @@ void MorseModeEchoTrainer::echoTrainerEval()
                 MorseSound::soundSignalERR();
             }
         }
-        else {
+        else
+        {
             MorseDisplay::printToScroll(REGULAR, "\n");
         }
 
