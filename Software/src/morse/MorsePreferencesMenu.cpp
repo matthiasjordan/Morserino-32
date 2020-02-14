@@ -38,6 +38,7 @@ namespace internal
     void displayACS();
     void displayPitch();
     void displayClicks();
+    void displayUseStraightKey();
     void displayExtPaddles();
     void displayPolarity();
     void displayLatency();
@@ -120,6 +121,9 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
             break;
         case MorsePreferences::posLatency:
             internal::displayLatency();
+            break;
+        case MorsePreferences::posStraightKey:
+            internal::displayUseStraightKey();
             break;
         case MorsePreferences::posExtPaddles:
             internal::displayExtPaddles();
@@ -252,6 +256,11 @@ void internal::displayPitch()
 void internal::displayClicks()
 {
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.encoderClicks ? "On " : "Off");
+}
+
+void internal::displayUseStraightKey()
+{
+    MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.useStraightKey ? "Yes    " : "No          ");
 }
 
 void internal::displayExtPaddles()
@@ -639,7 +648,7 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
             {
                 case MorsePreferences::posCurtisMode:
                     MorsePreferences::prefs.keyermode = (MorsePreferences::prefs.keyermode + t);                      // set the curtis mode
-                    MorsePreferences::prefs.keyermode = constrain(MorsePreferences::prefs.keyermode, 1, 4);
+                    MorsePreferences::prefs.keyermode = constrain(MorsePreferences::prefs.keyermode, IAMBICA, NONSQUEEZE);
                     internal::displayCurtisMode();                                    // display curtis mode
                     break;
                 case MorsePreferences::posCurtisBDahTiming:
@@ -667,6 +676,10 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                 case MorsePreferences::posClicks:
                     MorsePreferences::prefs.encoderClicks = !MorsePreferences::prefs.encoderClicks;
                     internal::displayClicks();
+                    break;
+                case MorsePreferences::posStraightKey:
+                    MorsePreferences::prefs.useStraightKey = !MorsePreferences::prefs.useStraightKey;
+                    internal::displayUseStraightKey();
                     break;
                 case MorsePreferences::posExtPaddles:
                     MorsePreferences::prefs.useExtPaddle = !MorsePreferences::prefs.useExtPaddle;                       // ext paddle on/off

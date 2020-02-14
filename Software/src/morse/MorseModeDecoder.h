@@ -18,10 +18,6 @@ class MorseModeDecoder: public MorseMode
         boolean loop() override;
         boolean togglePause() override;
         void onPreferencesChanged() override;
-
-    private:
-        void startDecoder();
-
 };
 
 extern MorseModeDecoder morseModeDecoder;

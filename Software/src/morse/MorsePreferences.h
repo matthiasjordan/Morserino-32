@@ -48,6 +48,7 @@ namespace MorsePreferences
         posSnapRecall,
         posSnapStore,
         posMaxSequence,
+        posStraightKey,
         //
         sentinel
     };
@@ -78,6 +79,7 @@ namespace MorsePreferences
             uint8_t version_minor = VERSION_MINOR;
             uint8_t sidetoneFreq = 11;               // side tone frequency                               1 - 15
             uint8_t sidetoneVolume = 60;              // side tone volume, as a value between 0 and 100   0 -100
+            boolean useStraightKey = false;
             boolean didah = false;                    // paddle polarity                                  bool
             uint8_t keyermode = 2;                    // Iambic keyer mode: see the #defines above        1 -  3
             uint8_t interCharSpace = 3;               // trainer: in dit lengths                          3 - 24

@@ -23,7 +23,6 @@
 #include "MorseSound.h"
 #include "MorseText.h"
 
-
 using namespace Decoder;
 
 const struct linklist Decoder::CWtree[71] = { //
@@ -111,6 +110,9 @@ uint8_t wpmDecoded;
 boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
 void (*Decoder::onCharacter)(String);
+void (*Decoder::onWordEnd)();
+void (*Decoder::onDit)();
+void (*Decoder::onDah)();
 
 DECODER_STATES Decoder::decoderState = LOW_;
 
@@ -181,7 +183,7 @@ namespace internal
     String encodeProSigns(String &input);
     boolean straightKey();
     boolean checkTone();
-    void doDecode();
+    boolean doDecode();
 }
 
 void Decoder::setupGoertzel()
@@ -205,16 +207,14 @@ void Decoder::setupGoertzel()
 void Decoder::startDecoder()
 {
     Decoder::onCharacter = [](String s)
-    {   MorseDisplay::printToScroll(REGULAR, s);};
+    {};
+    Decoder::onWordEnd = []()
+    {};
+    Decoder::onDit = []()
+    {};
+    Decoder::onDah = []()
+    {};
     Decoder::speedChanged = true;
-    delay(650);
-    MorseDisplay::clear();
-    MorseDisplay::displayTopLine();
-    MorseDisplay::drawInputStatus(false);
-    MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-
-    MorseDisplay::displayCWspeed();
-    MorseDisplay::displayVolume();
 
     MorseKeyer::setup();
 
@@ -270,7 +270,8 @@ uint8_t Decoder::getDecodedWpm()
 
 boolean internal::straightKey()
 {            // return true if a straight key was closed, or a touch paddle touched
-    if ((MorseMachine::isMode(MorseMachine::morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey))
+//    if ((MorseMachine::isMode(MorseMachine::morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey))
+    if (((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey))
         return true;
     else
         return false;
@@ -291,7 +292,6 @@ boolean internal::checkTone()
 
 ///// check straight key first before you check audio in.... (unless we are in transceiver mode)
 ///// straight key is connected to external paddle connector (tip), i.e. the same as the left pin (dit normally)
-
     if (straightKey())
     {
         realstate = true;
@@ -369,12 +369,12 @@ boolean internal::checkTone()
     }
 }   /// end checkTone()
 
-void internal::doDecode()
+boolean internal::doDecode()
 {
+    boolean isCoding = false;
     float lacktime;
     int wpm;
 
-//    MORSELOGLN("Decoder::doDecode() 1");
     switch (decoderState)
     {
         case INTERELEMENT_:
@@ -382,6 +382,7 @@ void internal::doDecode()
             {
                 internal::ON_();
                 decoderState = HIGH_;
+                isCoding = true;
             }
             else
             {
@@ -395,7 +396,8 @@ void internal::doDecode()
                      * decode the Morse character and display it
                      */
                     String symbol = getMorsedChar();
-                    if (symbol != "") {
+                    if (symbol != "")
+                    {
                         onCharacter(symbol);
                     }
 
@@ -414,6 +416,7 @@ void internal::doDecode()
             {
                 internal::ON_();
                 decoderState = HIGH_;
+                isCoding = true;
             }
             else
             {
@@ -425,7 +428,7 @@ void internal::doDecode()
                     lacktime = 5.5;
                 if (lowDuration > (lacktime * ditAvg))
                 {
-                    MorseDisplay::printToScroll(REGULAR, " ");                       // output a blank
+                    Decoder::onWordEnd();
                     decoderState = LOW_;
                 }
             }
@@ -435,6 +438,7 @@ void internal::doDecode()
             {
                 internal::ON_();
                 decoderState = HIGH_;
+                isCoding = true;
             }
             break;
         case HIGH_:
@@ -442,19 +446,23 @@ void internal::doDecode()
             {
                 internal::OFF_();
                 decoderState = INTERELEMENT_;
+                isCoding = true;
             }
             break;
     }
+
+    return isCoding;
 }
 
-void Decoder::doDecodeShow()
+boolean Decoder::doDecodeShow()
 {
-    internal::doDecode();
+    boolean isCoding = internal::doDecode();
     if (Decoder::speedChanged)
     {
         Decoder::speedChanged = false;
         MorseDisplay::displayCWspeed();
     }
+    return isCoding;
 }
 
 void internal::ON_()
@@ -485,11 +493,13 @@ void internal::OFF_()
         { /// we got a dit -
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
             internal::recalculateDit(highDuration);
+            onDit();
         }
         else
         {        /// we got a dah
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
             internal::recalculateDah(highDuration);
+            onDah();
         }
     }
     //pwmNoTone();                     // stop side tone

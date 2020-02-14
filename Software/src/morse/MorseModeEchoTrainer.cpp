@@ -21,6 +21,7 @@
 #include "MorseMachine.h"
 #include "MorseMenu.h"
 #include "decoder.h"
+#include "MorseInput.h"
 
 MorseModeEchoTrainer morseModeEchoTrainer;
 
@@ -41,11 +42,25 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
+    MorseInput::start(
+    [](String r)
+    {
+        MorseDisplay::printToScroll(REGULAR, r);
+        morseModeEchoTrainer.storeCharInResponse(r);
+    },
+    []()
+    {
+        MorseDisplay::printToScroll(REGULAR, " ");
+        morseModeEchoTrainer.onKeyerWordEndNDitDah();
+    });
+
+
     MorseText::proceed();
     MorseText::onGeneratorNewWord = [](String r)
     {   morseModeEchoTrainer.onGeneratorNewWord(r);};
 
     MorseModeEchoTrainer::echoStop = false;
+    MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");
@@ -70,24 +85,6 @@ void MorseModeEchoTrainer::startEcho()
         echoTrainerState = SEND_WORD;
     }
     MorseModeEchoTrainer::active = false;
-
-    MorseKeyer::setup();
-    MorseKeyer::onCharacter = [](String r)
-    {
-        morseModeEchoTrainer.storeCharInResponse(r);
-    };
-    MorseKeyer::onWordEnd = []()
-    {
-        return morseModeEchoTrainer.onKeyerWordEnd();
-    };
-    MorseKeyer::onWordEndDitDah = []()
-    {
-        morseModeEchoTrainer.onKeyerWordEndDitDah();
-    };
-    MorseKeyer::onWordEndNDitDah = []()
-    {
-        morseModeEchoTrainer.onKeyerWordEndNDitDah();
-    };
 }
 
 boolean MorseModeEchoTrainer::onKeyerWordEnd()
@@ -102,10 +99,7 @@ boolean MorseModeEchoTrainer::onKeyerWordEnd()
 
 void MorseModeEchoTrainer::onKeyerWordEndDitDah()
 {
-    if (MorseMachine::isMode(MorseMachine::echoTrainer))
-    {      // change the state of the trainer at end of word
-        MorseModeEchoTrainer::setState(MorseModeEchoTrainer::COMPLETE_ANSWER);
-    }
+    MorseModeEchoTrainer::setState(MorseModeEchoTrainer::COMPLETE_ANSWER);
 }
 
 void MorseModeEchoTrainer::onKeyerWordEndNDitDah()
@@ -331,8 +325,10 @@ boolean MorseModeEchoTrainer::loop()
                 break;
             case MorseModeEchoTrainer::COMPLETE_ANSWER:
             case MorseModeEchoTrainer::GET_ANSWER:
-                if (MorseKeyer::doPaddleIambic())
-                    return true;                             // we are busy keying and so need a very tight loop !
+                if (MorseInput::doInput())
+                {
+                    return true;
+                }
                 break;
         }
     }

@@ -33,7 +33,7 @@ const String MorsePreferences::prefOption[] =
             "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
             "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
             "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-            "Max # of Words",
+            "Max # of Words","Straight key ",
             //
             "Sentinel"};
 
@@ -56,7 +56,7 @@ prefPos MorsePreferences::echoPlayerOptions[] =
             posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
             posEchoConf, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::echoTrainerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
             posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::kochGenOptions[] =
@@ -64,21 +64,21 @@ prefPos MorsePreferences::kochGenOptions[] =
             posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
             posQuickStart, sentinel};
 prefPos MorsePreferences::kochEchoOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
             posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::morseTennisOptions[] = {posLoraSyncW, posTimeOut, posQuickStart, sentinel};
+prefPos MorsePreferences::morseTennisOptions[] = {posStraightKey, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::loraTrxOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
 prefPos MorsePreferences::extTrxOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
 prefPos MorsePreferences::decoderOptions[] =
     {posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
 
 prefPos MorsePreferences::allOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
+    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
             posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
             posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
             posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart,
@@ -270,6 +270,7 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     if ((temp = pref.getUChar("maxSequence", p.maxSequence)))
         p.maxSequence = temp;
 
+    p.useStraightKey = pref.getBool("useStraightKey");
     p.didah = pref.getBool("didah", true);
     p.useExtPaddle = pref.getBool("useExtPaddle");
     p.encoderClicks = pref.getBool("encoderClicks", true);
@@ -326,6 +327,8 @@ void MorsePreferences::writePreferences(String repository)
 
     if (p.sidetoneFreq != pref.getUChar("sidetoneFreq"))
         pref.putUChar("sidetoneFreq", p.sidetoneFreq);
+    if (p.useStraightKey != pref.getBool("useStraightKey"))
+        pref.putBool("useStraightKey", p.useStraightKey);
     if (p.didah != pref.getBool("didah"))
         pref.putBool("didah", p.didah);
     if (p.keyermode != pref.getUChar("keyermode"))

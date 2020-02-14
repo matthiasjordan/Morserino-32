@@ -28,6 +28,9 @@ namespace Decoder
     extern boolean filteredState;
     extern boolean filteredStateBefore;
     extern void (*onCharacter)(String);
+    extern void (*onWordEnd)();
+    extern void (*onDit)();
+    extern void (*onDah)();
 
     /// state machine for decoding CW
     enum DECODER_STATES
@@ -49,7 +52,7 @@ namespace Decoder
 
 
     void startDecoder();
-    void doDecodeShow();
+    boolean doDecodeShow();
     void setupGoertzel();
     void drawInputStatus(boolean on);
     void interWordTimerOff();

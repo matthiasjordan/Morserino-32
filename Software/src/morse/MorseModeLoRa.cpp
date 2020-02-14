@@ -19,6 +19,8 @@
 #include "MorseLoRaCW.h"
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
+#include "MorseInput.h"
+#include "decoder.h"
 
 MorseModeLoRa morseModeLoRa;
 
@@ -30,6 +32,7 @@ boolean MorseModeLoRa::menuExec(String mode)
     {
         MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
         MorseMachine::morseState = MorseMachine::loraTrx;
+        MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
         MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
         delay(600);
@@ -37,17 +40,21 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
 
-        MorseKeyer::setup();
-        MorseKeyer::clearPaddleLatches();
         MorseKeyer::keyTx = false;
-        MorseKeyer::onWordEnd = []()
+        MorseInput::start([](String s){
+            MorseDisplay::printToScroll(REGULAR, s);
+            MorseLoRaCW::cwForLora(0);
+        },
+        []()
         {
+            MorseDisplay::printToScroll(REGULAR, " ");
             /* finalise the string and send it to LoRA */
             MorseLoRaCW::cwForLora(3);
             char *buf = MorseLoRaCW::getTxBuffer();
             MorseLoRa::sendWithLora(buf);
-            return false;
-        };
+        });
+        Decoder::onDit = [](){MorseLoRaCW::cwForLora(1);};
+        Decoder::onDah = [](){MorseLoRaCW::cwForLora(2);};
 
         MorseGenerator::setStart();
         MorseGenerator::Config *genCon = MorseGenerator::getConfig();
@@ -65,7 +72,7 @@ boolean MorseModeLoRa::menuExec(String mode)
 
 boolean MorseModeLoRa::loop()
 {
-    if (MorseKeyer::doPaddleIambic())
+    if (MorseInput::doInput())
     {
         return true;                                                        // we are busy keying and so need a very tight loop !
     }

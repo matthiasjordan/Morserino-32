@@ -30,35 +30,22 @@ boolean MorseModeDecoder::menuExec(String mode)
     MorseKeyer::keyTx = false;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start Decoder");
-
-    Decoder::startDecoder();
-    return true;
-}
-
-
-void MorseModeDecoder::startDecoder()
-{
-    Decoder::onCharacter = [](String s){};
-    Decoder::speedChanged = true;
     delay(650);
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
     MorseDisplay::drawInputStatus(false);
     MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
-
     MorseDisplay::displayCWspeed();
     MorseDisplay::displayVolume();
 
-    MorseKeyer::setup();
+    Decoder::startDecoder();
+    Decoder::onCharacter = [](String s)
+    {   MorseDisplay::printToScroll(REGULAR, s);};
+    Decoder::onWordEnd = []()
+    {   MorseDisplay::printToScroll(REGULAR, " ");};
 
-    /// set up variables for Goertzel Morse Decoder
-    Decoder::setupGoertzel();
-    Decoder::filteredState = Decoder::filteredStateBefore = false;
-    Decoder::decoderState = Decoder::LOW_;
-    Decoder::ditAvg = 60;
-    Decoder::dahAvg = 180;
+    return true;
 }
-
 
 boolean MorseModeDecoder::loop()
 {
