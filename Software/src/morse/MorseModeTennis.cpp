@@ -26,6 +26,7 @@ boolean MorseModeTennis::menuExec(String mode)
 {
     MorsePreferences::currentOptions = MorsePreferences::morseTennisOptions;               // list of available options in lora trx mode
     MorseMachine::morseState = MorseMachine::morseTennis;
+    MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 4, "Start");
     MorseDisplay::printOnScroll(1, REGULAR, 1, "Morse Tennis");

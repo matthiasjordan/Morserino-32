@@ -40,6 +40,7 @@ MorseDisplay::Config displayConfig;
 const int8_t MorseDisplay::maxPos = NoOfLines - 3;
 int8_t MorseDisplay::relPos = MorseDisplay::maxPos;
 uint8_t MorseDisplay::bottomLine = 0;
+String (*MorseDisplay::getKeyerModeSymbol)() = MorseDisplay::getKeyerModeSymbolWStraightKey;
 
 char textBuffer[NoOfLines][2 * NoOfCharsPerLine + 1]; /// we need extra room for style markers (FONT_ATTRIB stored as characters to toggle on/off the style within a line)
                                                       /// and 0 terminator
@@ -288,7 +289,8 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
     {
         if (style == lastStyle)
         {                                // not regular, but we have no change in style!
-            if (textBuffer[bottomLine][pos-1] < 4) {
+            if (textBuffer[bottomLine][pos - 1] < 4)
+            {
                 pos -= 1;                                               // go one pos back to overwrite style marker
             }
             memcpy(&textBuffer[bottomLine][pos], text.c_str(), l);  // copy the string of characters
@@ -589,8 +591,10 @@ void MorseDisplay::updateSMeter(int rssi)
 
     static boolean wasZero = false;
 
-    if (rssi == 0) {
-        if (wasZero) {
+    if (rssi == 0)
+    {
+        if (wasZero)
+        {
             return;
         }
         else
@@ -609,14 +613,54 @@ void MorseDisplay::updateSMeter(int rssi)
 
 void MorseDisplay::drawInputStatus(boolean on)
 {
-    if (on) {
+    if (on)
+    {
         display.setColor(BLACK);
     }
-    else {
+    else
+    {
         display.setColor(WHITE);
     }
     display.fillRect(1, 1, 20, 13);
     display.display();
+}
+
+String MorseDisplay::getKeyerModeSymbolWOStraightKey()
+{
+    switch (MorsePreferences::prefs.keyermode)
+    {
+        case IAMBICA:
+        {
+            return "A";
+        }
+        case IAMBICB:
+        {
+            return "B";
+        }
+        case ULTIMATIC:
+        {
+            return "U";
+        }
+        case NONSQUEEZE:
+        {
+            return "N";
+        }
+    }
+    return " ";
+}
+
+String MorseDisplay::getKeyerModeSymbolWStraightKey()
+{
+    String symbol;
+    if (MorsePreferences::prefs.useStraightKey)
+    {
+        symbol = "S";
+    }
+    else
+    {
+        symbol = getKeyerModeSymbolWOStraightKey();
+    }
+    return symbol;
 }
 
 //////// Display the status line in CW Keyer Mode
@@ -629,35 +673,20 @@ void MorseDisplay::displayTopLine()
     MorseDisplay::clearStatusLine();
 
     // printOnStatusLine(true, 0, (MorsePreferences::prefs.useExtPaddle ? "X " : "T "));          // we do not show which paddle is in use anymore
-    if (MorseMachine::isMode(MorseMachine::morseGenerator)) {
+    if (MorseMachine::isMode(MorseMachine::morseGenerator))
+    {
         MorseDisplay::printOnStatusLine(true, 1, MorsePreferences::prefs.wordDoubler ? "x2" : "  ");
     }
     else
     {
-        switch (MorsePreferences::prefs.keyermode)
-        {
-            case IAMBICA: {
-                MorseDisplay::printOnStatusLine(false, 2, "A ");
-                break;          // Iambic A (no paddle eval during dah)
-            }
-            case IAMBICB: {
-                MorseDisplay::printOnStatusLine(false, 2, "B ");
-                break;          // orig Curtis B mode: paddle eval during element
-            }
-            case ULTIMATIC: {
-                MorseDisplay::printOnStatusLine(false, 2, "U ");
-                break;          // Ultimatic Mode
-            }
-            case NONSQUEEZE: {
-                MorseDisplay::printOnStatusLine(false, 2, "N ");
-                break;         // Non-squeeze mode
-            }
-        }
+        String symbol = getKeyerModeSymbol();
+        MorseDisplay::printOnStatusLine(false, 2, symbol + " ");
     }
 
     displayCWspeed();                                     // update display of CW speed
     if ((MorseMachine::isMode(MorseMachine::loraTrx))
-            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == true)) {
+            || (MorseMachine::isMode(MorseMachine::morseGenerator) && MorsePreferences::prefs.loraTrainerMode == true))
+    {
         dispLoraLogo();
     }
 

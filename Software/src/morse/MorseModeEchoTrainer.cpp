@@ -42,20 +42,6 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-//    Decoder::startDecoder();
-//    Decoder::onCharacter = [](String r)
-//    {
-//        MorseDisplay::printToScroll(REGULAR, r);
-//        morseModeEchoTrainer.storeCharInResponse(r);
-//    };
-//    Decoder::onWordEnd = []()
-//    {
-//        Serial.println("MMET:oWE");
-//        MorseDisplay::printToScroll(REGULAR, " ");
-//        morseModeEchoTrainer.onKeyerWordEndNDitDah();
-//    };
-//
-
     MorseInput::start(
     [](String r)
     {
@@ -74,6 +60,7 @@ void MorseModeEchoTrainer::startEcho()
     {   morseModeEchoTrainer.onGeneratorNewWord(r);};
 
     MorseModeEchoTrainer::echoStop = false;
+    MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start:       ");

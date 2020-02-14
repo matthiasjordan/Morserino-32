@@ -14,6 +14,7 @@ boolean MorseModeTrx::menuExec(String mode)
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Trx");
     delay(650);
+    MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
     MorseDisplay::drawInputStatus(false);

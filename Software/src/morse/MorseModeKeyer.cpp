@@ -31,6 +31,7 @@ boolean MorseModeKeyer::menuExec(String mode)
         MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, REGULAR, 0, "Start CW Keyer");
         delay(500);
+        MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWOStraightKey;
         MorseDisplay::clear();
         MorseDisplay::displayTopLine();
         MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer

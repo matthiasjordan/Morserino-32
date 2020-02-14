@@ -9,13 +9,15 @@
 namespace MorseDisplay
 {
 
-    typedef struct display_config {
+    typedef struct display_config
+    {
             boolean autoFlush;
     } Config;
 
     extern const int8_t maxPos;
     extern int8_t relPos;
     extern uint8_t bottomLine;
+    extern String (*getKeyerModeSymbol)();
 
     void init();
     Config* getConfig();
@@ -48,6 +50,8 @@ namespace MorseDisplay
     void dispLoraLogo();
     void updateSMeter(int rssi);
     void drawInputStatus(boolean on);
+    String getKeyerModeSymbolWOStraightKey();
+    String getKeyerModeSymbolWStraightKey();
     void displayTopLine();
     void displayCWspeed();
     void showVolumeBar(uint16_t mini, uint16_t maxi);

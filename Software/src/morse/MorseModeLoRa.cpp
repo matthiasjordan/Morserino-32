@@ -32,6 +32,7 @@ boolean MorseModeLoRa::menuExec(String mode)
     {
         MorsePreferences::currentOptions = MorsePreferences::loraTrxOptions;               // list of available options in lora trx mode
         MorseMachine::morseState = MorseMachine::loraTrx;
+        MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
         MorseDisplay::clear();
         MorseDisplay::printOnScroll(1, REGULAR, 0, "Start LoRa Trx");
         delay(600);
