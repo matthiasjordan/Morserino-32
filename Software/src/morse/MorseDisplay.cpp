@@ -621,7 +621,7 @@ void MorseDisplay::drawInputStatus(boolean on)
     {
         display.setColor(WHITE);
     }
-    display.fillRect(1, 1, 20, 13);
+    display.fillRect(1, 1, 10, 13);
     display.display();
 }
 
