@@ -8,14 +8,11 @@
 #include "MorseInput.h"
 #include "decoder.h"
 #include "MorseKeyer.h"
+#include "MorsePreferences.h"
 
 using namespace MorseInput;
 
-boolean MorseInput::useStraightKey = false;
-//void (*MorseInput::onCharacter)(String) = [](String s)
-//{};
-//void (*MorseInput::onWordEnd)() = []()
-//{};
+
 
 void MorseInput::start(void (*onCharacter)(String), void (*onWordEnd)())
 {
@@ -32,7 +29,8 @@ void MorseInput::start(void (*onCharacter)(String), void (*onWordEnd)())
 boolean MorseInput::doInput()
 {
     boolean busy = false;
-    if (useStraightKey) {
+
+    if (MorsePreferences::prefs.useStraightKey) {
         busy = Decoder::doDecodeShow();
     }
     else {

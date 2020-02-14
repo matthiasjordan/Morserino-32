@@ -56,7 +56,6 @@ void MorseModeEchoTrainer::startEcho()
 //    };
 //
 
-    MorseInput::useStraightKey = false;
     MorseInput::start(
     [](String r)
     {
