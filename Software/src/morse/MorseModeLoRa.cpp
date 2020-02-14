@@ -20,6 +20,7 @@
 #include "MorseKeyer.h"
 #include "MorseGenerator.h"
 #include "MorseInput.h"
+#include "decoder.h"
 
 MorseModeLoRa morseModeLoRa;
 
@@ -41,6 +42,7 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseKeyer::keyTx = false;
         MorseInput::start([](String s){
             MorseDisplay::printToScroll(REGULAR, s);
+            MorseLoRaCW::cwForLora(0);
         },
         []()
         {
@@ -50,6 +52,8 @@ boolean MorseModeLoRa::menuExec(String mode)
             char *buf = MorseLoRaCW::getTxBuffer();
             MorseLoRa::sendWithLora(buf);
         });
+        Decoder::onDit = [](){MorseLoRaCW::cwForLora(1);};
+        Decoder::onDah = [](){MorseLoRaCW::cwForLora(2);};
 
         MorseGenerator::setStart();
         MorseGenerator::Config *genCon = MorseGenerator::getConfig();

@@ -23,7 +23,6 @@
 #include "MorseSound.h"
 #include "MorseText.h"
 
-
 using namespace Decoder;
 
 const struct linklist Decoder::CWtree[71] = { //
@@ -112,6 +111,8 @@ boolean Decoder::filteredState = false;
 boolean Decoder::filteredStateBefore = false;
 void (*Decoder::onCharacter)(String);
 void (*Decoder::onWordEnd)();
+void (*Decoder::onDit)();
+void (*Decoder::onDah)();
 
 DECODER_STATES Decoder::decoderState = LOW_;
 
@@ -206,9 +207,13 @@ void Decoder::setupGoertzel()
 void Decoder::startDecoder()
 {
     Decoder::onCharacter = [](String s)
-    {  Serial.println("D::sD " + s); };
+    {};
     Decoder::onWordEnd = []()
-    {  Serial.println("D::oWE"); };
+    {};
+    Decoder::onDit = []()
+    {};
+    Decoder::onDah = []()
+    {};
     Decoder::speedChanged = true;
 
     MorseKeyer::setup();
@@ -391,7 +396,8 @@ boolean internal::doDecode()
                      * decode the Morse character and display it
                      */
                     String symbol = getMorsedChar();
-                    if (symbol != "") {
+                    if (symbol != "")
+                    {
                         onCharacter(symbol);
                     }
 
@@ -487,11 +493,13 @@ void internal::OFF_()
         { /// we got a dit -
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dit;
             internal::recalculateDit(highDuration);
+            onDit();
         }
         else
         {        /// we got a dah
             Decoder::treeptr = Decoder::CWtree[Decoder::treeptr].dah;
             internal::recalculateDah(highDuration);
+            onDah();
         }
     }
     //pwmNoTone();                     // stop side tone

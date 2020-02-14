@@ -29,6 +29,8 @@ namespace Decoder
     extern boolean filteredStateBefore;
     extern void (*onCharacter)(String);
     extern void (*onWordEnd)();
+    extern void (*onDit)();
+    extern void (*onDah)();
 
     /// state machine for decoding CW
     enum DECODER_STATES
