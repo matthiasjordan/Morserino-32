@@ -173,8 +173,11 @@ boolean stop = false;
 volatile uint8_t dit_rot = 0;
 volatile unsigned long dit_collector = 0;
 
+namespace Decoder {
 namespace internal
 {
+    boolean keyTx = false;
+
     void ON_();
     void OFF_();
 
@@ -184,6 +187,7 @@ namespace internal
     boolean straightKey();
     boolean checkTone();
     boolean doDecode();
+}
 }
 
 void Decoder::setupGoertzel()
@@ -295,12 +299,12 @@ boolean internal::checkTone()
     if (straightKey())
     {
         realstate = true;
-        //keyTx = true;
+        Decoder::internal::keyTx = true;
     }
     else
     {
         realstate = false;
-        //keyTx = false;
+        Decoder::internal::keyTx = false;
         for (int index = 0; index < Decoder::goertzel_n; index++)
             testData[index] = analogRead(audioInPin);
         //MORSELOGLN("Read and stored analog values!");
@@ -471,7 +475,7 @@ void internal::ON_()
     lowDuration = timeNow - startTimeLow;             // we record the length of the pause
     startTimeHigh = timeNow;                          // prime the timer for the high state
 
-    MorseGenerator::keyOut(true, false, MorseSound::notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
+    MorseGenerator::keyOut(true, Decoder::internal::keyTx, MorseSound::notes[MorsePreferences::prefs.sidetoneFreq], MorsePreferences::prefs.sidetoneVolume);
 
     MorseDisplay::drawInputStatus(true);
 
@@ -504,7 +508,7 @@ void internal::OFF_()
     }
     //pwmNoTone();                     // stop side tone
     //digitalWrite(keyerPin, LOW);      // stop keying Tx
-    MorseGenerator::keyOut(false, false, 0, 0);
+    MorseGenerator::keyOut(false, true, 0, 0);
     ///////
     MorseDisplay::drawInputStatus(false);
 
