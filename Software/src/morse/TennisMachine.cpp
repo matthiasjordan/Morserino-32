@@ -159,7 +159,9 @@ void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
     {
         String us = message.getMatch();
         MORSELOGLN("ACK sent - off to answered");
-        machine->client.send(message.getFullPatternMatch());
+        String txMsg = message.getFullPatternMatch();
+        machine->client.printSentMessage(txMsg);
+        machine->client.send(txMsg);
         message.getAndClear();
         machine->gameState.us.call = us;
         machine->switchToState(&machine->stateInviteAnswered);
