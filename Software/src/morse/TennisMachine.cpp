@@ -113,9 +113,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     {
         String us = message.getMatch();
         MORSELOGLN("StateInitial sent cq - off to invite sent - our call: '" + us + "'");
-        String msg = message.getFullPatternMatch();
-        machine->client.send(msg);
-        machine->client.printSentMessage(msg);
+        machine->client.sendAndPrint(message.getFullPatternMatch());
         message.getAndClear();
         machine->gameState.us.call = us;
         machine->switchToState(&machine->stateInviteSent);
@@ -159,9 +157,7 @@ void TennisMachine::StateInviteReceived::onMessageTransmit(WordBuffer &message)
     {
         String us = message.getMatch();
         MORSELOGLN("ACK sent - off to answered");
-        String txMsg = message.getFullPatternMatch();
-        machine->client.printSentMessage(txMsg);
-        machine->client.send(txMsg);
+        machine->client.sendAndPrint(message.getFullPatternMatch());
         message.getAndClear();
         machine->gameState.us.call = us;
         machine->switchToState(&machine->stateInviteAnswered);
@@ -282,8 +278,7 @@ void TennisMachine::StateInviteAccepted::onMessageTransmit(WordBuffer &message)
 
     if (message.matches(pattern))
     {
-        machine->client.printSentMessage(pattern);
-        machine->client.send(pattern);
+        machine->client.sendAndPrint(pattern);
         machine->client.print("Game starts.\n");
         message.getAndClear();
         machine->switchToState(&machine->stateStartRoundSender);
@@ -324,8 +319,7 @@ void TennisMachine::StateStartRoundSender::onMessageTransmit(WordBuffer &message
         // Send test passed
         String challenge = message.getMatch();
         machine->gameState.challenge = challenge;
-        machine->client.send(challenge);
-        machine->client.printSentMessage(challenge);
+        machine->client.sendAndPrint(challenge);
         machine->client.challengeSound(true);
         message.getAndClear();
         machine->switchToState(&machine->stateWaitForAnswer);

@@ -25,9 +25,9 @@ class TennisMachine
 
         struct Client {
             void (*send)(String s);
+            void (*sendAndPrint)(String s);
             void (*print)(String s);
             void (*printReceivedMessage)(String s);
-            void (*printSentMessage)(String s);
             void (*printScore)(GameState *g);
             void (*challengeSound)(boolean ok);
         };
