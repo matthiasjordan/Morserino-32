@@ -30,6 +30,14 @@ boolean MorseModeTrx::menuExec(String mode)
         MorseDisplay::printToScroll(REGULAR, " ");
     });
     Decoder::startDecoder();
+    Decoder::onCharacter = [](String s)
+    {
+        MorseDisplay::printToScroll(BOLD, s);
+    };
+    Decoder::onWordEnd = []()
+    {
+        MorseDisplay::printToScroll(BOLD, " ");
+    };
     return true;
 }
 
