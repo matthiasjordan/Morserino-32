@@ -62,10 +62,10 @@ void MorseKeyer::setup()
     MorseKeyer::updateTimings();
     onCharacter = [](String s)
     {
-        MorseDisplay::printToScroll(REGULAR, s);
+        MorseDisplay::printToScroll(FONT_OUTGOING, s);
     };
     onWordEnd = []() {
-        MorseDisplay::printToScroll(REGULAR, " ");
+        MorseDisplay::printToScroll(FONT_OUTGOING, " ");
     };
     onWordEndDitDah = &voidFunction;
     onWordEndNDitDah = &voidFunction;

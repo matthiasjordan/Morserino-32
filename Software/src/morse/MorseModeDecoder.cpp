@@ -40,9 +40,9 @@ boolean MorseModeDecoder::menuExec(String mode)
 
     Decoder::startDecoder();
     Decoder::onCharacter = [](String s)
-    {   MorseDisplay::printToScroll(REGULAR, s);};
+    {   MorseDisplay::printToScroll(FONT_INCOMING, s);};
     Decoder::onWordEnd = []()
-    {   MorseDisplay::printToScroll(REGULAR, " ");};
+    {   MorseDisplay::printToScroll(FONT_INCOMING, " ");};
 
     return true;
 }

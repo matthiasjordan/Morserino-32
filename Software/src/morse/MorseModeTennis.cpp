@@ -40,9 +40,9 @@ boolean MorseModeTennis::menuExec(String mode)
 
     TennisMachine::Client client;
     client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
-    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(REGULAR, "< " + m + "\n");};
+    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(FONT_INCOMING, "< " + m + "\n");};
     client.send = [](String m){ morseModeTennis.send(m);};
-    client.printSentMessage = [](String m) {MorseDisplay::printToScroll(REGULAR, "\n> " + m + "\n");};
+    client.printSentMessage = [](String m) {MorseDisplay::printToScroll(FONT_OUTGOING, "\n> " + m + "\n");};
     client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
     client.printScore = [](TennisMachine::GameState *g) { MorseDisplay::printToScroll(BOLD, "u: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n"); };
 
@@ -51,12 +51,12 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseInput::start([](String c)
         {
             Serial.println("char " + c);
-            MorseDisplay::printToScroll(BOLD, c);
+            MorseDisplay::printToScroll(FONT_OUTGOING, c);
             morseModeTennis.sendBuffer.addChar(c);
         },
         []()
         {
-            MorseDisplay::printToScroll(BOLD, " ");
+            MorseDisplay::printToScroll(FONT_OUTGOING, " ");
             morseModeTennis.sendBuffer.endWord();
             morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
         }

@@ -42,12 +42,12 @@ boolean MorseModeLoRa::menuExec(String mode)
 
         MorseKeyer::keyTx = false;
         MorseInput::start([](String s){
-            MorseDisplay::printToScroll(REGULAR, s);
+            MorseDisplay::printToScroll(FONT_OUTGOING, s);
             MorseLoRaCW::cwForLora(0);
         },
         []()
         {
-            MorseDisplay::printToScroll(REGULAR, " ");
+            MorseDisplay::printToScroll(FONT_OUTGOING, " ");
             /* finalise the string and send it to LoRA */
             MorseLoRaCW::cwForLora(3);
             char *buf = MorseLoRaCW::getTxBuffer();

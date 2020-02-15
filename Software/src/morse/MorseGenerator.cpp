@@ -83,7 +83,7 @@ void MorseGenerator::setStart()
     generatorConfig.printSpaceAfterChar = false;
     generatorConfig.timing = Timing::tx;
     generatorConfig.clearBufferBeforPrintChar = false;
-    generatorConfig.printCharStyle = REGULAR;
+    generatorConfig.printCharStyle = FONT_INCOMING;
     generatorConfig.printChar = true;
     generatorConfig.onFetchNewWord = &voidFunction;
     generatorConfig.onGeneratorWordEnd = &uLongFunctionMinus1;
@@ -202,7 +202,7 @@ void MorseGenerator::generateCW()
                     {
                         case LF:
                         {
-                            MorseDisplay::printToScroll(REGULAR, "\n");
+                            MorseDisplay::printToScroll(FONT_INCOMING, "\n");
                             break;
                         }
                         case flush:
@@ -212,13 +212,13 @@ void MorseGenerator::generateCW()
                         }
                         case spaceAndFlush:
                         {
-                            MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+                            MorseDisplay::printToScroll(FONT_INCOMING, " ");    /// in any case, add a blank after the word on the display
                             MorseDisplay::flushScroll();
                             break;
                         }
                         case space:
                         {
-                            MorseDisplay::printToScroll(REGULAR, " ");    /// in any case, add a blank after the word on the display
+                            MorseDisplay::printToScroll(FONT_INCOMING, " ");    /// in any case, add a blank after the word on the display
                             break;
                         }
                         case nothing:
@@ -244,7 +244,7 @@ void MorseGenerator::generateCW()
                 /// if Koch learn character we show dit or dah
                 if (generatorConfig.printDitDah)
                 {
-                    MorseDisplay::printToScroll(REGULAR, c == '1' ? "." : "-");
+                    MorseDisplay::printToScroll(FONT_INCOMING, c == '1' ? "." : "-");
                 }
 
                 if (generatorConfig.key && !stopFlag) // we finished maxSequence and so do start output (otherwise we get a short click)
@@ -581,7 +581,7 @@ void internal::dispGeneratedChar()
         MorseDisplay::printToScroll(generatorConfig.printCharStyle, MorseText::internalToProSigns(charString));
         if (generatorConfig.printSpaceAfterChar)
         {
-            MorseDisplay::printToScroll(REGULAR, " ");                      // output a space
+            MorseDisplay::printToScroll(FONT_INCOMING, " ");                      // output a space
         }
     }
     else

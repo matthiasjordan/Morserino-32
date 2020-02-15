@@ -5,9 +5,7 @@
 
 const String PROJECTNAME = "Morselino-32";
 
-#define DEBUG
-
-#ifdef DEBUG
+#ifdef MORSERINO_DEBUG
 #define MORSELOGLN(x) Serial.println(x)
 #define MORSELOG(x) Serial.print(x)
 #else
@@ -52,6 +50,9 @@ enum FONT_ATTRIB
 {
     REGULAR, BOLD, INVERSE_REGULAR, INVERSE_BOLD
 };
+
+const FONT_ATTRIB FONT_INCOMING = REGULAR;
+const FONT_ATTRIB FONT_OUTGOING = BOLD;
 
 //OLED pins to ESP32 GPIOs:
 const int OLED_SDA = 4;

@@ -25,18 +25,18 @@ boolean MorseModeTrx::menuExec(String mode)
 
     MorseKeyer::keyTx = true;
     MorseInput::start([](String s) {
-        MorseDisplay::printToScroll(REGULAR, s);
+        MorseDisplay::printToScroll(FONT_OUTGOING, s);
     }, [](){
-        MorseDisplay::printToScroll(REGULAR, " ");
+        MorseDisplay::printToScroll(FONT_OUTGOING, " ");
     });
     Decoder::startDecoder();
     Decoder::onCharacter = [](String s)
     {
-        MorseDisplay::printToScroll(BOLD, s);
+        MorseDisplay::printToScroll(FONT_INCOMING, s);
     };
     Decoder::onWordEnd = []()
     {
-        MorseDisplay::printToScroll(BOLD, " ");
+        MorseDisplay::printToScroll(FONT_INCOMING, " ");
     };
     return true;
 }

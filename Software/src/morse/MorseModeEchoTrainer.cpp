@@ -45,12 +45,12 @@ void MorseModeEchoTrainer::startEcho()
     MorseInput::start(
     [](String r)
     {
-        MorseDisplay::printToScroll(REGULAR, r);
+        MorseDisplay::printToScroll(FONT_OUTGOING, r);
         morseModeEchoTrainer.storeCharInResponse(r);
     },
     []()
     {
-        MorseDisplay::printToScroll(REGULAR, " ");
+        MorseDisplay::printToScroll(FONT_OUTGOING, " ");
         morseModeEchoTrainer.onKeyerWordEndNDitDah();
     });
 
