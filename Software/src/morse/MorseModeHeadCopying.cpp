@@ -35,6 +35,10 @@ boolean MorseModeHeadCopying::menuExec(String mode)
     autoStopState = off;
     MorseDisplay::getConfig()->autoFlush = false;
 
+    MorseText::Config *texCon = MorseText::getConfig();
+    texCon->repeatEach = 1;
+    texCon->generateStartSequence = false;
+
     return true;
 }
 

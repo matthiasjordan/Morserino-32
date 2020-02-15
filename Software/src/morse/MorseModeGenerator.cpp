@@ -62,7 +62,11 @@ void MorseModeGenerator::onPreferencesChanged()
 {
     MorseGenerator::handleEffectiveTrainerDisplay(MorsePreferences::prefs.trainerDisplay);
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 2);
-    MorseText::getConfig()->repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+
+    MorseText::Config *texCon = MorseText::getConfig();
+    texCon->repeatEach = MorsePreferences::prefs.wordDoubler ? 2 : 1;
+    texCon->generateStartSequence = true;
+
     MorseGenerator::Config *genCon = MorseGenerator::getConfig();
     genCon->maxWords = MorsePreferences::prefs.maxSequence;
     genCon->onGeneratorWordEnd = []()
@@ -99,7 +103,6 @@ void MorseModeGenerator::onPreferencesChanged()
             MorseLoRaCW::cwForLora(e);
         }
     };
-
 }
 
 boolean MorseModeGenerator::togglePause()
