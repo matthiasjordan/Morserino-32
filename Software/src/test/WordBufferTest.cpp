@@ -121,6 +121,7 @@ void test_WordBuffer_matches_4()
 {
     assertEquals("matches 4 1", true, WordBuffer("cq de dx").matches("cq de #"));
     assertEquals("matches 4 2", false, WordBuffer("cq dx dx").matches("cq de #"));
+    assertEquals("matches 4 3", false, WordBuffer("cq de *").matches("cq de #"));
 }
 
 void test_WordBuffer_fullPatternMatch_1()

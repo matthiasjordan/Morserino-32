@@ -34,6 +34,7 @@ class WordBuffer
         boolean wordEnd = false;
         void handleWordEnd();
         String trim(String in);
+        boolean textOK(String s);
 };
 
 #endif /* WORDBUFFER_H_ */

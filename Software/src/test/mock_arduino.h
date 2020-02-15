@@ -40,6 +40,10 @@ public:
 	unsigned int length();
 	void trim();
 	int lastIndexOf(char c);
+	int indexOf(char c);
+
+private:
+	int indexOf(char c, boolean first);
 };
 
 

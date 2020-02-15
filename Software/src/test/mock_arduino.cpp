@@ -71,12 +71,25 @@ String String::substring(unsigned int a, unsigned int b)
 
 int String::lastIndexOf(char c)
 {
+    return String::indexOf(c, false);
+}
+
+int String::indexOf(char c) {
+    return String::indexOf(c, true);
+}
+
+int String::indexOf(char c, boolean first)
+{
     int res = -1;
     for (unsigned int i = 0; (i < length()); i++)
     {
         if (c_str()[i] == c)
         {
             res = i;
+            if (first)
+            {
+                break;
+            }
         }
     }
     return res;

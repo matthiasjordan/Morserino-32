@@ -106,6 +106,11 @@ boolean WordBuffer::matches(String pattern)
         if (p[1] == "#")
         {
             String wcc = b[1];
+
+            if (!textOK(wcc)) {
+                return false;
+            }
+
             if (wildcardContent == "")
             {
                 wildcardContent = wcc;
@@ -137,6 +142,12 @@ boolean WordBuffer::matches(String pattern)
         fullPatternMatch = trim(buffer.substring(tmpbuf.length()));
         return true;
     }
+}
+
+boolean WordBuffer::textOK(String s) {
+    int i = s.indexOf('*');
+    Serial.println("textOK " + s + " -> " + String(i));
+    return (i == -1);
 }
 
 String WordBuffer::trim(String in) {
