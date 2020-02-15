@@ -1,6 +1,9 @@
 Work in progress 2.2.0
 
-* Nothing so far.
+* New game: Morse Tennis
+
+* Straight key support as input method for all modes: users can use a straight 
+  key and play Morse Tennis, use the Echo trainer or learn new Koch characters.
 
 
 Release 2.1.0
