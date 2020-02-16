@@ -59,7 +59,7 @@ boolean MorseModeLoRa::menuExec(String mode)
         MorseGenerator::setStart();
         MorseGenerator::Config *genCon = MorseGenerator::getConfig();
         genCon->printChar = true;
-        genCon->printCharStyle = BOLD;
+        genCon->printCharStyle = FONT_INCOMING;
         genCon->printSpaceAfterChar = false;
         genCon->timing = MorseGenerator::rx;
 
