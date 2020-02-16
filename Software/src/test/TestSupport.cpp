@@ -19,6 +19,15 @@ const char* toString(bool b)
     return b ? "true" : "false";
 }
 
+
+void assertEquals(const char* msg, const char *expected, String actual) {
+    assertEquals(msg, expected, actual.c_str());
+}
+
+void assertEquals(const char* msg, String expected, String actual) {
+    assertEquals(msg, expected.c_str(), actual.c_str());
+}
+
 void assertEquals(const char* msg, std::string expected, std::string actual)
 {
     assertEquals(msg, expected.c_str(), actual.c_str());

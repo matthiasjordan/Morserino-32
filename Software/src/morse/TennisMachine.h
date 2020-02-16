@@ -8,8 +8,14 @@
 class TennisMachine
 {
     public:
-        struct Config {
-            uint8_t repeatCall = 2;
+        struct GameConfig {
+            String cqCall;
+            String dxdepat;
+            String dxdeus;
+            String usdedx;
+            String usdepat;
+            String sendChallenge;
+            String answerChallenge;
         };
 
         struct Station {
@@ -33,6 +39,7 @@ class TennisMachine
         };
 
         void setClient(Client &c) {client = c;};
+        void setGameConfig(GameConfig &c) {config = c;};
 
         void start();
         const char* getState();
@@ -173,15 +180,14 @@ class TennisMachine
         State *currentState = 0;
 
         Client client;
-        Config config;
+        GameConfig config;
         GameState gameState;
 
         WordBuffer sendBuffer;
         WordBuffer receiveBuffer;
 
         void switchToState(State *newState);
-//        void send(String message);
-//        void print(String message);
+        String renderPattern(String pattern);
 };
 
 #endif /* MORSEMODETENNIS_H_ */

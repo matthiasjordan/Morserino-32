@@ -38,6 +38,16 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseKeyer::clearPaddleLatches();
     MorseKeyer::keyTx = false;
 
+    TennisMachine::GameConfig gameConfig;
+    gameConfig.cqCall = "cq de #";
+    gameConfig.dxdepat = "$dx de #";
+    gameConfig.dxdeus = "$dx de $us";
+    gameConfig.usdedx = "$us de $dx";
+    gameConfig.usdepat = "$us de #";
+    gameConfig.sendChallenge = "# #";
+    gameConfig.answerChallenge = "#";
+    machine.setGameConfig(gameConfig);
+
     TennisMachine::Client client;
     client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
     client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(FONT_INCOMING, "< " + m + "\n");};

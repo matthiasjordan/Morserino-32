@@ -15,20 +15,31 @@ boolean lastChallenge;
 
 TennisMachine createSUT() {
     TennisMachine sut;
+
     TennisMachine::Client client;
     client.print = [](String m)
     {   TESTPR("DISPLAY: '%s'\n", m.c_str());};
     client.printReceivedMessage = [](String m)
     {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
-    client.printSentMessage = [](String m)
-    {   TESTPR("DISPLAY: '> %s'\n", m.c_str());};
+    client.sendAndPrint = [](String m)
+    {   TESTPR("DISPLAY: '> %s'\n", m.c_str()); lastSent = m;};
     client.send = [](String m)
     {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
     client.challengeSound = [](boolean ok)
     { TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR"); lastChallenge = ok; };
     client.printScore = [](TennisMachine::GameState *g) { TESTPR("%s", ("\nus: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n").c_str()); };
-
     sut.setClient(client);
+
+    TennisMachine::GameConfig gameConfig;
+    gameConfig.cqCall = "cq de #";
+    gameConfig.dxdepat = "$dx de #";
+    gameConfig.dxdeus = "$dx de $us";
+    gameConfig.usdedx = "$us de $dx";
+    gameConfig.usdepat = "$us de #";
+    gameConfig.sendChallenge = "# #";
+    gameConfig.answerChallenge = "#";
+    sut.setGameConfig(gameConfig);
+
     return sut;
 }
 
@@ -63,6 +74,7 @@ void test_TennisMachine_1_we_initiate()
     assertEquals("6", "StateStartRoundSender", sut.getState());
 
     buf.addWord("hallo hallo");
+    printf("Buffer before 5: %s\n", buf.get().c_str());
     sut.onMessageTransmit(buf);
     // Managed to key same word twice - advance to next state
     assertEquals("7", "StateWaitForAnswer", sut.getState());

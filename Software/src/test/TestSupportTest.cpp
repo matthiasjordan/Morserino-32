@@ -50,10 +50,43 @@ void test_TestSupport_aE4()
     }
 }
 
+void test_String1() {
+    String a = String("a b c");
+    String b = String("b");
+    String x = String("x");
+    a.replace(b, x);
+    if (a != "a x c")
+    {
+        logFailure("FAILED: String.replace() 1");
+    }
+}
+
+void test_String2() {
+    String a = String("a b c");
+    String x = String("x");
+    a.replace("b", x);
+    if (a != "a x c")
+    {
+        logFailure("FAILED: String.replace() 2");
+    }
+}
+
+void test_String3() {
+    String a = String("a b c");
+    a.replace("b", "x");
+    if (a != "a x c")
+    {
+        logFailure("FAILED: String.replace() 3");
+    }
+}
+
 void test_TestSupport_1()
 {
     test_TestSupport_aE1();
     test_TestSupport_aE2();
     test_TestSupport_aE3();
     test_TestSupport_aE4();
+    test_String1();
+    test_String2();
+    test_String3();
 }
