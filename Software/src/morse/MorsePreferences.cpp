@@ -27,62 +27,76 @@
 
 using namespace MorsePreferences;
 
-const String MorsePreferences::prefOption[] =
-    {"Encoder Click", "Tone Pitch Hz", "External Pol.", "Paddle Polar.", "Keyer Mode   ", "CurtisB DahT%", "CurtisB DitT%", "AutoChar Spce",
-            "Tone Shift   ", "InterWord Spc", "InterChar Spc", "Random Groups", "Length Rnd Gr", "Length Calls ", "Length Abbrev",
-            "Length Words ", "CW Gen Displ ", "Each Word 2x ", "Echo Prompt  ", "Echo Repeats ", "Confrm. Tone ", "Key ext TX   ",
-            "Send via LoRa", "Bandwidth    ", "Adaptv. Speed", "Koch Sequence", "Koch         ", "Latency      ", "Randomize File",
-            "Time Out     ", "Quick Start  ", "LoRa Channel  ", "LoRa Band    ", "LoRa Frequ   ", "RECALLSnapshot", "STORE Snapshot",
-            "Max # of Words","Straight key ",
-            //
-            "Sentinel"};
+const Item MorsePreferences::prefOption[] = { //
+        {posClicks, "Encoder Click", sectionMain}, //
+                {posPitch, "Tone Pitch Hz", sectionMain}, //
+                {posExtPaddles, "External Pol.", sectionMain}, //
+                {posPolarity, "Paddle Polar.", sectionMain}, //
+                {posCurtisMode, "Keyer Mode   ", sectionMain}, //
+                {posCurtisBDahTiming, "CurtisB DahT%", sectionMain}, //
+                {posCurtisBDotTiming, "CurtisB DitT%", sectionMain}, //
+                {posACS, "AutoChar Spce", sectionMain}, //
+                {posEchoToneShift, "Tone Shift   ", sectionMain}, //
+                {posInterWordSpace, "InterWord Spc", sectionMain}, //
+                {posInterCharSpace, "InterChar Spc", sectionMain}, //
+                {posRandomOption, "Random Groups", sectionMain}, //
+                {posRandomLength, "Length Rnd Gr", sectionMain}, //
+                {posCallLength, "Length Calls ", sectionMain}, //
+                {posAbbrevLength, "Length Abbrev", sectionMain}, //
+                {posWordLength, "Length Words ", sectionMain}, //
+                {posTrainerDisplay, "CW Gen Displ ", sectionMain}, //
+                {posWordDoubler, "Each Word 2x ", sectionMain}, //
+                {posEchoDisplay, "Echo Prompt  ", sectionMain}, //
+                {posEchoRepeats, "Echo Repeats ", sectionMain}, //
+                {posEchoConf, "Confrm. Tone ", sectionMain}, //
+                {posKeyTrainerMode, "Key ext TX   ", sectionMain}, //
+                {posLoraTrainerMode, "Send via LoRa", sectionMain}, //
+                {posGoertzelBandwidth, "Bandwidth    ", sectionMain}, //
+                {posSpeedAdapt, "Adaptv. Speed", sectionMain}, //
+                {posKochSeq, "Koch Sequence", sectionMain}, //
+                {posKochFilter, "Koch         ", sectionMain}, //
+                {posLatency, "Latency      ", sectionMain}, //
+                {posRandomFile, "Randomize File", sectionMain}, //
+                {posTimeOut, "Time Out     ", sectionMain}, //
+                {posQuickStart, "Quick Start  ", sectionMain}, //
+                {posMaxSequence, "Max # of Words", sectionMain}, //
+                {posStraightKey, "Straight key ", sectionMain}, //
+                {posLoraSyncW, "LoRa Channel  ", sectionLoRa}, //
+                {posLoraBand, "LoRa Band    ", sectionLoRa}, //
+                {posLoraQRG, "LoRa Frequ   ", sectionLoRa}, //
+                {posSnapRecall, "RECALLSnapshot", sectionSnapshots}, //
+                {posSnapStore, "STORE Snapshot", sectionSnapshots}, //
 
-prefPos MorsePreferences::keyerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posKeyTrainerMode, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::generatorOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-            posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode,
-            posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::headOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
-            posAbbrevLength, posWordLength, posMaxSequence, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart,
-            sentinel};
-prefPos MorsePreferences::playerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posMaxSequence, posTrainerDisplay, posRandomFile,
-            posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::echoPlayerOptions[] =
-    {posClicks, posPitch, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
-            posEchoConf, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::echoTrainerOptions[] =
-    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-            posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::kochGenOptions[] =
-    {posClicks, posPitch, posExtPaddles, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength,
-            posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posKochSeq, posTimeOut,
-            posQuickStart, sentinel};
-prefPos MorsePreferences::kochEchoOptions[] =
-    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
-            posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::morseTennisOptions[] = {posStraightKey, posLoraSyncW, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::loraTrxOptions[] =
-    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posTimeOut, posQuickStart, posLoraSyncW, sentinel};
-prefPos MorsePreferences::extTrxOptions[] =
-    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
-prefPos MorsePreferences::decoderOptions[] =
-    {posClicks, posPitch, posGoertzelBandwidth, posTimeOut, posQuickStart, sentinel};
+                //
+                {sentinel, "Sentinel", sectionMain}, //
+        };
 
-prefPos MorsePreferences::allOptions[] =
-    {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming, posACS,
-            posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
-            posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posEchoRepeats, posEchoDisplay, posEchoConf,
-            posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth, posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart,
-            sentinel};
+prefPos MorsePreferences::keyerOptions[] = {posExtPaddles, posPolarity, posLatency, posCurtisMode, posCurtisBDahTiming, posCurtisBDotTiming,
+        posACS, posKeyTrainerMode, sentinel};
+prefPos MorsePreferences::generatorOptions[] = {posInterWordSpace, posInterCharSpace, posRandomOption, posRandomLength, posCallLength,
+        posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, sentinel};
+prefPos MorsePreferences::headOptions[] = {posRandomOption, posRandomLength, posCallLength, posAbbrevLength, posWordLength,
+        posKeyTrainerMode, posLoraTrainerMode, sentinel};
+prefPos MorsePreferences::playerOptions[] = {posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler, posKeyTrainerMode,
+        posLoraTrainerMode, sentinel};
+prefPos MorsePreferences::echoPlayerOptions[] = {posEchoToneShift, posMaxSequence, posRandomFile, posEchoRepeats, posEchoDisplay,
+        posEchoConf, sentinel};
+prefPos MorsePreferences::echoTrainerOptions[] = {posEchoToneShift, posRandomOption, posRandomLength, posCallLength, posAbbrevLength,
+        posWordLength, posMaxSequence, posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, sentinel};
+prefPos MorsePreferences::kochGenOptions[] = {posRandomLength, posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay,
+        posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posKochSeq, sentinel};
+prefPos MorsePreferences::kochEchoOptions[] = {posEchoToneShift, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
+        posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, sentinel};
+prefPos MorsePreferences::morseTennisOptions[] = {posLoraSyncW, sentinel};
+prefPos MorsePreferences::loraTrxOptions[] = {posEchoToneShift, posLoraSyncW, sentinel};
+prefPos MorsePreferences::extTrxOptions[] = {posEchoToneShift, posGoertzelBandwidth, sentinel};
+prefPos MorsePreferences::decoderOptions[] = {posGoertzelBandwidth, sentinel};
+
+prefPos MorsePreferences::allOptions[] = {posClicks, posPitch, posStraightKey, posExtPaddles, posPolarity, posLatency, posCurtisMode,
+        posCurtisBDahTiming, posCurtisBDotTiming, posACS, posEchoToneShift, posInterWordSpace, posInterCharSpace, posRandomOption,
+        posRandomLength, posCallLength, posAbbrevLength, posWordLength, posMaxSequence, posTrainerDisplay, posRandomFile, posWordDoubler,
+        posEchoRepeats, posEchoDisplay, posEchoConf, posKeyTrainerMode, posLoraTrainerMode, posLoraSyncW, posGoertzelBandwidth,
+        posSpeedAdapt, posKochSeq, posTimeOut, posQuickStart, sentinel};
 
 prefPos MorsePreferences::noOptions[] = {};
 

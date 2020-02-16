@@ -42,18 +42,32 @@ namespace MorsePreferences
         posRandomFile,
         posTimeOut,
         posQuickStart,
+        posMaxSequence,
+        posStraightKey,
         posLoraSyncW,
         posLoraBand,
         posLoraQRG,
         posSnapRecall,
         posSnapStore,
-        posMaxSequence,
-        posStraightKey,
         //
         sentinel
     };
 
-    extern const String prefOption[];
+    enum Section {
+        sectionMain,
+        sectionLoRa,
+        sectionSnapshots
+    };
+
+    struct Item {
+        prefPos pos;
+        String title;
+        Section section;
+    };
+
+
+
+    extern const Item prefOption[];
 
     extern prefPos keyerOptions[];
     extern prefPos generatorOptions[];
@@ -119,7 +133,7 @@ namespace MorsePreferences
             ///// stored in preferences, but not adjustable through preferences menu:
             uint8_t responsePause = 5;         // in echoTrainer mode, how long do we wait for response? in interWordSpaces; 2-12, default 5
             uint8_t wpm = 15;                         // keyer speed in words per minute                  5 - 60
-            uint8_t menuPtr = 1;                      // current position of menu
+            uint8_t menuPtr = 0;                      // current position of menu
             String wlanSSID = "";                    // SSID for connecting to the Internet
             String wlanPassword = "";                // password for connecting to WiFi router
             uint32_t fileWordPointer = 0;             // remember how far we have read the file in player mode / reset when loading new file

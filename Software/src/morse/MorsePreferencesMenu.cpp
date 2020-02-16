@@ -83,26 +83,39 @@ boolean MorsePreferencesMenu::menuExec(String mode)
     return false;
 }
 
+
+MorsePreferences::Item findItem(int itemNo) {
+    int i;
+    for (i = 0; (MorsePreferences::prefOption[i].pos != itemNo);) {
+        i += 1;
+    }
+    return MorsePreferences::prefOption[i];
+}
+
+
 //////// Display the preferences menu - we display the following preferences
 
 void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
 {
     MorseDisplay::clear();
-    if (pos < MorsePreferences::posLoraBand)
-    {
-        MorseDisplay::printOnStatusLine(true, 0, "Set Preferences: ");
-    }
-    else if (pos < MorsePreferences::posSnapRecall)
+
+    MorsePreferences::Item item = findItem(pos);
+
+    if (item.section == MorsePreferences::sectionLoRa)
     {
         MorseDisplay::printOnStatusLine(true, 0, "Config LoRa:     ");
     }
-    else
+    else if (item.section == MorsePreferences::sectionSnapshots)
     {
         MorseDisplay::printOnStatusLine(true, 0, "Manage Snapshots:");
     }
-    MorseDisplay::printOnScroll(1, BOLD, 0, MorsePreferences::prefOption[pos]);
+    else
+    {
+        MorseDisplay::printOnStatusLine(true, 0, "Set Preferences: ");
+    }
+    MorseDisplay::printOnScroll(1, BOLD, 0, item.title);
 
-    switch (pos)
+    switch (item.pos)
     {
         case MorsePreferences::posCurtisMode:
             internal::displayCurtisMode();
@@ -218,6 +231,10 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
         case MorsePreferences::posMaxSequence:
             internal::displayMaxSequence();
             break;
+        case MorsePreferences::sentinel: {
+            MorseDisplay::printToScroll(REGULAR, "Sorry, this should\nnot have happened!");
+            break;
+        }
     } /// switch (pos)
     MorseDisplay::displayDisplay();
 } // displayKeyerPreferences()
@@ -894,14 +911,14 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
 boolean MorsePreferencesMenu::setupPreferences(uint8_t atMenu)
 {
     // enum morserinoMode {morseKeyer, loraTrx, morseGenerator, echoTrainer, shutDown, morseDecoder, invalid };
-    static int oldPos = 1;
+    static int oldPos = 0;
     int t;
 
     int ptrIndex;
     MorsePreferences::prefPos posPtr;
 
     ///// we should check here if the old ptr (oldIndex) is contained in the current preferences collection (currentOptions)
-    ptrIndex = 1;
+    ptrIndex = 0;
 
     for (int i = 0; (MorsePreferences::currentOptions[i] != MorsePreferences::sentinel); ++i)
     {
