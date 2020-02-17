@@ -102,8 +102,39 @@ void TennisMachine::StateInitial::onLeave()
 
 }
 
-void TennisMachine::StateInitial::onMessageReceive(String message)
+TennisMachine::InitialMessageEnvelope TennisMachine::parseInitial(String message) {
+    TennisMachine::InitialMessageEnvelope msg;
+    const char *m = message.c_str();
+    msg.protocolVersion = ((uint8_t) m[0]) - 32;
+    msg.d.msgSet = ((uint8_t) m[1]) - 32;
+    msg.text = String(&(m[2]));
+    printf("msg: %d %d %s <- %s\n", msg.protocolVersion, msg.d.msgSet, msg.text.c_str(), message.c_str());
+    return msg;
+}
+
+String TennisMachine::encodeInitial(TennisMachine::InitialMessageEnvelope msg) {
+    String message;
+
+    char buf[3];
+    buf[0] = (char) msg.protocolVersion + 32;
+    buf[1] = (char) (msg.d.msgSet+32);
+    buf[2] = 0;
+    String prefix = String(buf);
+    message = prefix + msg.text;
+    printf("msg: %d %d %s -> %s (%s)\n", msg.protocolVersion, msg.d.msgSet, msg.text.c_str(), message.c_str(), prefix.c_str());
+    return message;
+}
+
+void TennisMachine::StateInitial::onMessageReceive(String rawMessage)
 {
+    TennisMachine::InitialMessageEnvelope inMsg = parseInitial(rawMessage);
+    if (inMsg.protocolVersion != TennisMachine::PROTOCOL_VERSION) {
+        machine->client.print("Spurious\nemission\nreceived :(");
+        machine->client.challengeSound(false);
+        return;
+    }
+
+    String message = inMsg.text;
     MORSELOGLN("StateInitial received " + message);
     WordBuffer msgBuf(message);
     if (msgBuf.matches(machine->config.cqCall))
@@ -122,7 +153,12 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
     {
         String us = message.getMatch();
         MORSELOGLN("StateInitial sent cq - off to invite sent - our call: '" + us + "'");
-        machine->client.sendAndPrint(message.getFullPatternMatch());
+        String text = message.getFullPatternMatch();
+        InitialMessageEnvelope msg;
+        msg.d.msgSet = 0;
+        msg.text = text;
+        machine->client.send(encodeInitial(msg));
+        machine->client.printSentMessage(text);
         message.getAndClear();
         machine->gameState.us.call = us;
         machine->switchToState(&machine->stateInviteSent);

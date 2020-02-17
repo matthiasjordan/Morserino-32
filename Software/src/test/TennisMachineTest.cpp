@@ -21,10 +21,9 @@ TennisMachine createSUT() {
     {   TESTPR("DISPLAY: '%s'\n", m.c_str());};
     client.printReceivedMessage = [](String m)
     {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
-    client.sendAndPrint = [](String m)
-    {   TESTPR("DISPLAY: '> %s'\n", m.c_str()); lastSent = m;};
     client.send = [](String m)
     {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
+    client.printSentMessage= [](String m) { TESTPR("DISPLAY: '> %s'\n", m.c_str()); lastSent = m;};
     client.challengeSound = [](boolean ok)
     { TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR"); lastChallenge = ok; };
     client.printScore = [](TennisMachine::GameState *g) { TESTPR("%s", ("\nus: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n").c_str()); };
@@ -194,7 +193,11 @@ void test_TennisMachine_4_we_get_invited()
     sut.start();
     assertEquals("1", "StateInitial", sut.getState());
 
-    sut.onMessageReceive("cq de xx1dx");
+    TennisMachine::InitialMessageEnvelope m;
+    m.d.msgSet = 5;
+    m.text = "cq de xx1dx";
+    String msg = TennisMachine::encodeInitial(m);
+    sut.onMessageReceive(msg);
     assertEquals("2", "StateInviteReceived", sut.getState());
 
     buf.addWord("err");
@@ -220,13 +223,29 @@ void test_TennisMachine_4_we_get_invited()
 }
 
 
+void test_TennisMachine_encodeInitialMessage() {
+    printf("Testing TennisMachine::InitialMessage 1\n");
+
+    TennisMachine::InitialMessageEnvelope msg;
+    msg.d.msgSet = 1;
+    msg.text = "hello world";
+
+    String encoded = TennisMachine::encodeInitial(msg);
+    TennisMachine::InitialMessageEnvelope decoded = TennisMachine::parseInitial(encoded);
+
+    assertEquals("test_TennisMachine_encodeInitialMessage 0", msg.protocolVersion, decoded.protocolVersion);
+    assertEquals("test_TennisMachine_encodeInitialMessage 1", msg.d.msgSet, decoded.d.msgSet);
+    assertEquals("test_TennisMachine_encodeInitialMessage 2", msg.text, decoded.text);
+}
+
 void test_TennisMachine()
 {
     printf("Testing TennisMachine\n");
+
+    test_TennisMachine_encodeInitialMessage();
 
     test_TennisMachine_1_we_initiate();
     test_TennisMachine_2();
     test_TennisMachine_3_with_typos();
     test_TennisMachine_4_we_get_invited();
-
 }

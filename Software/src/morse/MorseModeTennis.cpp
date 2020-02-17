@@ -52,7 +52,7 @@ boolean MorseModeTennis::menuExec(String mode)
     client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
     client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(FONT_INCOMING, "< " + m + "\n");};
     client.send = [](String m){ morseModeTennis.send(m);};
-    client.sendAndPrint = [](String m) {morseModeTennis.send(m); MorseDisplay::printToScroll(FONT_OUTGOING, "\n> " + m + "\n");};
+    client.printSentMessage= [](String m) {MorseDisplay::printToScroll(FONT_OUTGOING, "\n> " + m + "\n");};
     client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
     client.printScore = [](TennisMachine::GameState *g) { MorseDisplay::printToScroll(BOLD, "u: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n"); };
 

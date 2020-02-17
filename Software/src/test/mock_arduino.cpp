@@ -162,21 +162,11 @@ void String::replace(String &what, String &byWhat) {
     }
 }
 
-
-//void String::replace(String &what, String &byWhat) {
-//    size_type pos = find(what);
-//    if (pos != npos) {
-////        (pos, what.length(), byWhat);
-//        std::string prefix = substring(0, pos);
-//        std::string suffix = substring(pos + what.length());
-//        std::string replacement = prefix + byWhat + suffix;
-//        clear();
-////        copy(replacement, 1);
-////        ((std::string *)this) += replacement;
-////        this << (std::string) replacement;
-//        assign(replacement);
-//    }
-//}
+void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index) {
+    for (int i = 0; (i < bufsize); i++) {
+        buf[i] = c_str()[index + i];
+    }
+}
 
 void MockSerial::println(const char *a)
 {

@@ -8,6 +8,8 @@
 class TennisMachine
 {
     public:
+        static const uint8_t PROTOCOL_VERSION = 1;
+
         struct GameConfig {
             String cqCall;
             String dxdepat;
@@ -29,14 +31,28 @@ class TennisMachine
             String challenge;
         };
 
+        struct InitialMessageData {
+            uint8_t msgSet;
+        };
+
+        struct InitialMessageEnvelope {
+            uint8_t protocolVersion = PROTOCOL_VERSION;
+            InitialMessageData d;
+            String text;
+        };
+
+
+
         struct Client {
             void (*send)(String s);
-            void (*sendAndPrint)(String s);
+            void sendAndPrint(String s) {this->send(s); this->printSentMessage(s);};
             void (*print)(String s);
             void (*printReceivedMessage)(String s);
+            void (*printSentMessage)(String s);
             void (*printScore)(GameState *g);
             void (*challengeSound)(boolean ok);
         };
+
 
         void setClient(Client &c) {client = c;};
         void setGameConfig(GameConfig &c) {config = c;};
@@ -47,6 +63,9 @@ class TennisMachine
         void onMessageReceive(String message);
         void onMessageTransmit(WordBuffer &message);
         GameState getGameState();
+
+        static InitialMessageEnvelope parseInitial(String message);
+        static String encodeInitial(InitialMessageEnvelope msg);
 
 
     private:

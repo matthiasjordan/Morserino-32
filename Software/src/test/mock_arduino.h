@@ -24,7 +24,7 @@ class String {
 
 public:
 	String() { delegate = std::string();};
-	String(char *a) { delegate = std::string(a); };
+    String(char *a) { delegate = std::string(a); };
 	String(const char *a) { delegate = std::string(a);};
 	String(std::string a) { delegate = std::string(a);};
 	String(unsigned long a) { delegate = std::string(std::to_string(a));};
@@ -50,6 +50,7 @@ public:
     void replace(const char *what, String &byWhat);
     void replace(const char *what, const char *byWhat);
 	void replace(String &what, String &byWhat);
+	void getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index = 0);
 
 private:
 	std::string delegate;
