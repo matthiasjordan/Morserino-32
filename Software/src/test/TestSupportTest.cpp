@@ -2,8 +2,8 @@
 
 std::vector<const char*> failedFrameworkTests;
 
-
-void logFailure(const char* msg) {
+void logFailure(const char* msg)
+{
     failedFrameworkTests.push_back(msg);
     printf("%s -- %lu\n", msg, failedFrameworkTests.size());
 }
@@ -50,7 +50,21 @@ void test_TestSupport_aE4()
     }
 }
 
-void test_String1() {
+void test_TestSupport_aE5()
+{
+    printf("equals m5 is supposed to fail!\n");
+    failedTests.clear();
+    uint16_t a = 1;
+    uint16_t b = 2;
+    assertEquals("equals m5", a, b);
+    if (failedTests.size() != 1)
+    {
+        logFailure("FAILED: assertEquals(m5, uint16_t, uint16_t)");
+    }
+}
+
+void test_String1()
+{
     String a = String("a b c");
     String b = String("b");
     String x = String("x");
@@ -61,7 +75,8 @@ void test_String1() {
     }
 }
 
-void test_String2() {
+void test_String2()
+{
     String a = String("a b c");
     String x = String("x");
     a.replace("b", x);
@@ -71,7 +86,8 @@ void test_String2() {
     }
 }
 
-void test_String3() {
+void test_String3()
+{
     String a = String("a b c");
     a.replace("b", "x");
     if (a != "a x c")
@@ -86,6 +102,7 @@ void test_TestSupport_1()
     test_TestSupport_aE2();
     test_TestSupport_aE3();
     test_TestSupport_aE4();
+    test_TestSupport_aE5();
     test_String1();
     test_String2();
     test_String3();

@@ -10,7 +10,8 @@ class TennisMachine
     public:
         static const uint8_t PROTOCOL_VERSION = 1;
 
-        struct GameConfig {
+        struct MessageSet {
+            String name;
             String cqCall;
             String dxdepat;
             String dxdeus;
@@ -18,6 +19,13 @@ class TennisMachine
             String usdepat;
             String sendChallenge;
             String answerChallenge;
+        };
+
+        struct GameConfig {
+            uint8_t msgSetNo;
+            MessageSet msgSet;
+            uint8_t receiverPoints;
+            uint8_t senderPoints;
         };
 
         struct Station {
@@ -33,6 +41,7 @@ class TennisMachine
 
         struct InitialMessageData {
             uint8_t msgSet;
+            uint8_t scoring;
         };
 
         struct InitialMessageEnvelope {
@@ -44,18 +53,23 @@ class TennisMachine
 
 
         struct Client {
-            void (*send)(String s);
+            virtual void send(String s) = 0;
             void sendAndPrint(String s) {this->send(s); this->printSentMessage(s);};
-            void (*print)(String s);
-            void (*printReceivedMessage)(String s);
-            void (*printSentMessage)(String s);
-            void (*printScore)(GameState *g);
-            void (*challengeSound)(boolean ok);
+            virtual void print(String s) = 0;
+            virtual void printReceivedMessage(String s) = 0;
+            virtual void printSentMessage(String s) = 0;
+            virtual void printScore(GameState *g) = 0;
+            virtual void challengeSound(boolean ok) = 0;
+            virtual void handle(InitialMessageData *d) = 0;
+            virtual MessageSet* getMsgSet() = 0;
+
+            TennisMachine *machine;
         };
 
 
-        void setClient(Client &c) {client = c;};
+        void setClient(Client *c) {client = c; client->machine = this;};
         void setGameConfig(GameConfig &c) {config = c;};
+        GameConfig *getGameConfig();
 
         void start();
         const char* getState();
@@ -198,7 +212,7 @@ class TennisMachine
 
         State *currentState = 0;
 
-        Client client;
+        Client *client;
         GameConfig config;
         GameState gameState;
 

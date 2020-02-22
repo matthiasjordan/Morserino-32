@@ -13,8 +13,8 @@ void assertEquals(const char* msg, const char *expected, String actual);
 void assertEquals(const char* msg, String expected, String actual);
 void assertEquals(const char* msg, std::string expected, std::string actual);
 void assertEquals(const char* msg, const char *expected, const char* actual);
-void assertEquals(const char* msg, bool expected, bool actual);
+void assertEquals(const char* msg, int expected, int actual);
 void assertTrue(const char* msg, bool actual);
-
+void assertFalse(const char* msg, bool actual);
 
 #endif

@@ -61,6 +61,8 @@ const Item MorsePreferences::prefOption[] = { //
                 {posQuickStart, "Quick Start  ", sectionMain}, //
                 {posMaxSequence, "Max # of Words", sectionMain}, //
                 {posStraightKey, "Straight key ", sectionMain}, //
+                {posTennisMsgSet, "Msg set", sectionMain}, //
+                {posTennisScoringRules, "Scoring", sectionMain}, //
                 {posLoraSyncW, "LoRa Channel  ", sectionLoRa}, //
                 {posLoraBand, "LoRa Band    ", sectionLoRa}, //
                 {posLoraQRG, "LoRa Frequ   ", sectionLoRa}, //
@@ -87,7 +89,7 @@ prefPos MorsePreferences::kochGenOptions[] = {posRandomLength, posAbbrevLength, 
         posWordDoubler, posKeyTrainerMode, posLoraTrainerMode, posKochSeq, sentinel};
 prefPos MorsePreferences::kochEchoOptions[] = {posEchoToneShift, posRandomLength, posAbbrevLength, posWordLength, posMaxSequence,
         posEchoRepeats, posEchoDisplay, posEchoConf, posSpeedAdapt, posKochSeq, sentinel};
-prefPos MorsePreferences::morseTennisOptions[] = {posLoraSyncW, sentinel};
+prefPos MorsePreferences::morseTennisOptions[] = {posTennisMsgSet, posTennisScoringRules, posLoraSyncW, sentinel};
 prefPos MorsePreferences::loraTrxOptions[] = {posEchoToneShift, posLoraSyncW, sentinel};
 prefPos MorsePreferences::extTrxOptions[] = {posEchoToneShift, posGoertzelBandwidth, sentinel};
 prefPos MorsePreferences::decoderOptions[] = {posGoertzelBandwidth, sentinel};
@@ -298,6 +300,9 @@ MorsePrefs MorsePreferences::readPreferences(String repository)
     p.lcwoKochSeq = pref.getBool("lcwoKochSeq");
     p.quickStart = pref.getBool("quickStart");
 
+    p.tennisMsgSet = pref.getUChar("tennisMsgSet");
+    p.tennisScoringRules = pref.getUChar("tennisScoring");
+
     if (atStart)
     {
         if ((temp = pref.getUChar("loraBand")))
@@ -439,6 +444,11 @@ void MorsePreferences::writePreferences(String repository)
         pref.putUChar("timeOut", p.timeOut);
     if (p.quickStart != pref.getBool("quickStart"))
         pref.putBool("quickStart", p.quickStart);
+
+    if (p.tennisMsgSet != pref.getUChar("tennisMsgSet"))
+        pref.putUChar("tennisMsgSet", p.tennisMsgSet);
+    if (p.tennisScoringRules != pref.getUChar("tennisScoring"))
+        pref.putUChar("tennisScoring", p.tennisScoringRules);
 
     if (p.snapShots != pref.getUChar("snapShots"))
         pref.putUChar("snapShots", p.snapShots);

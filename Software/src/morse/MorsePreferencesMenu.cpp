@@ -66,6 +66,8 @@ namespace internal
     void displayKochSeq();
     void displayTimeOut();
     void displayQuickStart();
+    void displayTennisMsgSet();
+    void displayTennisScoring();
     void displayLoraBand();
     void displayLoraQRG();
     void displaySnapRecall();
@@ -230,6 +232,12 @@ void MorsePreferencesMenu::displayKeyerPreferencesMenu(int pos)
             break;
         case MorsePreferences::posMaxSequence:
             internal::displayMaxSequence();
+            break;
+        case MorsePreferences::posTennisMsgSet:
+            internal::displayTennisMsgSet();
+            break;
+        case MorsePreferences::posTennisScoringRules:
+            internal::displayTennisScoring();
             break;
         case MorsePreferences::sentinel: {
             MorseDisplay::printToScroll(REGULAR, "Sorry, this should\nnot have happened!");
@@ -553,6 +561,42 @@ void internal::displayQuickStart()
     MorseDisplay::printOnScroll(2, REGULAR, 1, MorsePreferences::prefs.quickStart ? "ON         " : "OFF        ");
 }
 
+void internal::displayTennisMsgSet()
+{
+    String option;
+    switch (MorsePreferences::prefs.tennisMsgSet)
+    {
+        case 0:
+            option = "Beginner     ";
+            break;
+        case 1:
+            option = "Intermediate ";
+            break;
+        case 2:
+            option = "Hardcore     ";
+            break;
+    }
+    MorseDisplay::printOnScroll(2, REGULAR, 1, option);
+}
+
+
+void internal::displayTennisScoring()
+{
+    String option;
+    switch (MorsePreferences::prefs.tennisScoringRules)
+    {
+        case 0:
+            option = "Cooperative  ";
+            break;
+        case 1:
+            option = "Contest      ";
+            break;
+    }
+    MorseDisplay::printOnScroll(2, REGULAR, 1, option);
+}
+
+
+
 void internal::displayLoraBand()
 {
     String bandName;
@@ -848,6 +892,16 @@ boolean MorsePreferencesMenu::adjustKeyerPreference(MorsePreferences::prefPos po
                 case MorsePreferences::posQuickStart:
                     MorsePreferences::prefs.quickStart = !MorsePreferences::prefs.quickStart;
                     internal::displayQuickStart();
+                    break;
+                case MorsePreferences::posTennisMsgSet:
+                    MorsePreferences::prefs.tennisMsgSet += (t + 1);
+                    MorsePreferences::prefs.tennisMsgSet = constrain(MorsePreferences::prefs.tennisMsgSet - 1, 0, 2);
+                    internal::displayTennisMsgSet();
+                    break;
+                case MorsePreferences::posTennisScoringRules:
+                    MorsePreferences::prefs.tennisScoringRules += (t + 1);
+                    MorsePreferences::prefs.tennisScoringRules = constrain(MorsePreferences::prefs.tennisScoringRules - 1, 0, 1);
+                    internal::displayTennisScoring();
                     break;
                 case MorsePreferences::posLoraBand:
                     MorsePreferences::prefs.loraBand += (t + 1);                              // set the LoRa band

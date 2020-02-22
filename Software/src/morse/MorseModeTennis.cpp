@@ -22,6 +22,114 @@
 
 MorseModeTennis morseModeTennis;
 
+void MorseModeTennis::ModeClient::print(String m)
+{
+    MorseDisplay::printToScroll(BOLD, m);
+}
+
+void MorseModeTennis::ModeClient::printReceivedMessage(String m)
+{
+    MorseDisplay::printToScroll(FONT_INCOMING, "< " + m + "\n");
+}
+
+void MorseModeTennis::ModeClient::send(String m)
+{
+    morseModeTennis.send(m);
+}
+
+void MorseModeTennis::ModeClient::printSentMessage(String m)
+{
+    MorseDisplay::printToScroll(FONT_OUTGOING, "\n> " + m + "\n");
+}
+
+void MorseModeTennis::ModeClient::challengeSound(boolean ok)
+{
+    ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR();
+}
+
+void MorseModeTennis::ModeClient::printScore(TennisMachine::GameState *g)
+{
+    MorseDisplay::printToScroll(BOLD, "u: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n");
+}
+
+void MorseModeTennis::ModeClient::handle(TennisMachine::InitialMessageData *d)
+{
+    TennisMachine::GameConfig gameConfig;
+    MorseModeTennis::updateMsgSet(d->msgSet, gameConfig);
+    MorseModeTennis::updateScoringRules(d->scoring, gameConfig);
+    machine->setGameConfig(gameConfig);
+}
+
+TennisMachine::MessageSet *MorseModeTennis::ModeClient::getMsgSet()
+{
+    return &machine->getGameConfig()->msgSet;
+}
+
+void MorseModeTennis::updateMsgSet(uint8_t msgSetNo, TennisMachine::GameConfig& gameConfig)
+{
+    gameConfig.msgSetNo = msgSetNo;
+    MORSELOGLN("MMT::updateMsgSet " + String(msgSetNo));
+    switch (msgSetNo)
+    {
+        case 0:
+        {
+            gameConfig.msgSet.name = "Basic";
+            gameConfig.msgSet.cqCall = "cq de #";
+            gameConfig.msgSet.dxdepat = "$dx de #";
+            gameConfig.msgSet.dxdeus = "$dx de $us";
+            gameConfig.msgSet.usdedx = "$us de $dx";
+            gameConfig.msgSet.usdepat = "$us de #";
+            gameConfig.msgSet.sendChallenge = "# #";
+            gameConfig.msgSet.answerChallenge = "#";
+            break;
+        }
+        case 1:
+        {
+            gameConfig.msgSet.name = "Advanced";
+            gameConfig.msgSet.cqCall = "cq cq cq de # # # +";
+            gameConfig.msgSet.dxdepat = "$dx de # k";
+            gameConfig.msgSet.dxdeus = "$dx de $us k";
+            gameConfig.msgSet.usdedx = "$us de $dx k";
+            gameConfig.msgSet.usdepat = "$us de # k";
+            gameConfig.msgSet.sendChallenge = "# #";
+            gameConfig.msgSet.answerChallenge = "#";
+            break;
+        }
+        case 2:
+        {
+            gameConfig.msgSet.name = "Top notch";
+            gameConfig.msgSet.cqCall = "cq cq cq de # # # +";
+            gameConfig.msgSet.dxdepat = "$dx de # k";
+            gameConfig.msgSet.dxdeus = "$dx de $us k";
+            gameConfig.msgSet.usdedx = "$us de $dx k";
+            gameConfig.msgSet.usdepat = "$us de # k";
+            gameConfig.msgSet.sendChallenge = "$dx de $us # # k";
+            gameConfig.msgSet.answerChallenge = "$dx de $us # k";
+            break;
+        }
+    }
+}
+
+void MorseModeTennis::updateScoringRules(unsigned char scoringRules, TennisMachine::GameConfig& gameConfig)
+{
+    MORSELOGLN("MMT::updateScoring " + String(scoringRules));
+    switch (scoringRules)
+    {
+        case 0:
+        {
+            gameConfig.senderPoints = 1;
+            gameConfig.receiverPoints = 1;
+            break;
+        }
+        case 1:
+        {
+            gameConfig.senderPoints = 0;
+            gameConfig.receiverPoints = 1;
+            break;
+        }
+    }
+}
+
 boolean MorseModeTennis::menuExec(String mode)
 {
     MorsePreferences::currentOptions = MorsePreferences::morseTennisOptions;               // list of available options in lora trx mode
@@ -38,44 +146,27 @@ boolean MorseModeTennis::menuExec(String mode)
     MorseKeyer::clearPaddleLatches();
     MorseKeyer::keyTx = false;
 
+    unsigned char msgSet = MorsePreferences::prefs.tennisMsgSet;
+    unsigned char scoringRules = MorsePreferences::prefs.tennisScoringRules;
     TennisMachine::GameConfig gameConfig;
-    gameConfig.cqCall = "cq de #";
-    gameConfig.dxdepat = "$dx de #";
-    gameConfig.dxdeus = "$dx de $us";
-    gameConfig.usdedx = "$us de $dx";
-    gameConfig.usdepat = "$us de #";
-    gameConfig.sendChallenge = "# #";
-    gameConfig.answerChallenge = "#";
+    updateMsgSet(msgSet, gameConfig);
+    updateScoringRules(scoringRules, gameConfig);
     machine.setGameConfig(gameConfig);
-
-    TennisMachine::Client client;
-    client.print = [](String m) { MorseDisplay::printToScroll(BOLD, m);};
-    client.printReceivedMessage = [](String m) { MorseDisplay::printToScroll(FONT_INCOMING, "< " + m + "\n");};
-    client.send = [](String m){ morseModeTennis.send(m);};
-    client.printSentMessage= [](String m) {MorseDisplay::printToScroll(FONT_OUTGOING, "\n> " + m + "\n");};
-    client.challengeSound = [] (boolean ok) { ok ? MorseSound::soundSignalOK() : MorseSound::soundSignalERR(); };
-    client.printScore = [](TennisMachine::GameState *g) { MorseDisplay::printToScroll(BOLD, "u: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n"); };
-
-    machine.setClient(client);
+    machine.setClient(&client);
 
     MorseInput::start([](String c)
-        {
-            Serial.println("char " + c);
-            MorseDisplay::printToScroll(FONT_OUTGOING, c);
-            morseModeTennis.sendBuffer.addChar(c);
-        },
-        []()
-        {
-            MorseDisplay::printToScroll(FONT_OUTGOING, " ");
-            morseModeTennis.sendBuffer.endWord();
-            morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
-        }
-    );
-
-
+    {
+        Serial.println("char " + c);
+        MorseDisplay::printToScroll(FONT_OUTGOING, c);
+        morseModeTennis.sendBuffer.addChar(c);
+    }, []()
+    {
+        MorseDisplay::printToScroll(FONT_OUTGOING, " ");
+        morseModeTennis.sendBuffer.endWord();
+        morseModeTennis.machine.onMessageTransmit(morseModeTennis.sendBuffer);
+    });
 
     MorseDisplay::getConfig()->autoFlush = true;
-
 
     MorseLoRa::receive();
 
@@ -104,7 +195,6 @@ void MorseModeTennis::onPreferencesChanged()
 {
 
 }
-
 
 /**
  * We call this to send a message.

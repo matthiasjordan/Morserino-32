@@ -7,36 +7,72 @@
 
 #include "TestSupport.h"
 #include "TennisMachine.h"
+#include "TennisMachineTest.h"
 
 #define TESTPR(m,v) printf(m, v)
 
 String lastSent;
 boolean lastChallenge;
 
-TennisMachine createSUT() {
-    TennisMachine sut;
+void TestClient::print(String m)
+{
+    TESTPR("DISPLAY: '%s'\n", m.c_str());
+}
 
-    TennisMachine::Client client;
-    client.print = [](String m)
-    {   TESTPR("DISPLAY: '%s'\n", m.c_str());};
-    client.printReceivedMessage = [](String m)
-    {   TESTPR("DISPLAY: '< %s'\n", m.c_str());};
-    client.send = [](String m)
-    {   TESTPR("> '%s'\n", m.c_str()); lastSent = m;};
-    client.printSentMessage= [](String m) { TESTPR("DISPLAY: '> %s'\n", m.c_str()); lastSent = m;};
-    client.challengeSound = [](boolean ok)
-    { TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR"); lastChallenge = ok; };
-    client.printScore = [](TennisMachine::GameState *g) { TESTPR("%s", ("\nus: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n").c_str()); };
+void TestClient::printReceivedMessage(String m)
+{
+    TESTPR("DISPLAY: '< %s'\n", m.c_str());
+}
+
+void TestClient::send(String m)
+{
+    TESTPR("> '%s'\n", m.c_str());
+    lastSent = m;
+}
+
+void TestClient::printSentMessage(String m)
+{
+    TESTPR("DISPLAY: '> %s'\n", m.c_str());
+    lastSent = m;
+}
+
+void TestClient::challengeSound(boolean ok)
+{
+    TESTPR("CHALLENGE %s'\n", ok ? "OK" : "ERR");
+    lastChallenge = ok;
+}
+
+void TestClient::printScore(TennisMachine::GameState *g)
+{
+    TESTPR("%s", ("\nus: " + String(g->us.points) + " dx: " + String(g->dx.points) + "\n").c_str());
+}
+
+void TestClient::handle(TennisMachine::InitialMessageData *d)
+{
+}
+
+TennisMachine::MessageSet* TestClient::getMsgSet()
+{
+    return &machine->getGameConfig()->msgSet;
+}
+
+TennisMachine createSUT()
+{
+    TennisMachine sut;
+    TestClient *client = new TestClient;
     sut.setClient(client);
 
     TennisMachine::GameConfig gameConfig;
-    gameConfig.cqCall = "cq de #";
-    gameConfig.dxdepat = "$dx de #";
-    gameConfig.dxdeus = "$dx de $us";
-    gameConfig.usdedx = "$us de $dx";
-    gameConfig.usdepat = "$us de #";
-    gameConfig.sendChallenge = "# #";
-    gameConfig.answerChallenge = "#";
+    gameConfig.msgSet.cqCall = "cq de #";
+    gameConfig.msgSet.dxdepat = "$dx de #";
+    gameConfig.msgSet.dxdeus = "$dx de $us";
+    gameConfig.msgSet.usdedx = "$us de $dx";
+    gameConfig.msgSet.usdepat = "$us de #";
+    gameConfig.msgSet.sendChallenge = "# #";
+    gameConfig.msgSet.answerChallenge = "#";
+
+    gameConfig.receiverPoints = 1;
+    gameConfig.senderPoints = 0;
     sut.setGameConfig(gameConfig);
 
     return sut;
@@ -80,20 +116,19 @@ void test_TennisMachine_1_we_initiate()
 
     sut.onMessageReceive("hellm");
     assertEquals("8", "StateStartRoundReceiver", sut.getState());
-    assertTrue("9 points us", 0 == sut.getGameState().us.points);
-    assertTrue("10 points dx", 0 == sut.getGameState().dx.points)
-    ;
+    assertEquals("9 points us", 0, sut.getGameState().us.points);
+    assertEquals("10 points dx", 0, sut.getGameState().dx.points);
     sut.onMessageReceive("foo");
     assertEquals("11", "StateChallengeReceived", sut.getState());
-    assertTrue("12 points us", 0 == sut.getGameState().us.points);
-    assertTrue("13 points dx", 0 == sut.getGameState().dx.points);
+    assertEquals("12 points us", 0, sut.getGameState().us.points);
+    assertEquals("13 points dx", 0, sut.getGameState().dx.points);
 
     buf.addWord("foo");
     sut.onMessageTransmit(buf);
     // Failed to key same word twice - so stay on curent state
     assertEquals("14", "StateStartRoundSender", sut.getState());
-    assertTrue("15 points us", 1 == sut.getGameState().us.points);
-    assertTrue("16 points dx", 0 == sut.getGameState().dx.points);
+    assertEquals("15 points us", 1, sut.getGameState().us.points);
+    assertEquals("16 points dx", 0, sut.getGameState().dx.points);
 
     buf.addWord("bar bar");
     sut.onMessageTransmit(buf);
@@ -102,17 +137,17 @@ void test_TennisMachine_1_we_initiate()
 
     sut.onMessageReceive("bar");
     assertEquals("18", "StateStartRoundReceiver", sut.getState());
-    assertTrue("19 points us", 1 == sut.getGameState().us.points);
-    assertTrue("20 points dx", 1 == sut.getGameState().dx.points);
+    assertEquals("19 points us", 1, sut.getGameState().us.points);
+    assertEquals("20 points dx", 1, sut.getGameState().dx.points);
 
     buf.addWord("<sk>");
     sut.onMessageTransmit(buf);
     // Managed to key same word twice - advance to next state
-    assertEquals("18", "StateEnd", sut.getState());
+    assertEquals("21", "StateEnd", sut.getState());
 
     WordBuffer wordBuffer = WordBuffer("<ka>");
     sut.onMessageTransmit(wordBuffer);
-    assertEquals("19", "StateInitial", sut.getState());
+    assertEquals("22", "StateInitial", sut.getState());
 
 }
 
@@ -149,7 +184,6 @@ void test_TennisMachine_2()
     assertEquals("7", "StateInitial", sut.getState());
 }
 
-
 void test_TennisMachine_3_with_typos()
 {
     printf("Testing TennisMachine 3\n");
@@ -182,7 +216,6 @@ void test_TennisMachine_3_with_typos()
     sut.onMessageTransmit(wordBuffer);
     assertEquals("7", "StateInitial", sut.getState());
 }
-
 
 void test_TennisMachine_4_we_get_invited()
 {
@@ -219,11 +252,10 @@ void test_TennisMachine_4_we_get_invited()
     sut.onMessageReceive("vvv");
     assertEquals("4", "StateChallengeReceived", sut.getState());
 
-
 }
 
-
-void test_TennisMachine_encodeInitialMessage() {
+void test_TennisMachine_encodeInitialMessage()
+{
     printf("Testing TennisMachine::InitialMessage 1\n");
 
     TennisMachine::InitialMessageEnvelope msg;

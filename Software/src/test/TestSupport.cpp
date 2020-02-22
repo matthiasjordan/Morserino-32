@@ -19,12 +19,13 @@ const char* toString(bool b)
     return b ? "true" : "false";
 }
 
-
-void assertEquals(const char* msg, const char *expected, String actual) {
+void assertEquals(const char* msg, const char *expected, String actual)
+{
     assertEquals(msg, expected, actual.c_str());
 }
 
-void assertEquals(const char* msg, String expected, String actual) {
+void assertEquals(const char* msg, String expected, String actual)
+{
     assertEquals(msg, expected.c_str(), actual.c_str());
 }
 
@@ -42,17 +43,30 @@ void assertEquals(const char* msg, const char* expected, const char* actual)
     }
 }
 
-void assertEquals(const char* msg, bool expected, bool actual)
+void assertEquals(const char* msg, int expected, int actual)
 {
     if (expected != actual)
     {
-        printf("FAILED: %s - expected: %s, actual: %s\n", msg, toString(expected), toString(actual));
+        printf("FAILED: %s - expected: %s, actual: %s\n", msg, String(expected).c_str(), String(actual).c_str());
         failedTests.push_back(msg);
     }
 }
 
 void assertTrue(const char* msg, bool actual)
 {
-    assertEquals(msg, true, actual);
+    if (!actual)
+    {
+        printf("FAILED: %s - expected: true, actual: %s\n", msg, toString(actual));
+        failedTests.push_back(msg);
+    }
+}
+
+void assertFalse(const char* msg, bool actual)
+{
+    if (actual)
+    {
+        printf("FAILED: %s - expected: false, actual: %s\n", msg, toString(actual));
+        failedTests.push_back(msg);
+    }
 }
 

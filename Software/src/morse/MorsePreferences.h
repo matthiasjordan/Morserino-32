@@ -49,6 +49,8 @@ namespace MorsePreferences
         posLoraQRG,
         posSnapRecall,
         posSnapStore,
+        posTennisMsgSet,
+        posTennisScoringRules,
         //
         sentinel
     };
@@ -150,6 +152,8 @@ namespace MorsePreferences
             uint8_t snapShots = 0;                    // keep track which snapshots are being used ( 0 .. 7, called 1 to 8)
             uint8_t maxSequence = 0;                  // max # of words generated beofre the Morserino pauses
 
+            uint8_t tennisMsgSet = 0;
+            uint8_t tennisScoringRules = 0;
             ////// end of variables stored in preferences
 
     };
