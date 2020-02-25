@@ -4,6 +4,12 @@ Work in progress 2.2.0
 
 * Straight key support as input method for all modes: users can use a straight 
   key and play Morse Tennis, use the Echo trainer or learn new Koch characters.
+  
+* Preferences overhaul: In top level, all preferences options are available.
+  Inside of a mode only those options are available that are relevant to the
+  current mode. E.g. Encoder Click is no longer in every mode but only in the
+  top level options because once you selected it, you probably don't care any
+  more. Same for other more general config options like CurtisB DitT% and so on.
 
 
 Release 2.1.0
