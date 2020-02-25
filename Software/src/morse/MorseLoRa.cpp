@@ -106,7 +106,7 @@ void internal::loraSystemSetup()
 void MorseLoRa::sendWithLora(const char loraTxBuffer[])
 {           // hand this string over as payload to the LoRA transceiver
     // send packet
-    Serial.println("MLR:sWL '" + String(loraTxBuffer) + "'");
+    MORSELOGLN("MLR:sWL '" + String(loraTxBuffer) + "'");
     LoRa.beginPacket();
     LoRa.print(loraTxBuffer);
     LoRa.endPacket();
@@ -132,7 +132,7 @@ void internal::onReceive(int packetSize)
     }
     else
     {
-        Serial.println("LoRa Packet longer than 48 bytes! Discarded...");
+        MORSELOGLN("LoRa Packet longer than 48 bytes! Discarded...");
     }
     // print RSSI of packet
 }
@@ -225,7 +225,7 @@ void internal::storePacket(int rssi, String packet)
 {             // whenever we receive something, we just store it in our buffer
     if (loRaBuWrite(rssi, packet) == 0)
     {
-        Serial.println("LoRa Buffer full");
+        MORSELOGLN("LoRa Buffer full");
     }
 }
 

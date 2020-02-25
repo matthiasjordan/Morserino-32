@@ -156,7 +156,7 @@ boolean MorseModeTennis::menuExec(String mode)
 
     MorseInput::start([](String c)
     {
-        Serial.println("char " + c);
+        MORSELOGLN("char " + c);
         MorseDisplay::printToScroll(FONT_OUTGOING, c);
         morseModeTennis.sendBuffer.addChar(c);
     }, []()
@@ -201,7 +201,7 @@ void MorseModeTennis::onPreferencesChanged()
  */
 void MorseModeTennis::send(String message)
 {
-    Serial.println("MMT::send " + message);
+    MORSELOGLN("MMT::send " + message);
     MorseLoRa::sendWithLora((const char*) message.c_str());
 }
 

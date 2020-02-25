@@ -96,7 +96,6 @@ String* split(String s)
  */
 boolean WordBuffer::matches(String pattern)
 {
-    Serial.println("WordBuffer matches " + pattern);
     String tmppat = pattern;
     String tmpbuf = buffer;
     String wildcardContent = "";
@@ -147,7 +146,6 @@ boolean WordBuffer::matches(String pattern)
 
 boolean WordBuffer::textOK(String s) {
     int i = s.indexOf('*');
-    Serial.println("textOK " + s + " -> " + String(i));
     return (i == -1);
 }
 

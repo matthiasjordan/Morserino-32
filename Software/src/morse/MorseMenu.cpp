@@ -363,6 +363,6 @@ void MorseMenu::cleanStartSettings()
 
 boolean internal::nothing(String mode)
 {
-    Serial.println("This should not be called: " + mode);
+    MORSELOGLN("This should not be called: " + mode);
     return false;
 }
