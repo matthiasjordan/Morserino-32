@@ -42,7 +42,6 @@ namespace internal
 {
     void menuDisplay(uint8_t ptr);
     boolean menuExec();
-    boolean nothing(String mode);
 }
 
 ////// The MENU
@@ -56,13 +55,13 @@ enum navi
 
 
 const MenuItem menuItems[] = {
-        {"", _dummy, {0, 0, 0, 0, 0}, MorseText::NA, MorsePreferences::allOptions, true, &internal::nothing, "", 0}, //
+        {"", _dummy, {0, 0, 0, 0, 0}, MorseText::NA, MorsePreferences::allOptions, true, 0, "", 0}, //
 
         {"CW Keyer", _keyer, {0, _goToSleep, _gen, _dummy, 0}, MorseText::NA, MorsePreferences::keyerOptions, true,
                 0, "a", &morseModeKeyer}, //
 
         {"CW Generator", _gen, {0, _keyer, _echo, _dummy, _genRand}, MorseText::NA, MorsePreferences::generatorOptions, true,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"Random", _genRand, {1, _genPlayer, _genAbb, _gen, 0}, MorseText::RANDOMS, MorsePreferences::generatorOptions, true,
                 0, "a", &morseModeGenerator}, //
         {"CW Abbrevs", _genAbb, {1, _genRand, _genWords, _gen, 0}, MorseText::ABBREVS, MorsePreferences::generatorOptions, true,
@@ -77,7 +76,7 @@ const MenuItem menuItems[] = {
                 0, "player", &morseModeGenerator}, //
 
         {"Echo Trainer", _echo, {0, _gen, _koch, _dummy, _echoRand}, MorseText::NA, MorsePreferences::echoTrainerOptions, true,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"Random", _echoRand, {1, _echoPlayer, _echoAbb, _echo, 0}, MorseText::RANDOMS, MorsePreferences::echoTrainerOptions, true,
                 0, "a", &morseModeEchoTrainer}, //
         {"CW Abbrevs", _echoAbb, {1, _echoRand, _echoWords, _echo, 0}, MorseText::ABBREVS, MorsePreferences::echoTrainerOptions, true,
@@ -92,13 +91,13 @@ const MenuItem menuItems[] = {
                 true, 0, "player", &morseModeEchoTrainer}, //
 
         {"Koch Trainer", _koch, {0, _echo, _head, _dummy, _kochSel}, MorseText::NA, MorsePreferences::kochEchoOptions, true,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"Select Lesson", _kochSel, {1, _kochEcho, _kochLearn, _koch, 0}, MorseText::NA, MorsePreferences::kochEchoOptions, true,
                 &MorsePreferencesMenu::menuExec, "selectKoch", 0}, //
         {"Learn New Chr", _kochLearn, {1, _kochSel, _kochGen, _koch, 0}, MorseText::KOCH_LEARN, MorsePreferences::kochEchoOptions,
                 true, 0, "learn", &morseModeKoch}, //
         {"CW Generator", _kochGen, {1, _kochLearn, _kochEcho, _koch, _kochGenRand}, MorseText::NA, MorsePreferences::kochGenOptions,
-                true, &internal::nothing, "", 0}, //
+                true, 0, "", 0}, //
         {"Random", _kochGenRand, {2, _kochGenMixed, _kochGenAbb, _kochGen, 0}, MorseText::RANDOMS, MorsePreferences::kochGenOptions,
                 true, 0, "trainer", &morseModeKoch}, //
         {"CW Abbrevs", _kochGenAbb, {2, _kochGenRand, _kochGenWords, _kochGen, 0}, MorseText::ABBREVS,
@@ -109,7 +108,7 @@ const MenuItem menuItems[] = {
                 true, 0, "trainer", &morseModeKoch}, //
 
         {"Echo Trainer", _kochEcho, {1, _kochGen, _kochSel, _koch, _kochEchoRand}, MorseText::NA, MorsePreferences::kochEchoOptions,
-                true, &internal::nothing, "", 0}, //
+                true, 0, "", 0}, //
         {"Random", _kochEchoRand, {2, _kochEchoMixed, _kochEchoAbb, _kochEcho, 0}, MorseText::RANDOMS,
                 MorsePreferences::kochEchoOptions, true, 0, "echo", &morseModeKoch}, //
         {"CW Abbrevs", _kochEchoAbb, {2, _kochEchoRand, _kochEchoWords, _kochEcho, 0}, MorseText::ABBREVS,
@@ -120,7 +119,7 @@ const MenuItem menuItems[] = {
                 MorsePreferences::kochEchoOptions, true, 0, "echo", &morseModeKoch}, //
 
         {"Head Copying", _head, {0, _koch, _tennis, _dummy, _headRand}, MorseText::NA, MorsePreferences::headOptions, true,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"Random", _headRand, {1, _headPlayer, _headAbb, _head, 0}, MorseText::RANDOMS, MorsePreferences::headOptions, true,
                 0, "a", &morseModeHeadCopying}, //
         {"CW Abbrevs", _headAbb, {1, _headRand, _headWords, _head, 0}, MorseText::ABBREVS, MorsePreferences::headOptions, true,
@@ -135,10 +134,10 @@ const MenuItem menuItems[] = {
                 0, "player", &morseModeHeadCopying}, //
 
         {"Morse Tennis", _tennis, {0, _head, _trx, _dummy, 0}, MorseText::NA, MorsePreferences::morseTennisOptions, true,
-               &internal::nothing, "", &morseModeTennis}, //
+               0, "", &morseModeTennis}, //
 
         {"Transceiver", _trx, {0, _tennis, _decode, _dummy, _trxLora}, MorseText::NA, MorsePreferences::noOptions, true,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"LoRa Trx", _trxLora, {1, _trxIcw, _trxIcw, _trx, 0}, MorseText::NA, MorsePreferences::loraTrxOptions, true,
                 0, "trx", &morseModeLoRa}, //
         {"iCW/Ext Trx", _trxIcw, {1, _trxLora, _trxLora, _trx, 0}, MorseText::NA, MorsePreferences::extTrxOptions, true,
@@ -148,7 +147,7 @@ const MenuItem menuItems[] = {
                 "a", &morseModeDecoder}, //
 
         {"WiFi Functions", _wifi, {0, _decode, _goToSleep, _dummy, _wifi_mac}, MorseText::NA, MorsePreferences::noOptions, false,
-                &internal::nothing, "", 0}, //
+                0, "", 0}, //
         {"Disp MAC Addr", _wifi_mac, {1, _wifi_update, _wifi_config, _wifi, 0}, MorseText::NA, MorsePreferences::noOptions, false,
                 &MorseWifi::menuExec, "mac", 0}, //
         {"Config WiFi", _wifi_config, {1, _wifi_mac, _wifi_check, _wifi, 0}, MorseText::NA, MorsePreferences::noOptions, false,
@@ -359,10 +358,4 @@ void MorseMenu::cleanStartSettings()
     MorseKeyer::keyerState = MorseKeyer::IDLE_STATE;
     Decoder::interWordTimer = 4294967000;   // almost the biggest possible unsigned long number :-) - do not output a space at the beginning
     MorseDisplay::displayTopLine();
-}
-
-boolean internal::nothing(String mode)
-{
-    MORSELOGLN("This should not be called: " + mode);
-    return false;
 }
