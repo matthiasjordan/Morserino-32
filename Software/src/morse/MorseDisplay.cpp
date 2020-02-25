@@ -235,8 +235,15 @@ void MorseDisplay::flushScroll()
     {
         for (int i = 0; (i < len); i++)
         {
-            String t = printToScroll_buffer.substring(i, i + 1);
-            //MORSELOGf(" flushing %d<%s> ", i, t.c_str());
+            char c = printToScroll_buffer.charAt(i);
+            uint8_t codeUnitCount = 1;
+            while (c & B10000000) {
+                // if topmost bit is set this is a UTF-8 multi-code-unit char and
+                // we search for the first 0 bit to determine the number of code-units.
+                codeUnitCount += 1;
+                c = c << 1;
+            }
+            String t = printToScroll_buffer.substring(i, i + codeUnitCount);
             printToScroll_internal(printToScroll_lastStyle, t);
         }
         clearScrollBuffer();
