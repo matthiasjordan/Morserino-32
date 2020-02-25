@@ -54,6 +54,12 @@ static unsigned char lora_bits[] = {0x0f, 0x18, 0x33, 0x24, 0x29, 0x2b, 0x29, 0x
 // define OLED display and its address - the Heltec ESP32 LoRA uses its display on 0x3c
 SSD1306 display(0x3c, OLED_SDA, OLED_SCL, OLED_RST);
 
+
+inline int16_t lineToY(uint8_t line) {
+    return SCROLL_TOP + line * LINE_HEIGHT;
+}
+
+
 void MorseDisplay::init()
 {
     display.init();
@@ -371,7 +377,7 @@ void MorseDisplay::refreshScrollLine(int bufferLine, int displayLine)
     uint8_t charsPrinted;
 
     display.setColor(BLACK);
-    display.fillRect(0, SCROLL_TOP + displayLine * LINE_HEIGHT, 127, LINE_HEIGHT + 1);   // black out the line on screen
+    display.fillRect(0, lineToY(displayLine) + 1, 127, LINE_HEIGHT);   // black out the line on screen
     for (int i = 0; (c = textBuffer[bufferLine][i]); ++i)
     {
         if (c < 4)
@@ -420,8 +426,6 @@ uint8_t MorseDisplay::vprintOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos
 
 uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos, String mystring)
 {    // place a string onto the scroll area; line = 0, 1 or 2
-    uint8_t w;
-
     if (how > BOLD)
     {
         display.setColor(WHITE);
@@ -446,9 +450,12 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
     //if (xpos == 0)
     //        w = 127;
     //else
-    w = display.getStringWidth(mystring);
+    uint8_t w = display.getStringWidth(mystring);
 
-    display.fillRect(xpos * 9, SCROLL_TOP + line * LINE_HEIGHT, w, LINE_HEIGHT + 1);
+
+    int16_t x = xpos * 9;
+    int16_t y = lineToY(line);
+    display.fillRect(x, y, w, LINE_HEIGHT + 1);
 
     if (how > BOLD)
     {
@@ -459,7 +466,7 @@ uint8_t MorseDisplay::printOnScroll(uint8_t line, FONT_ATTRIB how, uint8_t xpos,
         display.setColor(WHITE);
     }
 
-    display.drawString(xpos * 9, SCROLL_TOP + line * LINE_HEIGHT, mystring);
+    display.drawString(x, y, mystring);
     display.display();
     MorseSystem::resetTOT();
     return w;         // we return the actual width of the output, in case of converted UTF8 characters
@@ -476,7 +483,8 @@ void MorseDisplay::printOnScrollFlash(uint8_t line, FONT_ATTRIB how, uint8_t xpo
 void MorseDisplay::clearLine(uint8_t line)
 {                                              /// clear a line - display is done somewhere else!
     display.setColor(BLACK);
-    display.fillRect(0, SCROLL_TOP + line * LINE_HEIGHT, 127, LINE_HEIGHT + 1);
+    int16_t y = lineToY(line);
+    display.fillRect(0, y, 127, LINE_HEIGHT + 1);
     display.setColor(WHITE);
 }
 
