@@ -1,4 +1,4 @@
-Work in progress 2.2.0
+Release 2.2.0
 
 * New game: Morse Tennis
 
@@ -10,6 +10,9 @@ Work in progress 2.2.0
   current mode. E.g. Encoder Click is no longer in every mode but only in the
   top level options because once you selected it, you probably don't care any
   more. Same for other more general config options like CurtisB DitT% and so on.
+  
+* Fixed the scrolling issue that lead to the lowest rows of pixels of
+  characters like "j" and "g" to be cut off.
 
 
 Release 2.1.0
