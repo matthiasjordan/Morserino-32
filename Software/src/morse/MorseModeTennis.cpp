@@ -141,7 +141,7 @@ boolean MorseModeTennis::menuExec(String mode)
     delay(600);
     MorseDisplay::clear();
     MorseDisplay::displayTopLine();
-    MorseDisplay::printToScroll(REGULAR, "");      // clear the buffer
+    MorseDisplay::clearScroll();
     MorseKeyer::setup();
     MorseKeyer::clearPaddleLatches();
     MorseKeyer::keyTx = false;

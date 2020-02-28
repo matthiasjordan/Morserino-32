@@ -271,6 +271,7 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
         refreshScrollArea((NoOfLines + bottomLine - 2) % NoOfLines);
         // reset the position pointers
         pos = screenPos = 0;
+        lastStyle = REGULAR;
         return;
     }
 
@@ -302,7 +303,7 @@ void MorseDisplay::printToScroll_internal(FONT_ATTRIB style, String text)
     {
         if (style == lastStyle)
         {                                // not regular, but we have no change in style!
-            if (textBuffer[bottomLine][pos - 1] < 4)
+            if ((pos >= 1) && textBuffer[bottomLine][pos - 1] < 4)
             {
                 pos -= 1;                                               // go one pos back to overwrite style marker
             }
