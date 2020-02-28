@@ -193,7 +193,6 @@ void MorseMenu::menu_()
     MorseLoRa::idle();
     MorseMenu::cleanStartSettings();
     MorseDisplay::clearScroll();                  // clear the buffer
-    MorseDisplay::clearScrollBuffer();
 
     MorseGenerator::keyOut(false, true, 0, 0);
     MorseGenerator::keyOut(false, false, 0, 0);
