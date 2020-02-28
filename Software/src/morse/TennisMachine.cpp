@@ -113,7 +113,6 @@ TennisMachine::InitialMessageEnvelope TennisMachine::parseInitial(String message
     msg.d.msgSet = ((uint8_t) m[1]) - 32;
     msg.d.scoring = ((uint8_t) m[2]) - 32;
     msg.text = String(&(m[3]));
-    printf("msg: p:%d m:%d s:%d %s <- %s\n", msg.protocolVersion, msg.d.msgSet, msg.d.scoring, msg.text.c_str(), message.c_str());
     return msg;
 }
 
@@ -128,7 +127,6 @@ String TennisMachine::encodeInitial(TennisMachine::InitialMessageEnvelope msg)
     buf[3] = 0;
     String prefix = String(buf);
     message = prefix + msg.text;
-    printf("msg: p:%d m:%d s:%d %s -> %s\n", msg.protocolVersion, msg.d.msgSet, msg.d.scoring, msg.text.c_str(), message.c_str());
     return message;
 }
 
@@ -146,7 +144,7 @@ void TennisMachine::StateInitial::onMessageReceive(String rawMessage)
     machine->client->handle(&inMsg.d);
     String message = inMsg.text;
     MORSELOGLN("StateInitial received " + message);
-    machine->client->print("DX proposing " + machine->client->getMsgSet()->name);
+    machine->client->print("DX proposing " + machine->client->getMsgSet()->name + "\n");
     WordBuffer msgBuf(message);
     if (msgBuf.matches(machine->client->getMsgSet()->cqCall))
     {
