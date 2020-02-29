@@ -112,7 +112,7 @@ void MorseModeTennis::updateMsgSet(uint8_t msgSetNo, TennisMachine::GameConfig& 
 
 void MorseModeTennis::updateScoringRules(unsigned char scoringRules, TennisMachine::GameConfig& gameConfig)
 {
-    MORSELOGLN("MMT::updateScoring " + String(scoringRules));
+    gameConfig.scoringNo = scoringRules;
     switch (scoringRules)
     {
         case 0:

@@ -24,6 +24,7 @@ class TennisMachine
         struct GameConfig {
             uint8_t msgSetNo;
             MessageSet msgSet;
+            uint8_t scoringNo;
             uint8_t receiverPoints;
             uint8_t senderPoints;
         };

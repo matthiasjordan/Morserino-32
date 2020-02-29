@@ -136,7 +136,7 @@ void TennisMachine::StateInitial::onMessageReceive(String rawMessage)
 
     if (inMsg.protocolVersion != TennisMachine::PROTOCOL_VERSION)
     {
-        machine->client->print("Spurious\nemission\nreceived :(");
+        machine->client->print("Spurious\nemission\nreceived :(\n");
         machine->client->challengeSound(false);
         return;
     }
@@ -165,6 +165,7 @@ void TennisMachine::StateInitial::onMessageTransmit(WordBuffer &message)
         String text = message.getFullPatternMatch();
         InitialMessageEnvelope msg;
         msg.d.msgSet = machine->config.msgSetNo;
+        msg.d.scoring = machine->config.scoringNo;
         msg.text = text;
         machine->client->send(encodeInitial(msg));
         machine->client->printSentMessage(text);
