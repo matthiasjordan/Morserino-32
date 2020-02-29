@@ -1,6 +1,6 @@
-= Morserino-32: User Manual
-W. Kraml (OE1WKL)
-v2.0 October 2019
+= Morselino-32: User Manual
+W. Kraml (OE1WKL), M. Jordan (DL4MAT)
+v2.2 March 2020
 :organization: Morserino-32 User Manual
 :doctype: book
 // Settings:
@@ -499,7 +499,7 @@ It mostly works like the Generator mode concerning preferences. The main differe
 This is a game for two players. The basic idea is that they throw words at each other and the receiving party has to repeat the word they just received. It's a bit like a cross between Echo Trainer and Tetris for two players. If the word is repeated correctly, the receiver scores. To make it a bit harder to send random garbage of epic length, the sender has to repeat the word to send themselves in order for it to get sent.
 
 
-==== Basic play
+==== Basic game play
 
 In order to establish a game, both players have to enter the Morse Tennis mode. One has to send cq, the other one has to reply.
 The cq call is "cq de <yourcall>" with "<yourcall>" replaced by this player's call sign (or any handle to be used in the game). If this message is given correctly, it will be sent to the other player who can reply to the call by sending "<yourcall> de <mycall>", with (no surprise here) "<mycall>" replaced by the second players call or handle. The first player has to acknowlege this reply by sending "<mycall> de <yourcall>" themselves and the game commences.
@@ -534,7 +534,7 @@ Similar, when tasked with sending a word two times in a row, the following would
 The message is sent as soon as the input ends in the same word twice in a row.
 
 
-==== Advanced play
+==== Advanced game play
 
 The above game play is primarily intended for beginners. For players interested in stricter adherence to the way morse QSOs are handled, there are two other message sets to be chosen from: "Intermediate" and "Hardcore". These options affect how messages expected in the game should be given. I'll explain how these options work in the following two examples.
 
@@ -556,6 +556,7 @@ Hardcore:
 
 There is also an option that switches the scoring method to cooperative. In this mode, both sender and receiver score a point when the receiver manages to key the word correctly. Since this scoring is a strong incentive to just send "e" back and forth, at least one player should try to sneak in a more difficult word from time to time when the [line-through]#kid# other player seems receptive to it.
 
+Concerning the options, players have to know that changes to the options are only observed after re-entering the mode Morse Tennis.
 
 
 ==== Ending and restarting

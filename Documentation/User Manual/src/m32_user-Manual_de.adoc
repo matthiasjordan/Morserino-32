@@ -1,6 +1,6 @@
-= Morserino-32: Benutzerhandbuch
-W. Kraml (OE1WKL)
-v2.0 October 2019
+= Morselino-32: Benutzerhandbuch
+W. Kraml (OE1WKL), M. Jordan (DL4MAT)
+v2.2 Februar 2020
 :organization: Morserino-32 Benutzerhandbuch
 :doctype: book
 // Settings:
@@ -491,6 +491,76 @@ Der Modus funktionert im Grunde so wieder Generator-Modus hinsichtlich der Optio
 
 * Das linke Paddle wird das zuvor gemorste Wort wiederholen, für den Fall, dass du dir nicht sicher bist, was du gehört hast.
 * Das rechte Paddle deckt das gemorste Wort auf und pausiert, bis du wieder das rechte Paddle antippst.
+
+
+
+=== Morse Tennis
+
+Das ist ein Spiel für zwei Spieler. Die grundlegende Idee ist das die Spieler sich einander Wörter zuwerfen, die der andere dann wiederholen muss. Es ist im Grunde eine Kreuzung aus Echo Trainer und Tetris für zwei Spieler. Wenn das Wort dann korrekt wiederholt wurde, bekommt der Empfänger einen Punkt. Um es ein bisschen schwieriger zu machen, einfach irgendwelchen Müll epischer Länge zu senden, muss der Sender das zu sendende Wort selbst einmal wiederholen, damit es zum anderen Spieler gesendet wird.
+
+
+==== Einfacher Spielfluss
+
+Um ein Spiel zu starten, müssen beide Spieler in den Modus "Morse Tennis" gehen. Einer muss dann cq senden, der andere muss antworten. Der cq-Ruf ist "cq de <deinrufzeichen>", wobei <deinrufzeichen> ersetzt werden muss durch das Rufzeichen (oder einen Spitznamen) des Spielers, der cq ruft. Wenn die Nachricht korrekt gegeben wurde, wird sie an den anderen Spieler gesendet, der antworten kann, indem er "<deinrufzeichen> de <meinrufzeichen>" sendet, wobei (vermutlich wenig überraschend) <meinrufzeichen> durch das Rufzeichen des zweiten Spielers ersetzt werden muss. Der erste Spieler muss dann diese Antwort noch einmal bestätigen, indem er "<meinrufzeichen> de <deinrufzeichen>" sendet, und das Spiel beginnt.
+
+Ein Beispiel für die Spielstart-Sequenz, in der der erste Spieler das Rufzeichen "tom" verwendet und der zweite Spieler das Rufzeichen "pa" wäre dann
+
+. cq de tom
+. tom de pa
+. pa de tom
+
+Zusammen mit dem eröffnenden cq-Ruf werden die Spiel-Einstellungen übertragen, sodass beide Spieler dasselbe Setup zum Spiel verwenden.
+
+Nach diesem initialen Austausch wechseln sich die Spieler ab. Der Spieler, der das Spiel durch seinen cq-Ruf initiiert hat, muss als erster ein Wort senden. Wie bereits erwähnt, muss das Wort zwei mal gegeben werden, damit es gesendet wird. Wenn der sendende Spieler das geschafft hat, muss der empfangende Spieler das Wort wiederholen. Schafft er das, bekommt er einen Punkt. In jedem Fall wechselt die Initiative nach einem Versuch, das Wort zu wiederholen, an den Spieler, der eben das Wort empfangen hat. Nun ist er an der Reihe, ein Wort zwei mal zu gegeben, um es zu senden.
+
+Ein Beipiel für den weiteren Spielverlauf ist:
+
+. tom gibt "foo fo", nichts passiert
+. tom gibt "foo foo", "foo" wird an pa gesendet
+. pa empfängt "foo" und gibt "foo", womit er einen Punkt macht.
+. pa gibt nun "bar bar", womit er "bar" an tom sendet.
+. tom empfängt "bar" und gibt "baa", macht daher keinen Punkt.
+
+In jedem Fall wird der Morserino die erwartete Nachricht wenden, wenn sie in der Eingabe des gebenden Spielers erkannt wurde. Bei einem Fehler muss also nicht das letzte Wort mit <err> "gelöscht" werden, sondern man fängt einfach wieder am Anfang an und probiert es nochmal. Im folgenden Beispiel versucht tom seinen cq-Ruf zu senden, aber vermorst sich die ersten zwei mal:
+
+. cq di cc cq de tom ("cq de tom" wird dann gesendet)
+
+Das gleiche gilt, wenn ein Spieler an der Reihe ist, ein Wort zweimal zu geben. Im Folgenden würde also "baz" gesendet:
+
+. baz bag d bw baz baz
+
+Die Nachricht wird gesendet, sobald die Eingabe mit demselben Wort zwei mal hintereinander endet.
+
+
+==== Fortgeschrittener Spielfluss
+
+Die oben beschriebene Spielweise ist primär für Anfänger gedacht. Spieler, die sich enger an die übliche Form von Morse-QSOs halten wollen, können zwei andere Message Sets verwenden: "Intermediate" und "Hardcore". Diese Optionen bestimmen, wie Nachrichten im Spiel aussehen sollen. Die folgenden Beispiele erklären die Unterschiede:
+
+
+Intermediate:
+
+. tom sendet: cq cq cq de tom tom tom <ar>
+. pa sendet: tom de pa k
+. tom sendet: pa de tom k (das Spiel beginnt nun )
+. tom sendet: foo foo (und sendet damit "foo" an pa)
+. pa sendet: foo (und macht einen Punkt)
+
+Hardcore:
+
+. tom sendet: cq cq cq de tom tom tom <ar>
+. pa sendet: tom de pa k
+. tom sendet: pa de tom k 
+. tom sendet: pa de tom foo foo k 
+. pa sendet: tom de pa foo 
+
+Es gibt auch eine Option, die Punktevergabe in einen kooperativen Modus zu schalten. In diesem Modus bekommen beide Spieler einen Punkt, wenn der Empfänger es schafft, das Wort korrekt zu wiederholen. Da diese Art der Bepunktung ein starkes Incentive dafür ist, sich einfach den Buchstaben "e" hin-und-her zu senden, sollte wenigstens ein Spieler vesuchen, hin und wieder ein schwierigeres Wort reinzumogeln, wenn [line-through]#das Kind#der Spielpartner empfänglich dafür erscheint.
+
+Bei den Optionen ist zu beachten, dass Änderungen erst beim erneuten Starten des Modus "Morse Tennis" aktiv werden.
+
+
+==== Beenden und neu starten
+
+Spieler, die das Spiel verlassen wollen, senden <sk>. Das Spiel neustarten kann man dann mit <ka>.
 
 
 
