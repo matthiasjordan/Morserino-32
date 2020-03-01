@@ -777,20 +777,11 @@ Again, you double click the black knob first to get into the parameters menu. No
 You can also delete a snapshot that is no longer needed, or that was created in error. Proceed as if you wanted to recall a snapshot, select the one you want to delete, and then click the RED button for deleting it. Like with storing and recalling snapshots, a short message will indicate that the action was successful.
 
 
-=== General Parameters
-A number of parameters are very generic in nature, and therefore apply to all modi of the Morserino-32.
 
-These are:
+=== List of all Morserino-32 parameters
 
-`Encoder Click`: If you do not want to hear a click whenever you turn the encoder, set this to off.
+Below listed are all parameters available in all modes. If outside of a mode, all parameters are actually available. Inside of a mode, only those parameters are available that are specific to the current mode. This prevents users from having to page over a gazillion options that they set months ago and are perfectly happy with, like the paddle polarity and other items of personal preference that don't change super often.
 
-`Tone Pitch`: The frequency of the side tone for the Morse code.
-
-`Time Out`:  If this is set to a value other than "No timeout" , the M32 will go into deep sleep mode after a specified time without any activity on the screen.  You can restart teh M32 by pressing the RED button.
-
-`Quick Start`: If this is set to ON, the M32 will immediately execute the Modus that was last active whenever it is switched on or restarted from deep sleep.
-
-=== List of All Morserino-32 Parameters
 Bold values are standard or recommended ones. When called from the start menu, all parameters are available for modification, when called from a running modus, only those that are relevant for this modus are available.
 
 [cols="2,6,3",options=header]
@@ -802,6 +793,7 @@ Bold values are standard or recommended ones. When called from the start menu, a
 
 | Encoder Click | Turning the encoder may generate a short tone burst, or be silent   | Off / On
 | Tone Pitch Hz   | The frequency of the side tone, in Hz | A series of tones between 233 and 932 Hz, corresponding to the musical notes of the B flat major scale from b flat to b'' flat (2 octaves)
+| Straight key | If set to Yes, the input device is assumed to be an old-school straight key. The internal paddle will accept straight-key-like tapping and the externally connected thing, too, which is particularly awesome if it actually is a straight key. This option applies to all modes, except where it does not make any sense - e.g. CW Generator and Keyer modes. | Yes / No
 | External Pol.        | Allows to reverse the polarity of an external paddle. Use this if your external paddle is wired "the wrong way", so that dots and dashes of internal and external paddle are all on the same side. | Normal / Reversed
 | Paddle Polarity | Defines which paddle side is for dits, and which for dahs | ` _. dah-dit` / **`._ di-dah`**
 | Latency | Defines how long after generating the current element (dot or dash) the paddles will be „deaf“. If it is 0, you have to release the paddle while the last element is still „on“. If set to 7, the paddles will only react to a paddle press after 7/8 of a dot length. | A value between 0 and 7, meaning 0/8 to 7/8 of a dot length (default is **4**, i.e. half a dot length).
@@ -832,7 +824,6 @@ Bold values are standard or recommended ones. When called from the start menu, a
 | Koch Sequence | This determines the sequence of characters when you use the Koch method for learning and training. | **M32 / JLMC** (Just Learn Morse Code)  /  LCWO
 | Time Out | If the time specified in this parameter passes without any display updates, the device will go into deep sleep mode. You can restart it by pressing the RED button. | No timeout / **5 min** / 10 min / 15 min
 | Quick Start | Allows you to bypass the intial menu selection, i.e.  at startup the device will immediately begin executing the modus that had been in effect before last shutdown. | ON / **OFF**
-| Auto Stop | Stops the generating of morse characters after each word in CW Generator and Koch Generator modes to help with learning head copying. Continue by touching the paddle or pressing the rotary encoder to show the word, and by doing this again to generate the next word. | ON / **OFF**
 |===
 
 == Appendices

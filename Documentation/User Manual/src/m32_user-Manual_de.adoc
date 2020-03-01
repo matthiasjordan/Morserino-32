@@ -776,20 +776,11 @@ Auch hier steigt man mit einem Doppelklick auf den schwarzen Knopf zuerst in das
 Man kann Snapshots auch löschen, die nicht mehr benötigt werden oder  versehentlich erstellt wurden. Gehen dabei so vor, als ob du einen Snapshot abrufen möchtest, wähle  den zu löschenden Snapshot mit dem Drehgeber aus, und klicke  dann auf die ROTE Taste zum Löschen. Wie beim Speichern und Abrufen von Snapshots zeigt eine kurze Meldung an, dass die Aktion erfolgreich war.
 
 
-=== Allgemeine Parameter
-Eine Reihe von Parametern sind sehr allgemeiner Natur und gelten daher für alle Modi des Morserino-32.
-
-Das sind:
-
-`Encoder Click`: Wenn man kein Klicken hören möchten, wenn man den Drehgeber dreht, stelle diesen Parameter auf OFF.
-
-`Tone Pitch`: Die Frequenz des Mithörtonse.
-
-`Time Out`:  Wenn dieser Wert auf einen anderen Wert als "No timeout" eingestellt ist, geht der M32 nach einer bestimmten Zeit ohne Aktivität auf dem Bildschirm in den Tiefschlafmodus.  Man kann den  M32 durch Drücken der ROTEN Taste neu starten.
-
-`Quick Start`: Wenn diese Einstellung auf ON gesetzt ist, führt der M32 nach dem Start sofort den Modus aus, der zuletzt aktiv war, ohne vorher im Menü stehen zu bleiben.
 
 === Liste aller Morserino-32 Parameter
+
+Unten sind alle Parameter aufgelistet, die in allen Modi verfügbar sind. Wenn man außerhalb eines Modus ist, sind all dieses Parameter tatsächlich verfügbar. Innerhalb eines Modus sind nur die Parameter verfügbar, die für den aktuellen Modus spezifisch sind. Das verhindert, dass Benutzer ständig über eine Fantastilliarde an Optionen blättern müssen, die sie bereits vor Monaten konfiguriert haben und mit denen sie absolut zufrieden sind, wie z.B. der Paddle Polarity oder anderen Gegenständen personlicher Präferenz, die sich nicht so häufig ändern.
+
 Fettgedruckte Werte sind Standard- oder empfohlene Werte. Beim Aufruf aus dem Startmenü stehen alle Parameter zum Ändern zur Verfügung, beim Aufruf aus einem laufenden Modus nur jene, die für diesen Modus relevant sind.
 
 [cols="2,6,3",options=header]
@@ -801,6 +792,7 @@ Fettgedruckte Werte sind Standard- oder empfohlene Werte. Beim Aufruf aus dem St
 
 | Encoder Click | Das Drehen des Drehgebers kann einen kurzen Tonimpuls erzeugen oder ohne Ton erfolgen   | Off / On
 | Tone Pitch Hz   | Die Frequenz des Mithörtons, in Hz | Eine Reihe von Tönen zwischen 233 und 932 Hz, die den musikalischen Noten der B-Dur-Skala von b zu b''  entsprechen (2 Oktaven).
+| Straight key | Wenn auf Yes, wird angenommen, dass das Eingabegerät eine Old-School-Morsetaste ist. Das interne Paddle wird dann Taps wie bei einer Morsetaste behandeln und extern angeschlossene Morsetasten funktionieren als solche, was besonders dann super ist, wenn man tatsächlich eine Morsetaste angeschlossen hat. Diese Option funktioniert in allen Modi, außer in denen, wo es keinen Sinn macht - z.B. beim CW Generator oder Keyer. | Yes / No
 | External Pol.        | Ermöglicht die Umkehrung der Polarität eines externen Paddels. Verwende dies, wenn das externe Paddel "falsch herum" verdrahtet ist, so dass Punkte und Striche des internen und externen Paddels alle auf der gleichen Seite liegen. | Normal / Reversed
 | Paddle Polarity | Legt fest, welche Paddelseite für Dits ist und welche für Dahs. | ` _. dah-dit` / **`._ di-dah`**
 | Latency | Legt fest, wie lange nach dem Erzeugen des aktuellen Elements (Punkt oder Strich) die Paddel "taub" sind. Wenn der Wert 0 ist, muss man das Paddel loslassen, während das letzte Element noch "an" ist. Ist der Wert auf 7 eingestellt, reagieren die Paddel erst nach 7/8 einer Punktlänge auf eine Berührung. | Ein Wert zwischen 0 und 7, also 0/8 bis 7/8 einer Punktlänge (Standardwert ist **4**, d.h. eine halbe Punktlänge).
@@ -831,7 +823,6 @@ Fettgedruckte Werte sind Standard- oder empfohlene Werte. Beim Aufruf aus dem St
 | Koch Sequence | Dies bestimmt die Reihenfolge der Zeichen, wenn man die Koch-Methode zum Lernen und Trainieren verwendet. | **M32 / JLMC** (Just Learn Morse Code)  /  LCWO
 | Time Out | Wenn die in diesem Parameter angegebene Zeit ohne Aktualisierung der Anzeige vergeht, geht das Gerät in den Tiefschlafmodus. Man kann es durch Drücken der ROTEN Taste neu starten. | No timeout (kein Timeout)/ **5 min** / 10 min / 15 min
 | Quick Start | Ermöglicht es (gesetzt auf ON), die anfängliche Menüauswahl zu umgehen, d.h. das Gerät beginnt beim Start sofort mit der Ausführung des Modus, der vor dem letzten Ausschalten wirksam war. | ON / **OFF**
-| Auto Stop | Wenn auf ON gestellt, stoppt die Erzeugung von Morsezeichen nach jedem Wort im CW-Generator-Modus, um das Erlernen des Gehörlesens zu erleichtern. Nach Berühren des Paddels oder Drücken des Drehgebers wird das Wort abgezeigt, und indem man dies erneut tut, wird das nächste Wort  generiert. | ON / **OFF**
 |===
 
 == Anhänge
