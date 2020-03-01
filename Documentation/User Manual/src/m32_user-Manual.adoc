@@ -15,8 +15,7 @@ ifeval::["{asciidoctor-version}" < "1.5.7"]
 :legacy-footnoteref:
 endif::[]
 ifdef::backend-pdf[]
-:pdf-theme: m32
-:pdf-themesdir: {docdir}
+:pdf-theme: m32-theme.yml
 :source-highlighter: rouge
 //:rouge-style: github
 :media: prepress

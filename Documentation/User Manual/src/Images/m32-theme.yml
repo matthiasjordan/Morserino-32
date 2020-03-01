@@ -7,7 +7,7 @@ page:
   margin-outer: 2.5cm
 title-page:
   logo:
-    image: m32c.png
+    image: M32c.png
   title:
      font-size: 24
      font_color: D32F2F
@@ -47,12 +47,12 @@ footer:
     right:
       content: '{chapter-title} | {page-number}'
     left:
-      content: image:m32c.png[pdfwidth=0.25in]
+      content: image:M32c.png[pdfwidth=0.25in]
   verso:
     left:
       content: '{page-number} | {chapter-title}'
     right:
-      content: image:m32c.png[pdfwidth=0.25in]
+      content: image:M32c.png[pdfwidth=0.25in]
 table:
   border-color: 888888
   stripe-background-color: AAAAAA
