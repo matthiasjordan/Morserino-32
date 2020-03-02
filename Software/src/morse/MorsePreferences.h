@@ -153,7 +153,7 @@ namespace MorsePreferences
             uint8_t maxSequence = 0;                  // max # of words generated beofre the Morserino pauses
 
             uint8_t tennisMsgSet = 0;
-            uint8_t tennisScoringRules = 0;
+            uint8_t tennisScoringRules = 1;
             ////// end of variables stored in preferences
 
     };
