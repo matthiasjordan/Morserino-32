@@ -5,6 +5,7 @@
 #include "MorseMachine.h"
 #include "MorseDisplay.h"
 #include "MorseInput.h"
+#include "MorsePreferences.h"
 
 MorseModeTrx morseModeTrx;
 
@@ -23,7 +24,6 @@ boolean MorseModeTrx::menuExec(String mode)
     MorseDisplay::displayCWspeed();
     MorseDisplay::displayVolume();
 
-    MorseKeyer::keyTx = true;
     MorseInput::start([](String s) {
         MorseDisplay::printToScroll(FONT_OUTGOING, s);
     }, [](){
@@ -38,6 +38,8 @@ boolean MorseModeTrx::menuExec(String mode)
     {
         MorseDisplay::printToScroll(FONT_INCOMING, " ");
     };
+
+    onPreferencesChanged();
     return true;
 }
 
@@ -53,6 +55,7 @@ boolean MorseModeTrx::loop()
 
 void MorseModeTrx::onPreferencesChanged()
 {
+    MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 1);
 }
 
 boolean MorseModeTrx::togglePause()
