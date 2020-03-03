@@ -65,6 +65,8 @@ boolean MorseModeLoRa::menuExec(String mode)
 
         MorseDisplay::getConfig()->autoFlush = true;
 
+        onPreferencesChanged();
+
         MorseLoRa::receive();
     }
     return true;
@@ -87,6 +89,6 @@ boolean MorseModeLoRa::togglePause()
 
 void MorseModeLoRa::onPreferencesChanged()
 {
-
+    MorseInput::setStraightKeyFromPrefs();
 }
 

@@ -56,6 +56,7 @@ boolean MorseModeTrx::loop()
 void MorseModeTrx::onPreferencesChanged()
 {
     MorseKeyer::keyTx = (MorsePreferences::prefs.keyTrainerMode == 1);
+    MorseInput::setStraightKeyFromPrefs();
 }
 
 boolean MorseModeTrx::togglePause()

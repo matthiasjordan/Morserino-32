@@ -12,8 +12,6 @@
 
 using namespace MorseInput;
 
-
-
 void MorseInput::start(void (*onCharacter)(String), void (*onWordEnd)())
 {
     Decoder::startDecoder();
@@ -24,18 +22,25 @@ void MorseInput::start(void (*onCharacter)(String), void (*onWordEnd)())
     MorseKeyer::onCharacter = onCharacter;
     MorseKeyer::onWordEnd = onWordEnd;
     MorseKeyer::clearPaddleLatches();
+    setStraightKeyFromPrefs();
 }
 
 boolean MorseInput::doInput()
 {
     boolean busy = false;
 
-    if (MorsePreferences::prefs.useStraightKey) {
+    if (MorsePreferences::prefs.useStraightKey)
+    {
         busy = Decoder::doDecodeShow();
     }
-    else {
+    else
+    {
         busy = MorseKeyer::doPaddleIambic();
     }
     return busy;
 }
 
+void MorseInput::setStraightKeyFromPrefs()
+{
+    Decoder::config.straightKeyInput = MorsePreferences::prefs.useStraightKey;
+}

@@ -25,6 +25,8 @@
 
 using namespace Decoder;
 
+Decoder::Config Decoder::config;
+
 const struct linklist Decoder::CWtree[71] = { //
         {"", 1, 2},            // 0
                 {"e", 3, 4},         // 1
@@ -210,6 +212,8 @@ void Decoder::setupGoertzel()
 
 void Decoder::startDecoder()
 {
+    config.straightKeyInput = false;
+
     Decoder::onCharacter = [](String s)
     {};
     Decoder::onWordEnd = []()
@@ -272,13 +276,17 @@ uint8_t Decoder::getDecodedWpm()
 
 #define straightPin leftPin
 
+/*
+ * return true if a straight key was closed, or a touch paddle touched
+ */
 boolean internal::straightKey()
-{            // return true if a straight key was closed, or a touch paddle touched
-//    if ((MorseMachine::isMode(MorseMachine::morseDecoder)) && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey))
-    if (((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey))
+{
+    if (config.straightKeyInput && ((!digitalRead(straightPin)) || MorseKeyer::leftKey || MorseKeyer::rightKey)) {
         return true;
-    else
+    }
+    else {
         return false;
+    }
 }
 
 boolean internal::checkTone()

@@ -7,6 +7,7 @@ namespace MorseInput {
 
     void start(void (*onCharacter)(String), void (*onWordEnd)());
     boolean doInput();
+    void setStraightKeyFromPrefs();
 }
 
 

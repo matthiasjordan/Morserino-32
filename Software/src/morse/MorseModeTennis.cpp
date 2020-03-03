@@ -168,6 +168,8 @@ boolean MorseModeTennis::menuExec(String mode)
 
     MorseDisplay::getConfig()->autoFlush = true;
 
+    onPreferencesChanged();
+
     MorseLoRa::receive();
 
     machine.start();
@@ -193,7 +195,7 @@ boolean MorseModeTennis::togglePause()
 
 void MorseModeTennis::onPreferencesChanged()
 {
-
+    MorseInput::setStraightKeyFromPrefs();
 }
 
 /**

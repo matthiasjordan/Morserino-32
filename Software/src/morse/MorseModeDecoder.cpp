@@ -44,6 +44,7 @@ boolean MorseModeDecoder::menuExec(String mode)
     Decoder::onWordEnd = []()
     {   MorseDisplay::printToScroll(FONT_INCOMING, " ");};
 
+    onPreferencesChanged();
     return true;
 }
 
@@ -58,5 +59,5 @@ boolean MorseModeDecoder::togglePause() {
 }
 
 void MorseModeDecoder::onPreferencesChanged() {
-    // nothing to do
+    Decoder::config.straightKeyInput = true;
 }

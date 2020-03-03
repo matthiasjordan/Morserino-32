@@ -14,6 +14,10 @@
 namespace Decoder
 {
 
+    struct Config {
+        boolean straightKeyInput;
+    };
+
     // morse code decoder
 
     struct linklist
@@ -31,6 +35,8 @@ namespace Decoder
     extern void (*onWordEnd)();
     extern void (*onDit)();
     extern void (*onDah)();
+
+    extern Config config;
 
     /// state machine for decoding CW
     enum DECODER_STATES

@@ -130,6 +130,8 @@ void MorseModeEchoTrainer::onPreferencesChanged()
     {   morseModeEchoTrainer.onLastWord();};
     generatorConfig->onGeneratorWordEnd = []()
     {   return morseModeEchoTrainer.onGeneratorWordEnd();};
+
+    MorseInput::setStraightKeyFromPrefs();
 }
 
 boolean MorseModeEchoTrainer::togglePause()
