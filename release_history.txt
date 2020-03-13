@@ -1,3 +1,9 @@
+Release 2.2.1
+
+* New games of Morse Tennis failed to reset the score of the previous game. 
+  This bug has been fixed.
+  
+
 Release 2.2.0
 
 * New game: Morse Tennis
