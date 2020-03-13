@@ -11,6 +11,8 @@ class MorseModeEchoTrainer: public MorseMode
                 boolean generateStartSequence;
                 boolean showPrompt;
                 boolean showFailedWord;
+                int speedUpAfter;
+                int speedDownAfter;
         } Config;
 
         boolean menuExec(String mode) override;
@@ -40,6 +42,8 @@ class MorseModeEchoTrainer: public MorseMode
         boolean echoStop;                         // for maxSequence
         boolean active;                           // flag for trainer mode
         int repeats;
+        int correctInARow;
+        int wrongInARow;
         echoStates echoTrainerState;
 
 

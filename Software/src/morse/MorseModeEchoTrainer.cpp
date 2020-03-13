@@ -42,24 +42,20 @@ void MorseModeEchoTrainer::startEcho()
     MorseMachine::morseState = MorseMachine::echoTrainer;
     MorseGenerator::setStart();
 
-    MorseInput::start(
-    [](String r)
+    MorseInput::start([](String r)
     {
         MorseDisplay::printToScroll(FONT_OUTGOING, r);
         morseModeEchoTrainer.storeCharInResponse(r);
-    },
-    []()
+    }, []()
     {
         MorseDisplay::printToScroll(FONT_OUTGOING, " ");
         morseModeEchoTrainer.onKeyerWordEndNDitDah();
     });
 
-
     MorseText::proceed();
     MorseText::onGeneratorNewWord = [](String r)
     {   morseModeEchoTrainer.onGeneratorNewWord(r);};
 
-    MorseModeEchoTrainer::echoStop = false;
     MorseDisplay::getKeyerModeSymbol = MorseDisplay::getKeyerModeSymbolWStraightKey;
     MorseDisplay::clear();
     MorseDisplay::printOnScroll(0, REGULAR, 0, MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) ? "New Character:" : "Echo Trainer:");
@@ -74,8 +70,17 @@ void MorseModeEchoTrainer::startEcho()
 
     metConfig.showFailedWord = !MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn);
     metConfig.generateStartSequence = false;
+    metConfig.speedUpAfter = 5;
+    metConfig.speedDownAfter = 3;
 
     MorseText::getConfig()->generateStartSequence = metConfig.generateStartSequence;
+
+    echoStop = false;
+    active = false;
+    repeats = 0;
+    correctInARow = 0;
+    wrongInARow = 0;
+
     if (metConfig.generateStartSequence)
     {
         echoTrainerState = START_ECHO;
@@ -84,7 +89,6 @@ void MorseModeEchoTrainer::startEcho()
     {
         echoTrainerState = SEND_WORD;
     }
-    MorseModeEchoTrainer::active = false;
 }
 
 boolean MorseModeEchoTrainer::onKeyerWordEnd()
@@ -167,6 +171,8 @@ void MorseModeEchoTrainer::echoTrainerEval()
     delay(MorseKeyer::interCharacterSpace / 2);
     if (echoResponse == echoTrainerWord)
     {
+        correctInARow += 1;
+        wrongInARow = 0;
         echoTrainerState = SEND_WORD;
         MorseDisplay::printToScroll(BOLD, "OK\n");
         if (MorsePreferences::prefs.echoConf)
@@ -174,14 +180,17 @@ void MorseModeEchoTrainer::echoTrainerEval()
             MorseSound::soundSignalOK();
         }
         delay(MorseKeyer::interWordSpace);
-        if (MorsePreferences::prefs.speedAdapt)
+        if (MorsePreferences::prefs.speedAdapt && (correctInARow >= metConfig.speedUpAfter))
         {
             MorseKeyer::changeSpeed(1);
+            correctInARow = 0;
         }
         MorseText::proceed();
     }
     else
     {
+        correctInARow = 0;
+        wrongInARow += 1;
         echoTrainerState = REPEAT_WORD;
         if (!MorseMenu::isCurrentMenuItem(MorseMenu::_kochLearn) || echoResponse != "")
         {
@@ -197,9 +206,10 @@ void MorseModeEchoTrainer::echoTrainerEval()
         }
 
         delay(MorseKeyer::interWordSpace);
-        if (MorsePreferences::prefs.speedAdapt)
+        if (MorsePreferences::prefs.speedAdapt && (wrongInARow >= metConfig.speedDownAfter))
         {
             MorseKeyer::changeSpeed(-1);
+            wrongInARow = 0;
         }
     }
     echoResponse = "";
