@@ -221,11 +221,6 @@ void MorseModeEchoTrainer::echoTrainerEval()
  */
 unsigned long MorseModeEchoTrainer::onGeneratorWordEnd()
 {
-    if (!MorseMachine::isMode(MorseMachine::echoTrainer))
-    {
-        return -1;
-    }
-
     unsigned long delta = 0;
 
     switch (MorseModeEchoTrainer::getState())
