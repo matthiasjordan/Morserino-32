@@ -96,6 +96,8 @@ const char* TennisMachine::StateInitial::getName()
 
 void TennisMachine::StateInitial::onEnter()
 {
+    machine->gameState.dx = Station();
+    machine->gameState.us = Station();
     MORSELOGLN("StateInitial entered");
     machine->client->print("Send cq or\nwait for qso!\n");
 }

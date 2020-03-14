@@ -2,7 +2,13 @@ Work in Progress 2.3.0
 
 * Echo trainer mode's speed adapt option will only change the speed after five
   consecutive successes or failures.
-  
+
+
+Release 2.2.1
+
+* New games of Morse Tennis failed to reset the score of the previous game. 
+  This bug has been fixed.
+
 
 Release 2.2.0
 
