@@ -14,7 +14,7 @@ const String PROJECTNAME = "Morselino-32";
 #endif
 
 //////// Program Version
-#define BETA false
+#define BETA true
 
 ///// its is crucial to have the right board version - Boards 2 and 2a (prototypes only) set it to 2, Boards 3 set it to 3
 ///// the Board Version 2 is for HEltec Modules V1 only, Board Version 3 for Heltec V2 only
@@ -29,7 +29,7 @@ const String PROJECTNAME = "Morselino-32";
 #define CWLORAVERSION B01
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 2
+#define VERSION_MINOR 3
 #define VERSION_BUGFIX 0
 
 enum DISPLAY_TYPE
